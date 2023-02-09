@@ -11,3 +11,6 @@ build:
 
 update:
 	GO111MODULE="off" go get -v -u -x .
+
+clean:
+	rm control-panel-dns

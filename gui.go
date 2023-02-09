@@ -3,8 +3,11 @@ package main
 
 import 	(
 	"os"
+	"os/user"
 	"log"
+	"net"
 	"git.wit.org/wit/gui"
+	"github.com/davecgh/go-spew/spew"
 )
 
 // This initializes the first window
@@ -31,6 +34,8 @@ func initGUI() {
 
 func addDemoTab(window *gui.Node, title string) {
 	var newNode, g, g2, tb *gui.Node
+	var err error
+	var name string
 
 	newNode = window.NewTab(title)
         log.Println("addDemoTab() newNode.Dump")
@@ -53,6 +58,32 @@ func addDemoTab(window *gui.Node, title string) {
 		s := tb.GetText()
 		log.Println("text =", s)
 	}
+	g2.NewButton("hello", func () {
+		log.Println("world")
+		scanInterfaces()
+	})
+	g2.NewButton("os.Hostname()", func () {
+		name, err = os.Hostname()
+		log.Println("name =", name, err)
+	})
+	g2.NewButton("os.User()", func () {
+		user, _ := user.Current()
+		spew.Dump(user)
+		log.Println("os.Getuid =", os.Getuid())
+	})
+	g2.NewButton("Escalate()", func () {
+		Escalate()
+	})
+	g2.NewButton("LookupAddr(<raw ipv6>) == fire from /etc/hosts", func () {
+		host, err := net.LookupAddr("2600:1700:afd5:6000:b26e:bfff:fe80:3c52")
+		if err != nil {
+			return
+		}
+		log.Println("host =", host)
+	})
+	g2.NewButton("DumpPublicDNSZone(apple.com)", func () {
+		DumpPublicDNSZone("apple.com")
+	})
 }
 
 func myDefaultExit(n *gui.Node) {
