@@ -1,4 +1,7 @@
-// This creates a simple hello world window
+// Various Linux/Unix'y things
+
+// https://wiki.archlinux.org/title/Dynamic_DNS
+
 package main
 
 import 	(
@@ -38,4 +41,14 @@ func DumpPublicDNSZone(zone string) {
 	for _, entry := range entries {
 		log.Println(entry)
 	}
+}
+
+func dumpIPs(host string) {
+    ips, err := net.LookupIP(host)
+        if err != nil {
+                log.Fatal(err)
+        }
+        for _, ip := range ips {
+                log.Println(host, ip)
+        }
 }

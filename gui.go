@@ -83,6 +83,7 @@ func addDemoTab(window *gui.Node, title string) {
 	})
 	g2.NewButton("DumpPublicDNSZone(apple.com)", func () {
 		DumpPublicDNSZone("apple.com")
+		dumpIPs("www.apple.com")
 	})
 }
 

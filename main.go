@@ -9,10 +9,14 @@ import 	(
 	arg "github.com/alexflint/go-arg"
 )
 
+var me Host
+
 func main() {
 	arg.MustParse(&args)
 	// fmt.Println(args.Foo, args.Bar, args.User)
 	log.Println("Toolkit = ", args.Toolkit)
+
+	me.ips = make(map[string]*IPtype)
 
 	// gui.InitPlugins([]string{"andlabs"})
 
