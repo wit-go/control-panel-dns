@@ -9,6 +9,13 @@ Goals:
 * Run as a daemon
 * When run in GUI, add status via systray
 
+# Rational
+
+With the advent of IPv6, it is finally possible again to have real hostnames for
+your machines, desktops, laptops, vm's, etc. This control panel will poll for
+changes, find out what the DNS entries are, then, if they are not correct, attempt
+to update the DNS server.
+
 ## References
 
 Useful links and other

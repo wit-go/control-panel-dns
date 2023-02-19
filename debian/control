@@ -1,9 +1,9 @@
-Source: go-wit-gui
+Source: control-panel-dns
 Build-Depends: golang
-Package: go-wit-gui 
+Package: control-panel-dns
 Maintainer: Jeff Carr <jcarr@wit.com>
 Architecture: amd64
 Depends:
-Recommends: libgtk-3-0
-Description: a abstraction layer for Go visual elements (GTK, QT, etc)
- Package gui implements a abstraction layer for Go visual elements.
+Recommends: libgtk-3-0, ddclient, ddupdate
+Description: a control panel for DNS and IPv6 settings
+ Goals: show the settings, validate & update DNS

@@ -7,7 +7,6 @@ package main
 import 	(
 	"os"
 	"os/exec"
-	"log"
 	"net"
 //	"git.wit.org/wit/gui"
 //	"github.com/davecgh/go-spew/spew"
@@ -19,13 +18,13 @@ func CheckSuperuser() bool {
 
 func Escalate() {
 	if os.Getuid() != 0 {
-		cmd := exec.Command("sudo", "./control-panel-dns")
+		cmd := exec.Command("sudo", "./control-panel-dns") // TODO: get the actual path
 		cmd.Stdin = os.Stdin
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		err := cmd.Run()
 		if err != nil {
-			log.Fatal(err)
+			exit(err)
 		}
 	}
 }
@@ -39,16 +38,29 @@ func DumpPublicDNSZone(zone string) {
 		panic(err)
 	}
 	for _, entry := range entries {
-		log.Println(entry)
+		log(entry)
 	}
 }
 
 func dumpIPs(host string) {
     ips, err := net.LookupIP(host)
         if err != nil {
-                log.Fatal(err)
+                exit(err)
         }
         for _, ip := range ips {
-                log.Println(host, ip)
+                log(host, ip)
         }
+}
+
+/*
+	check if ddclient is installed, working, and/or configured
+	https://github.com/ddclient/ddclient
+*/
+func ddclient() {
+}
+
+/*
+	check if ddupdate is installed, working, and/or configured
+*/
+func ddupdate() {
 }

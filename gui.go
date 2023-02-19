@@ -4,7 +4,6 @@ package main
 import 	(
 	"os"
 	"os/user"
-	"log"
 	"net"
 	"git.wit.org/wit/gui"
 	"github.com/davecgh/go-spew/spew"
@@ -13,14 +12,14 @@ import 	(
 // This initializes the first window
 func initGUI() {
 	var w *gui.Node
-	gui.Config.Title = "Hello World golang wit/gui Window"
+	gui.Config.Title = "DNS and IPv6 Control Panel"
 	gui.Config.Width = 640
 	gui.Config.Height = 480
 	gui.Config.Exit = myDefaultExit
 
 	w = gui.NewWindow()
 	w.Dump()
-	addDemoTab(w, "A Simple Tab Demo")
+	addDNSTab(w, "DNS")
 
 	// TODO: add these back
 	if (args.GuiDemo) {
@@ -32,16 +31,14 @@ func initGUI() {
 	}
 }
 
-func addDemoTab(window *gui.Node, title string) {
+func addDNSTab(window *gui.Node, title string) {
 	var newNode, g, g2, tb *gui.Node
-	var err error
-	var name string
 
 	newNode = window.NewTab(title)
-        log.Println("addDemoTab() newNode.Dump")
+        log("addDemoTab() newNode.Dump")
 	newNode.Dump()
 
-	g = newNode.NewGroup("group 1")
+	g = newNode.NewGroup("junk")
 	dd := g.NewDropdown("demoCombo2")
 	dd.AddDropdownName("more 1")
 	dd.AddDropdownName("more 2")
@@ -49,27 +46,49 @@ func addDemoTab(window *gui.Node, title string) {
 	dd.OnChanged = func(*gui.Node) {
 		s := dd.GetText()
 		tb.SetText("hello world " + args.User + "\n" + s)
+		log("text =", s)
 	}
+	g.NewLabel("UID =")
+	g.NewButton("hello", func () {
+		log("world")
+	})
 
-	g2 = newNode.NewGroup("group 2")
+
+	g2 = newNode.NewGroup("Real Stuff")
 	tb = g2.NewTextbox("tb")
-	log.Println("tb =", tb.GetText())
+	log("tb =", tb.GetText())
 	tb.OnChanged = func(*gui.Node) {
 		s := tb.GetText()
-		log.Println("text =", s)
+		log("text =", s)
 	}
-	g2.NewButton("hello", func () {
-		log.Println("world")
-		scanInterfaces()
+	g2.NewButton("Network Interfaces", func () {
+		for i, t := range me.ifmap {
+			log("name =", t.iface.Name)
+			log("int =", i, "name =", t.name, t.iface)
+			dd.AddDropdownName(t.iface.Name)
+		}
 	})
-	g2.NewButton("os.Hostname()", func () {
-		name, err = os.Hostname()
-		log.Println("name =", name, err)
+	g2.NewButton("Hostname", func () {
+		getHostname()
+		g.NewLabel("FQDN = " + me.fqdn)
+	})
+	g2.NewButton("Actual AAAA", func () {
+		var aaaa []string
+		aaaa = realAAAA()
+		for _, s := range aaaa {
+			g.NewLabel("my actual AAAA = " + s)
+		}
+	})
+	g2.NewButton("checkDNS()", func () {
+		checkDNS()
 	})
 	g2.NewButton("os.User()", func () {
 		user, _ := user.Current()
 		spew.Dump(user)
-		log.Println("os.Getuid =", os.Getuid())
+		log("os.Getuid =", os.Getuid())
+	})
+	g2.NewButton("Example_listLink()", func () {
+		Example_listLink()
 	})
 	g2.NewButton("Escalate()", func () {
 		Escalate()
@@ -79,7 +98,7 @@ func addDemoTab(window *gui.Node, title string) {
 		if err != nil {
 			return
 		}
-		log.Println("host =", host)
+		log("host =", host)
 	})
 	g2.NewButton("DumpPublicDNSZone(apple.com)", func () {
 		DumpPublicDNSZone("apple.com")
@@ -88,6 +107,6 @@ func addDemoTab(window *gui.Node, title string) {
 }
 
 func myDefaultExit(n *gui.Node) {
-        log.Println("You can Do exit() things here")
+        log("You can Do exit() things here")
 	os.Exit(0)
 }
