@@ -14,8 +14,8 @@ build-release:
 
 build:
 	reset
-	GO111MODULE="off" go get -v -x .
-	GO111MODULE="off" go build -v
+	# GO111MODULE="off" go get -v -x .
+	GO111MODULE="off" go build -v -o control-panel-dns
 
 test:
 	GO111MODULE="off" go test -v
