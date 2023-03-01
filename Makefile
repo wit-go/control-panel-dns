@@ -1,8 +1,8 @@
 run: build
 	./control-panel-dns
 
-verbose: build
-	./control-panel-dns --verbose --verbose-net --gui-debug --toolkit-debug
+debug: build
+	./control-panel-dns --verbose --verbose-net --gui-debug
 
 dns: build
 	./control-panel-dns --verbose-dns

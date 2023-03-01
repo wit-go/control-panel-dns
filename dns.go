@@ -8,8 +8,6 @@ import 	(
 	"net"
 )
 
-var dnsTTL int = 3600;	// Recheck DNS is working every TTL (in seconds)
-
 /*
 	Check a bunch of things. If they don't work right, then things are not correctly configured
 	They are things like:

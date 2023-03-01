@@ -25,21 +25,18 @@ func getHostname() {
 		return
 	}
 	log("FQDN hostname is", me.fqdn)
-
-	var aaaa []string
-	aaaa = getAAAA(me.fqdn)
-	log("AAAA =", aaaa)
 }
 
-func getAAAA(s string) []string {
+func dnsAAAA(s string) []string {
+	var aaaa []string
 	// lookup the IP address from DNS
-	dnsRR := dnssecsocket.Dnstrace(s, "AAAA")
-	log(args.VerboseDNS, SPEW, dnsRR)
-	if (dnsRR == nil) {
-		return nil
+	rrset := dnssecsocket.Dnstrace(s, "AAAA")
+	log(args.VerboseDNS, SPEW, rrset)
+	for i, rr := range rrset {
+		log(args.VerboseDNS, "r.Answer =", i, rr)
+		ipaddr := dns.Field(rr, 1)
+		aaaa = append(aaaa, ipaddr)
 	}
-	ipaddr1 := dns.Field(dnsRR, 1)
-	ipaddr2 := dns.Field(dnsRR, 2)
-	log("ipaddr", ipaddr1, ipaddr2)
-	return []string{ipaddr1, ipaddr2}
+	log(args.VerboseDNS, "aaaa =", aaaa)
+	return aaaa
 }

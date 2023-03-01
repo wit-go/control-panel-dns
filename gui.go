@@ -6,79 +6,67 @@ import 	(
 	"os/user"
 	"net"
 	"git.wit.org/wit/gui"
+	"git.wit.org/wit/shell"
 	"github.com/davecgh/go-spew/spew"
 )
 
 // This initializes the first window
 func initGUI() {
-	var w *gui.Node
 	gui.Config.Title = "DNS and IPv6 Control Panel"
 	gui.Config.Width = 640
 	gui.Config.Height = 480
 	gui.Config.Exit = myDefaultExit
 
-	w = gui.NewWindow()
-	w.Dump()
-	addDNSTab(w, "DNS")
-
-	// TODO: add these back
-	if (args.GuiDemo) {
-		gui.DemoWindow()
-	}
+	me.window = gui.NewWindow()
+	me.window.Dump()
+	addDNSTab("DNS")
 
 	if (args.GuiDebug) {
 		gui.DebugWindow()
 	}
 }
 
-func addDNSTab(window *gui.Node, title string) {
-	var newNode, g, g2, tb *gui.Node
+func addDNSTab(title string) {
+	var g2 *gui.Node
 
-	newNode = window.NewTab(title)
-        log("addDemoTab() newNode.Dump")
-	newNode.Dump()
+	me.tab = me.window.NewTab(title)
+        // log("addDemoTab() newNode.Dump")
+	// newNode.Dump()
 
-	g = newNode.NewGroup("junk")
-	dd := g.NewDropdown("demoCombo2")
+	me.notes = me.tab.NewGroup("junk")
+	dd := me.notes.NewDropdown("demoCombo2")
 	dd.AddDropdownName("more 1")
 	dd.AddDropdownName("more 2")
 	dd.AddDropdownName("more 3")
-	dd.OnChanged = func(*gui.Node) {
+	dd.Custom = func() {
 		s := dd.GetText()
-		tb.SetText("hello world " + args.User + "\n" + s)
-		log("text =", s)
+		output("dd.Custom( dd.GetText() ) =" + s + "\n", true)
 	}
-	g.NewLabel("UID =")
-	g.NewButton("hello", func () {
+	me.notes.NewButton("hello", func () {
 		log("world")
 	})
 
+	g2 = me.tab.NewGroup("Real Stuff")
 
-	g2 = newNode.NewGroup("Real Stuff")
-	tb = g2.NewTextbox("tb")
-	log("tb =", tb.GetText())
-	tb.OnChanged = func(*gui.Node) {
-		s := tb.GetText()
-		log("text =", s)
-	}
 	g2.NewButton("Network Interfaces", func () {
 		for i, t := range me.ifmap {
 			log("name =", t.iface.Name)
 			log("int =", i, "name =", t.name, t.iface)
-			dd.AddDropdownName(t.iface.Name)
+			output("iface = " + t.iface.Name + "\n", true)
 		}
 	})
 	g2.NewButton("Hostname", func () {
 		getHostname()
-		g.NewLabel("FQDN = " + me.fqdn)
+		output("FQDN = " + me.fqdn + "\n", true)
 	})
 	g2.NewButton("Actual AAAA", func () {
 		var aaaa []string
 		aaaa = realAAAA()
 		for _, s := range aaaa {
-			g.NewLabel("my actual AAAA = " + s)
+			output("my actual AAAA = " + s + "\n", true)
 		}
 	})
+
 	g2.NewButton("checkDNS()", func () {
 		checkDNS()
 	})
@@ -93,6 +81,16 @@ func addDNSTab(window *gui.Node, title string) {
 	g2.NewButton("Escalate()", func () {
 		Escalate()
 	})
+	g2.NewButton("pprof(goroutine)", func () {
+		loggo()
+		// panic("correctly inside of gui goroutine (goroutine 1?)")
+	})
+	g2.NewButton("gui.DebugWindow()", func () {
+		gui.DebugWindow()
+	})
+	g2.NewButton("NewCheckbox(test)", func () {
+		me.notes.NewCheckbox("test")
+	})
 	g2.NewButton("LookupAddr(<raw ipv6>) == fire from /etc/hosts", func () {
 		host, err := net.LookupAddr("2600:1700:afd5:6000:b26e:bfff:fe80:3c52")
 		if err != nil {
@@ -104,9 +102,53 @@ func addDNSTab(window *gui.Node, title string) {
 		DumpPublicDNSZone("apple.com")
 		dumpIPs("www.apple.com")
 	})
+
+	nsupdateGroup(me.tab)
+
+	tmp := me.tab.NewGroup("output")
+	me.output = tmp.NewTextbox("some output")
+	me.output.Custom = func() {
+		s := me.output.GetText()
+		log("output text =", s)
+	}
 }
 
 func myDefaultExit(n *gui.Node) {
         log("You can Do exit() things here")
 	os.Exit(0)
+}
+
+func nsupdateGroup(w *gui.Node) {
+	g := w.NewGroup("dns update")
+	g.NewLabel("UID = " + me.user)
+	g.NewButton("DNS AAAA", func () {
+		var aaaa []string
+		var out string
+		h := me.fqdn
+		// h := "fire.lab.wit.org"
+		aaaa = dnsAAAA(h)
+		log(SPEW, me)
+		if (aaaa == nil) {
+			out += "There are no DNS AAAA records for hostname: " + h + "\n"
+		}
+		for _, s := range aaaa {
+			out += "host " + h + " DNS AAAA = " + s + "\n"
+		}
+	})
+	g.NewButton("dig +trace", func () {
+		o := shell.Run("dig +trace +noadditional DS " + me.fqdn + " @8.8.8.8")
+		output(o, false)
+		// log(o)
+	})
+}
+
+var outJunk string
+func output(s string, a bool) {
+	if (a) {
+		outJunk += s
+	} else {
+		outJunk = s
+	}
+	me.output.SetText(outJunk)
+	//log(outJunk)
 }

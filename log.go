@@ -1,9 +1,27 @@
-// I like things to be easy. Why can't the standard language be like this?
-
+//
+// version v1.1
+//
+// I like things to be easy.
+//
+// this means all the log settings are in one place. it should allow
+// things to be over-ridden externally to the library
+// but still allow command line --args to pass debugging settings
+//
+// I also have a generic sleep() and exit() in here because it's simple
+//
+// Usage:
+//
+// log("something", foo, bar)
+// var DEBUG bool = true
+// log(DEBUG, "something else", someOtherVariable)  # if DEBUG == false, return doing nothing
+// log(SPEW, "something else", someOtherVariable)   # this get's sent to spew.Dump(). Very useful for debugging!
+//
 package main
 
 import 	(
 	"os"
+	"runtime"
+	"runtime/pprof"
 	golog "log"
 	"time"
 	"reflect"
@@ -82,7 +100,6 @@ func log(a ...any) {
 	}
 	var blah bool
 	if (reflect.TypeOf(a[0]) == reflect.TypeOf(blah)) {
-		// golog.Println("\t a[0] = bool")
 		if (a[0] == false) {
 			return
 		}
@@ -91,13 +108,16 @@ func log(a ...any) {
 
 	if (reflect.TypeOf(a[0]) == reflect.TypeOf(SPEW)) {
 		a = a[1:]
-		spew.Dump(a)
+		// spew.Dump(a)
+		scs := spew.ConfigState{MaxDepth: 1}
+		scs.Dump(a)
 		return
 	}
 
 	golog.Println(a...)
-	// golog.Println("\t a[0] =", a[0])
-	// for argNum, arg := range a {
-	// 	golog.Println("\t", argNum, arg)
-	// }
+}
+
+func loggo() {
+	pprof.Lookup("goroutine").WriteTo(os.Stdout, 1)
+	log("runtime.NumGoroutine() = ", runtime.NumGoroutine())
 }
