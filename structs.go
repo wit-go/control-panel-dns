@@ -12,7 +12,7 @@ var me Host
 type Host struct {
 	hostname	string			// mirrors
 	domainname	string			// kernel.org
-	fqdn		string			// mirrors.kernel.org
+	// fqdn		string			// mirrors.kernel.org
 	dnsTTL		int			// Recheck DNS is working every TTL (in seconds)
 	user		string			// name of the user
 	ipmap		map[string]*IPtype	// the current ip addresses
@@ -23,6 +23,10 @@ type Host struct {
 	tab		*gui.Node		// the main dns tab
 	notes		*gui.Node		// using this to put notes here
 	output		*gui.Node		// Textbox for dumping output
+	uid		*gui.Node		// user
+	fqdn		*gui.Node		// display the full hostname
+	IPv4		*gui.Node		// show valid IPv4 addresses
+	IPv6		*gui.Node		// show valid IPv6 addresses
 }
 
 type IPtype struct {

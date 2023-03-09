@@ -18,13 +18,19 @@ import "git.wit.org/jcarr/dnssecsocket"
 
 func getHostname() {
 	var err error
-	me.fqdn, err = fqdn.FqdnHostname()
+	var s string = "gui.Label == nil"
+	s, err = fqdn.FqdnHostname()
 	if (err != nil) {
 		log("FQDN hostname error =", err)
 		exit()
 		return
 	}
-	log("FQDN hostname is", me.fqdn)
+	if (me.fqdn != nil) {
+		// s =  me.fqdn.GetText()
+		output("trying to update gui.Label", true)
+		me.fqdn.SetText(s)
+	}
+	output("FQDN = jcarr" + s + "\n", true)
 }
 
 func dnsAAAA(s string) []string {

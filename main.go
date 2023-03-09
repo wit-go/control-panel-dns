@@ -1,6 +1,7 @@
 // GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007
 // Copyright (c) 2023 WIT.COM, Inc.
 // This is a control panel for DNS
+
 package main
 
 import 	(
@@ -64,7 +65,7 @@ func checkNetworkChanges() {
 
 // Run this every once and a while
 func dnsTTL() {
-	output("FQDN = " + me.fqdn + "\n", false)
+	output("FQDN = " + me.fqdn.GetText() + "\n", true)
 	getHostname()
 	scanInterfaces()
 	for i, t := range me.ifmap {

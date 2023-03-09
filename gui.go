@@ -13,7 +13,7 @@ import 	(
 // This initializes the first window
 func initGUI() {
 	gui.Config.Title = "DNS and IPv6 Control Panel"
-	gui.Config.Width = 640
+	gui.Config.Width = 1024
 	gui.Config.Height = 480
 	gui.Config.Exit = myDefaultExit
 
@@ -33,19 +33,6 @@ func addDNSTab(title string) {
         // log("addDemoTab() newNode.Dump")
 	// newNode.Dump()
 
-	me.notes = me.tab.NewGroup("junk")
-	dd := me.notes.NewDropdown("demoCombo2")
-	dd.AddDropdownName("more 1")
-	dd.AddDropdownName("more 2")
-	dd.AddDropdownName("more 3")
-	dd.Custom = func() {
-		s := dd.GetText()
-		output("dd.Custom( dd.GetText() ) =" + s + "\n", true)
-	}
-	me.notes.NewButton("hello", func () {
-		log("world")
-	})
-
 	g2 = me.tab.NewGroup("Real Stuff")
 
 	g2.NewButton("Network Interfaces", func () {
@@ -57,7 +44,6 @@ func addDNSTab(title string) {
 	})
 	g2.NewButton("Hostname", func () {
 		getHostname()
-		output("FQDN = " + me.fqdn + "\n", true)
 	})
 	g2.NewButton("Actual AAAA", func () {
 		var aaaa []string
@@ -120,11 +106,14 @@ func myDefaultExit(n *gui.Node) {
 
 func nsupdateGroup(w *gui.Node) {
 	g := w.NewGroup("dns update")
-	g.NewLabel("UID = " + me.user)
+	me.uid = g.NewLabel("UID = " + me.user)
+	me.fqdn = g.NewLabel("fqdn:")
+	me.IPv4 = g.NewLabel("192.168.2.2")
+	me.IPv6 = g.NewLabel("fe::02")
 	g.NewButton("DNS AAAA", func () {
 		var aaaa []string
 		var out string
-		h := me.fqdn
+		h := me.fqdn.GetText()
 		// h := "fire.lab.wit.org"
 		aaaa = dnsAAAA(h)
 		log(SPEW, me)
@@ -136,7 +125,7 @@ func nsupdateGroup(w *gui.Node) {
 		}
 	})
 	g.NewButton("dig +trace", func () {
-		o := shell.Run("dig +trace +noadditional DS " + me.fqdn + " @8.8.8.8")
+		o := shell.Run("dig +trace +noadditional DS " + me.fqdn.GetText() + " @8.8.8.8")
 		output(o, false)
 		// log(o)
 	})
