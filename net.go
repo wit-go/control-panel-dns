@@ -81,6 +81,7 @@ func checkInterface(i net.Interface) {
 		me.ipchange = true
 		if (me.Interfaces != nil) {
 			me.Interfaces.AddText(i.Name)
+			me.Interfaces.SetText(i.Name)
 		}
 		return
 	}
@@ -92,6 +93,7 @@ func checkInterface(i net.Interface) {
 		me.ipchange = true
 		if (me.Interfaces != nil) {
 			me.Interfaces.AddText(i.Name)
+			me.Interfaces.SetText(i.Name)
 		}
 		return
 	}
@@ -162,9 +164,17 @@ func checkIP(ip *net.IPNet, i net.Interface) bool {
 		me.ipmap[realip].ipv6 = true
 		me.ipmap[realip].ipv4 = false
 		t = "IPv6"
+		if (me.IPv6 != nil) {
+			me.IPv6.AddText(realip)
+			me.IPv6.SetText(realip)
+		}
 	} else {
 		me.ipmap[realip].ipv6 = false
 		me.ipmap[realip].ipv4 = true
+		if (me.IPv4 != nil) {
+			me.IPv4.AddText(realip)
+			me.IPv4.SetText(realip)
+		}
 	}
 	if (IsReal(&ip.IP)) {
 		log("\tIP is Real    ", t, i.Index, i.Name, realip)

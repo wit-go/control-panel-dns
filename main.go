@@ -40,7 +40,7 @@ func main() {
 
 	log("Toolkit = ", args.Toolkit)
 	// gui.InitPlugins([]string{"andlabs"})
-	gui.SetDebug(true)
+	// gui.SetDebug(true)
 	gui.Main(initGUI)
 }
 
@@ -65,18 +65,17 @@ func checkNetworkChanges() {
 
 // Run this every once and a while
 func dnsTTL() {
-	output("FQDN = " + me.fqdn.GetText() + "\n", false)
+	log("FQDN =", me.fqdn.GetText())
 	getHostname()
 	scanInterfaces()
 	for i, t := range me.ifmap {
-		output(strconv.Itoa(i) + " iface = " + t.iface.Name + "\n", true)
+		log(strconv.Itoa(i) + " iface = " + t.iface.Name)
 	}
 	var aaaa []string
 	aaaa = realAAAA()
 	for _, s := range aaaa {
-		output("my actual AAAA = " + s + "\n", true)
-		me.IPv6.AddText(s)
+		log("my actual AAAA = ",s)
+		// me.IPv6.AddText(s)
 		me.IPv6.SetText(s)
 	}
-	// loggo()
 }

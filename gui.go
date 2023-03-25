@@ -4,6 +4,7 @@ package main
 import 	(
 	"os"
 	"os/user"
+	"strconv"
 	"net"
 	"git.wit.org/wit/gui"
 	"git.wit.org/wit/shell"
@@ -23,7 +24,7 @@ func initGUI() {
 	if (args.GuiDebug) {
 		gui.DebugWindow()
 	}
-	gui.ShowDebugValues()
+	// gui.ShowDebugValues()
 }
 
 func addDNSTab(title string) {
@@ -39,7 +40,7 @@ func addDNSTab(title string) {
 		for i, t := range me.ifmap {
 			log("name =", t.iface.Name)
 			log("int =", i, "name =", t.name, t.iface)
-			output("iface = " + t.iface.Name + "\n", true)
+			log("iface = " + t.iface.Name)
 		}
 	})
 	g2.NewButton("Hostname", func () {
@@ -49,7 +50,7 @@ func addDNSTab(title string) {
 		var aaaa []string
 		aaaa = realAAAA()
 		for _, s := range aaaa {
-			output("my actual AAAA = " + s + "\n", true)
+			log("my actual AAAA = ", s)
 		}
 	})
 
@@ -59,7 +60,11 @@ func addDNSTab(title string) {
 	g2.NewButton("os.User()", func () {
 		user, _ := user.Current()
 		spew.Dump(user)
-		log("os.Getuid =", os.Getuid())
+		log("os.Getuid =", user.Username, os.Getuid())
+		if (me.uid != nil) {
+			me.uid.AddText(user.Username + " (" + strconv.Itoa(os.Getuid()) + ")")
+			me.uid.SetText(user.Username + " (" + strconv.Itoa(os.Getuid()) + ")")
+		}
 	})
 	g2.NewButton("Example_listLink()", func () {
 		Example_listLink()
@@ -111,15 +116,15 @@ func nsupdateGroup(w *gui.Node) {
 
 	grid.SetNext(1,1)
 	grid.NewLabel("hostname =")
-	grid.SetNext(1,2)
+	// grid.SetNext(1,2)
 	me.fqdn = grid.NewCombobox("foo(0,1)")
 	me.fqdn.AddText("fire.lab.wit.com")
 	me.fqdn.AddText("mirrors.wit.com")
 	me.fqdn.SetText("sad.lab.wit.org")
 
-	grid.SetNext(2,1)
+	// grid.SetNext(2,1)
 	grid.NewLabel("UID =")
-	grid.SetNext(2,2)
+	// grid.SetNext(2,2)
 	me.uid = grid.NewCombobox("foo(1,1)")
 	me.uid.AddText("root (0)")
 	me.uid.AddText("mail (8)")
@@ -133,7 +138,6 @@ func nsupdateGroup(w *gui.Node) {
 
 	grid.NewLabel("interfaces =")
 	me.Interfaces = grid.NewCombobox("foo(1,3)")
-	me.Interfaces.AddText("jcarr0")
 
 	g.NewButton("DNS AAAA", func () {
 		var aaaa []string

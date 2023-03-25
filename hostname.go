@@ -27,10 +27,10 @@ func getHostname() {
 	}
 	if (me.fqdn != nil) {
 		// s =  me.fqdn.GetText()
-		output("trying to update gui.Label", true)
+		log("trying to update gui.Label")
 		me.fqdn.SetText(s)
 	}
-	output("FQDN = jcarr" + s + "\n", true)
+	log("FQDN =", s)
 }
 
 func dnsAAAA(s string) []string {
