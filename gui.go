@@ -72,15 +72,8 @@ func addDNSTab(title string) {
 	g2.NewButton("Escalate()", func () {
 		Escalate()
 	})
-	g2.NewButton("pprof(goroutine)", func () {
-		// loggo()
-		// panic("correctly inside of gui goroutine (goroutine 1?)")
-	})
 	g2.NewButton("gui.DebugWindow()", func () {
 		gui.DebugWindow()
-	})
-	g2.NewButton("NewCheckbox(test)", func () {
-		me.notes.NewCheckbox("test")
 	})
 	g2.NewButton("LookupAddr(<raw ipv6>) == fire from /etc/hosts", func () {
 		host, err := net.LookupAddr("2600:1700:afd5:6000:b26e:bfff:fe80:3c52")
@@ -139,18 +132,46 @@ func nsupdateGroup(w *gui.Node) {
 	grid.NewLabel("interfaces =")
 	me.Interfaces = grid.NewCombobox("foo(1,3)")
 
+	grid.NewLabel("DNS AAAA =")
+	me.DnsAAAA = grid.NewLabel("need to lookup")
+
+	grid.NewLabel("DNS A =")
+	me.DnsA = grid.NewLabel("need to lookup")
+
+	grid.NewLabel("DNS Status =")
+	me.DnsStatus = grid.NewLabel("unknown")
+
 	g.NewButton("DNS AAAA", func () {
 		var aaaa []string
-		var out string
-		h := me.fqdn.GetText()
-		// h := "fire.lab.wit.org"
+		h := me.hostname
+		if (h == "") {
+			h = "unknown.lab.wit.org"
+			// h = "hpdevone.lab.wit.org"
+		}
 		aaaa = dnsAAAA(h)
 		log(SPEW, me)
 		if (aaaa == nil) {
-			out += "There are no DNS AAAA records for hostname: " + h + "\n"
+			log("There are no DNS AAAA records for hostname: ", h)
 		}
+		var broken int = 0
+		var all string
 		for _, s := range aaaa {
-			out += "host " + h + " DNS AAAA = " + s + "\n"
+			log("host", h, "DNS AAAA =", s)
+			all += s + "\n"
+			if ( me.ipmap[s] == nil) {
+				log("THIS IS THE WRONG AAAA DNS ENTRY:  host", h, "DNS AAAA =", s)
+				broken = 2
+			} else {
+				if (broken == 0) {
+					broken = 1
+				}
+			}
+		}
+		me.DnsAAAA.SetText(all)
+		if (broken == 1) {
+			me.DnsStatus.SetText("WORKING")
+		} else {
+			me.DnsStatus.SetText("Broken")
 		}
 	})
 	g.NewButton("dig +trace", func () {

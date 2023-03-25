@@ -28,6 +28,9 @@ type Host struct {
 	IPv4		*gui.Node		// show valid IPv4 addresses
 	IPv6		*gui.Node		// show valid IPv6 addresses
 	Interfaces	*gui.Node		// Interfaces
+	DnsAAAA		*gui.Node		// the actual DNS AAAA results
+	DnsA		*gui.Node		// the actual DNS A results (ignore for status since mostly never happens?)
+	DnsStatus	*gui.Node		// the current state of DNS
 }
 
 type IPtype struct {

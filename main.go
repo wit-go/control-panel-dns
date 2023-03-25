@@ -48,9 +48,10 @@ func main() {
 	Poll for changes to the networking settings
 */
 func checkNetworkChanges() {
-	var ttl int = 3
+	var ttl int = 0
+	var ttlsleep int = 5
 	for {
-		sleep(1)
+		sleep(ttlsleep)
 		ttl -= 1
 		if (ttl < 0) {
 			if (runtime.GOOS == "linux") {
