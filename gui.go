@@ -18,12 +18,12 @@ func initGUI() {
 	gui.Config.Exit = myDefaultExit
 
 	me.window = gui.NewWindow()
-	me.window.Dump()
 	addDNSTab("DNS")
 
 	if (args.GuiDebug) {
 		gui.DebugWindow()
 	}
+	gui.ShowDebugValues()
 }
 
 func addDNSTab(title string) {
@@ -68,7 +68,7 @@ func addDNSTab(title string) {
 		Escalate()
 	})
 	g2.NewButton("pprof(goroutine)", func () {
-		loggo()
+		// loggo()
 		// panic("correctly inside of gui goroutine (goroutine 1?)")
 	})
 	g2.NewButton("gui.DebugWindow()", func () {
@@ -106,10 +106,35 @@ func myDefaultExit(n *gui.Node) {
 
 func nsupdateGroup(w *gui.Node) {
 	g := w.NewGroup("dns update")
-	me.uid = g.NewLabel("UID = " + me.user)
-	me.fqdn = g.NewLabel("fqdn:")
-	me.IPv4 = g.NewLabel("192.168.2.2")
-	me.IPv6 = g.NewLabel("fe::02")
+
+	grid := g.NewGrid("fucknuts", 2, 2)
+
+	grid.SetNext(1,1)
+	grid.NewLabel("hostname =")
+	grid.SetNext(1,2)
+	me.fqdn = grid.NewCombobox("foo(0,1)")
+	me.fqdn.AddText("fire.lab.wit.com")
+	me.fqdn.AddText("mirrors.wit.com")
+	me.fqdn.SetText("sad.lab.wit.org")
+
+	grid.SetNext(2,1)
+	grid.NewLabel("UID =")
+	grid.SetNext(2,2)
+	me.uid = grid.NewCombobox("foo(1,1)")
+	me.uid.AddText("root (0)")
+	me.uid.AddText("mail (8)")
+	me.uid.AddText("jcarr (1000)")
+
+	grid.NewLabel("IPv4 =")
+	me.IPv4 = grid.NewCombobox("foo(2,1)")
+
+	grid.NewLabel("IPv6 =")
+	me.IPv6 = grid.NewCombobox("foo(1,3)")
+
+	grid.NewLabel("interfaces =")
+	me.Interfaces = grid.NewCombobox("foo(1,3)")
+	me.Interfaces.AddText("jcarr0")
+
 	g.NewButton("DNS AAAA", func () {
 		var aaaa []string
 		var out string
@@ -139,5 +164,5 @@ func output(s string, a bool) {
 		outJunk = s
 	}
 	me.output.SetText(outJunk)
-	//log(outJunk)
+	log(outJunk)
 }

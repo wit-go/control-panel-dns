@@ -27,6 +27,7 @@ type Host struct {
 	fqdn		*gui.Node		// display the full hostname
 	IPv4		*gui.Node		// show valid IPv4 addresses
 	IPv6		*gui.Node		// show valid IPv6 addresses
+	Interfaces	*gui.Node		// Interfaces
 }
 
 type IPtype struct {

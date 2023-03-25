@@ -1,6 +1,10 @@
 run: build
 	./control-panel-dns
 
+install:
+	go install -v go.wit.com/control-panel-dns@latest
+	# go install -v git.wit.com/wit/control-panel-dns@latest
+
 debug: build
 	./control-panel-dns --verbose --verbose-net --gui-debug
 
@@ -16,6 +20,12 @@ build:
 	reset
 	# GO111MODULE="off" go get -v -x .
 	GO111MODULE="off" go build -v -o control-panel-dns
+
+# ./control-panel-dns.v1: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.34' not found (required by ./control-panel-dns.v1)
+# ./control-panel-dns.v1: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.32' not found (required by ./control-panel-dns.v1)
+# compiling with CGO disabled means it compiles but then plugins don't load
+GLIBC_2.34-error:
+	GO111MODULE="off" CGO_ENABLED=0 go build -v -o control-panel-dns
 
 test:
 	GO111MODULE="off" go test -v
@@ -57,3 +67,27 @@ build-with-custom-go.mod:
 # )
 # replace github.com/versent/saml2aws/v2 v2.35.0 => github.com/marcottedan/saml2aws/v2 master
 # replace github.com/versent/saml2aws/v2 => /Users/dmarcotte/git/saml2aws/
+#
+check-cert:
+	reset
+	# https://crt.sh/?q=check.lab.wit.org
+	# # https://letsencrypt.org/certificates/
+	# openssl s_client -connect check.lab.wit.org:443 -showcerts
+	openssl s_client -CApath /etc/ssl/certs/ -connect check.lab.wit.org:443 -showcerts
+	# openssl s_client -CApath /etc/ssl/certs/ -connect check.lab.wit.org:443 -showcerts -trace -debug
+	# openssl s_client -CAfile isrgrootx1.pem -connect check.lab.wit.org:443 -showcerts
+	# cat isrgrootx1.pem lets-encrypt-r3.pem > full-chain.pem
+	# full-chain.pem
+	# openssl s_client -CAfile /etc/ssl/certs/wit-full-chain.pem -connect check.lab.wit.org:443 -showcerts
+
+ssl-cert-hash:
+	openssl x509 -hash -noout -in wit-full-chain.pem
+	# cd /etc/ssl/certs && ln -s wit-full-chain.pem 4042bcee.0
+	openssl x509 -hash -noout -in isrgrootx1.pem
+	openssl x509 -hash -noout -in lets-encrypt-r3.pem
+
+sudo-cp:
+	sudo cp -a lets-encrypt-r3.pem 8d33f237.0 /etc/ssl/certs/
+
+go-get:
+	go install -v check.lab.wit.org/gui

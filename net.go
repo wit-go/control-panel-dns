@@ -79,6 +79,9 @@ func checkInterface(i net.Interface) {
 		me.ifmap[i.Index].gone = false
 		me.ifmap[i.Index].iface = &i
 		me.ipchange = true
+		if (me.Interfaces != nil) {
+			me.Interfaces.AddText(i.Name)
+		}
 		return
 	}
 	me.ifmap[i.Index].gone = false
@@ -87,6 +90,9 @@ func checkInterface(i net.Interface) {
 		log(val.iface.Name, "has changed to it's name to", i.Name)
 		me.ifmap[i.Index].iface = &i
 		me.ipchange = true
+		if (me.Interfaces != nil) {
+			me.Interfaces.AddText(i.Name)
+		}
 		return
 	}
 }
