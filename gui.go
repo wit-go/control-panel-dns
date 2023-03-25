@@ -5,6 +5,7 @@ import 	(
 	"os"
 	"os/user"
 	"strconv"
+	"strings"
 	"net"
 	"git.wit.org/wit/gui"
 	"git.wit.org/wit/shell"
@@ -62,9 +63,13 @@ func addDNSTab(title string) {
 		spew.Dump(user)
 		log("os.Getuid =", user.Username, os.Getuid())
 		if (me.uid != nil) {
-			me.uid.AddText(user.Username + " (" + strconv.Itoa(os.Getuid()) + ")")
 			me.uid.SetText(user.Username + " (" + strconv.Itoa(os.Getuid()) + ")")
 		}
+	})
+	g2.NewButton("dig +trace", func () {
+		o := shell.Run("dig +trace +noadditional DS " + me.hostname + " @8.8.8.8")
+		log(o)
+		// log(o)
 	})
 	g2.NewButton("Example_listLink()", func () {
 		Example_listLink()
@@ -109,19 +114,20 @@ func nsupdateGroup(w *gui.Node) {
 
 	grid.SetNext(1,1)
 	grid.NewLabel("hostname =")
-	// grid.SetNext(1,2)
-	me.fqdn = grid.NewCombobox("foo(0,1)")
-	me.fqdn.AddText("fire.lab.wit.com")
-	me.fqdn.AddText("mirrors.wit.com")
-	me.fqdn.SetText("sad.lab.wit.org")
+	me.fqdn = grid.NewLabel("?")
+	me.hostname = ""
 
-	// grid.SetNext(2,1)
 	grid.NewLabel("UID =")
-	// grid.SetNext(2,2)
-	me.uid = grid.NewCombobox("foo(1,1)")
-	me.uid.AddText("root (0)")
-	me.uid.AddText("mail (8)")
-	me.uid.AddText("jcarr (1000)")
+	me.uid = grid.NewLabel("?")
+
+	grid.NewLabel("DNS AAAA =")
+	me.DnsAAAA = grid.NewLabel("?")
+
+	grid.NewLabel("DNS A =")
+	me.DnsA = grid.NewLabel("?")
+
+	grid.NewLabel("DNS Status =")
+	me.DnsStatus = grid.NewLabel("unknown")
 
 	grid.NewLabel("IPv4 =")
 	me.IPv4 = grid.NewCombobox("foo(2,1)")
@@ -132,16 +138,7 @@ func nsupdateGroup(w *gui.Node) {
 	grid.NewLabel("interfaces =")
 	me.Interfaces = grid.NewCombobox("foo(1,3)")
 
-	grid.NewLabel("DNS AAAA =")
-	me.DnsAAAA = grid.NewLabel("need to lookup")
-
-	grid.NewLabel("DNS A =")
-	me.DnsA = grid.NewLabel("need to lookup")
-
-	grid.NewLabel("DNS Status =")
-	me.DnsStatus = grid.NewLabel("unknown")
-
-	g.NewButton("DNS AAAA", func () {
+	g.NewButton("Update DNS", func () {
 		var aaaa []string
 		h := me.hostname
 		if (h == "") {
@@ -167,17 +164,21 @@ func nsupdateGroup(w *gui.Node) {
 				}
 			}
 		}
+		strings.TrimSuffix(all, "\r\n")
 		me.DnsAAAA.SetText(all)
 		if (broken == 1) {
 			me.DnsStatus.SetText("WORKING")
 		} else {
-			me.DnsStatus.SetText("Broken")
+			me.DnsStatus.SetText("BROKEN")
+			log("Need to run go-nsupdate here")
 		}
-	})
-	g.NewButton("dig +trace", func () {
-		o := shell.Run("dig +trace +noadditional DS " + me.fqdn.GetText() + " @8.8.8.8")
-		output(o, false)
-		// log(o)
+
+		user, _ := user.Current()
+		spew.Dump(user)
+		log("os.Getuid =", user.Username, os.Getuid())
+		if (me.uid != nil) {
+			me.uid.SetText(user.Username + " (" + strconv.Itoa(os.Getuid()) + ")")
+		}
 	})
 }
 
