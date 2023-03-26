@@ -14,31 +14,22 @@ import 	(
 
 // This initializes the first window
 func initGUI() {
-	/*
-	gui.Config.Title = "DNS and IPv6 Control Panel"
-	gui.Config.Width = 1024
-	gui.Config.Height = 480
-	gui.Config.Exit = myDefaultExit
-	*/
-
-	// me.window = gui.NewWindow()
-	me.window = myGui.New2().Window().Standard()
-	sleep(1)
+	me.window = myGui.New2().Window("DNS and IPv6 Control Panel").Standard()
 	me.window.Dump(true)
+
+	sleep(1)
 	addDNSTab("DNS")
 
 	if (args.GuiDebug) {
 		gui.DebugWindow()
 	}
-	// gui.ShowDebugValues()
+	gui.ShowDebugValues()
 }
 
 func addDNSTab(title string) {
 	var g2 *gui.Node
 
 	me.tab = me.window.NewTab(title)
-        // log("addDemoTab() newNode.Dump")
-	// newNode.Dump()
 
 	g2 = me.tab.NewGroup("Real Stuff")
 
@@ -169,7 +160,8 @@ func nsupdateGroup(w *gui.Node) {
 				}
 			}
 		}
-		strings.TrimSuffix(all, "\r\n")
+		all = strings.TrimSuffix(all, "\r\n")
+		all = strings.TrimSuffix(all, "\n")
 		me.DnsAAAA.SetText(all)
 		if (broken == 1) {
 			me.DnsStatus.SetText("WORKING")
