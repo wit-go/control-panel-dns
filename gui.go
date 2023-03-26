@@ -179,8 +179,7 @@ func updateDNS() {
 			}
 		}
 	}
-	all = strings.TrimSuffix(all, "\r\n")
-	all = strings.TrimSuffix(all, "\n")
+	all = strings.TrimSpace(all)
 	me.DnsAAAA.SetText(all)
 	if (broken == 1) {
 		me.DnsStatus.SetText("WORKING")
