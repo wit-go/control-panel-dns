@@ -28,9 +28,11 @@ func getHostname() {
 	if (me.fqdn != nil) {
 		// s =  me.fqdn.GetText()
 		log("trying to update gui.Label")
-		// me.fqdn.AddText(s)
-		me.fqdn.SetText(s)
-		me.hostname = s
+		if (me.hostname != s) {
+			me.fqdn.SetText(s)
+			me.hostname = s
+			me.changed = true
+		}
 	}
 	log("FQDN =", s)
 }

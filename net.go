@@ -78,7 +78,7 @@ func checkInterface(i net.Interface) {
 		me.ifmap[i.Index] = new(IFtype)
 		me.ifmap[i.Index].gone = false
 		me.ifmap[i.Index].iface = &i
-		me.ipchange = true
+		me.changed = true
 		if (me.Interfaces != nil) {
 			me.Interfaces.AddText(i.Name)
 			me.Interfaces.SetText(i.Name)
@@ -90,7 +90,7 @@ func checkInterface(i net.Interface) {
 	if (val.iface.Name != i.Name) {
 		log(val.iface.Name, "has changed to it's name to", i.Name)
 		me.ifmap[i.Index].iface = &i
-		me.ipchange = true
+		me.changed = true
 		if (me.Interfaces != nil) {
 			me.Interfaces.AddText(i.Name)
 			me.Interfaces.SetText(i.Name)
@@ -165,14 +165,12 @@ func checkIP(ip *net.IPNet, i net.Interface) bool {
 		me.ipmap[realip].ipv4 = false
 		t = "IPv6"
 		if (me.IPv6 != nil) {
-			me.IPv6.AddText(realip)
 			me.IPv6.SetText(realip)
 		}
 	} else {
 		me.ipmap[realip].ipv6 = false
 		me.ipmap[realip].ipv4 = true
 		if (me.IPv4 != nil) {
-			me.IPv4.AddText(realip)
 			me.IPv4.SetText(realip)
 		}
 	}
@@ -189,7 +187,7 @@ func checkIP(ip *net.IPNet, i net.Interface) bool {
 }
 
 func scanInterfaces() {
-	me.ipchange = false
+	me.changed = false
 	ifaces, _ := net.Interfaces()
 	// me.ifnew = ifaces
 	log(DEBUGNET, SPEW, ifaces)
@@ -215,6 +213,20 @@ func scanInterfaces() {
 		}
 	}
 	deleteChanges()
+	var all4 string
+	var all6 string
+	for s, t := range me.ipmap {
+		log("HAVE name =", s, "IPv4 =", t.ipv4)
+		log("HAVE name =", s, "IPv6 =", t.ipv6)
+		if (t.ipv4) {
+			all4 += s + "\n"
+		}
+		if (t.ipv6) {
+			all6 += s + "\n"
+		}
+	}
+	me.IPv4.SetText(all4)
+	me.IPv6.SetText(all6)
 }
 
 // delete network interfaces and ip addresses from the gui
@@ -223,6 +235,7 @@ func deleteChanges() {
 		if (t.gone) {
 			log("DELETE int =", i, "name =", t.name, t.iface)
 			delete(me.ifmap, i)
+			me.changed = true
 		}
 		t.gone = true
 	}
@@ -233,6 +246,7 @@ func deleteChanges() {
 			log("DELETE name =", s, "iface =", t.iface)
 			log("DELETE name =", s, "ip =", t.ip)
 			delete(me.ipmap, s)
+			me.changed = true
 		}
 		t.gone = true
 	}

@@ -33,6 +33,9 @@ func addDNSTab(title string) {
 
 	g2 = me.tab.NewGroup("Real Stuff")
 
+	g2.NewButton("gui.DebugWindow()", func () {
+		gui.DebugWindow()
+	})
 	g2.NewButton("Network Interfaces", func () {
 		for i, t := range me.ifmap {
 			log("name =", t.iface.Name)
@@ -72,9 +75,6 @@ func addDNSTab(title string) {
 	})
 	g2.NewButton("Escalate()", func () {
 		Escalate()
-	})
-	g2.NewButton("gui.DebugWindow()", func () {
-		gui.DebugWindow()
 	})
 	g2.NewButton("LookupAddr(<raw ipv6>) == fire from /etc/hosts", func () {
 		host, err := net.LookupAddr("2600:1700:afd5:6000:b26e:bfff:fe80:3c52")
@@ -122,60 +122,20 @@ func nsupdateGroup(w *gui.Node) {
 	grid.NewLabel("DNS A =")
 	me.DnsA = grid.NewLabel("?")
 
+	grid.NewLabel("IPv4 =")
+	me.IPv4 = grid.NewLabel("?")
+
+	grid.NewLabel("IPv6 =")
+	me.IPv6 = grid.NewLabel("?")
+
+	grid.NewLabel("interfaces =")
+	me.Interfaces = grid.NewCombobox("Interfaces")
+
 	grid.NewLabel("DNS Status =")
 	me.DnsStatus = grid.NewLabel("unknown")
 
-	grid.NewLabel("IPv4 =")
-	me.IPv4 = grid.NewCombobox("foo(2,1)")
-
-	grid.NewLabel("IPv6 =")
-	me.IPv6 = grid.NewCombobox("foo(1,3)")
-
-	grid.NewLabel("interfaces =")
-	me.Interfaces = grid.NewCombobox("foo(1,3)")
-
 	g.NewButton("Update DNS", func () {
-		var aaaa []string
-		h := me.hostname
-		if (h == "") {
-			h = "unknown.lab.wit.org"
-			// h = "hpdevone.lab.wit.org"
-		}
-		aaaa = dnsAAAA(h)
-		log(SPEW, me)
-		if (aaaa == nil) {
-			log("There are no DNS AAAA records for hostname: ", h)
-		}
-		var broken int = 0
-		var all string
-		for _, s := range aaaa {
-			log("host", h, "DNS AAAA =", s)
-			all += s + "\n"
-			if ( me.ipmap[s] == nil) {
-				log("THIS IS THE WRONG AAAA DNS ENTRY:  host", h, "DNS AAAA =", s)
-				broken = 2
-			} else {
-				if (broken == 0) {
-					broken = 1
-				}
-			}
-		}
-		all = strings.TrimSuffix(all, "\r\n")
-		all = strings.TrimSuffix(all, "\n")
-		me.DnsAAAA.SetText(all)
-		if (broken == 1) {
-			me.DnsStatus.SetText("WORKING")
-		} else {
-			me.DnsStatus.SetText("BROKEN")
-			log("Need to run go-nsupdate here")
-		}
-
-		user, _ := user.Current()
-		spew.Dump(user)
-		log("os.Getuid =", user.Username, os.Getuid())
-		if (me.uid != nil) {
-			me.uid.SetText(user.Username + " (" + strconv.Itoa(os.Getuid()) + ")")
-		}
+		updateDNS()
 		me.tab.Margin()
 		me.tab.Pad()
 		grid.Pad()
@@ -191,4 +151,48 @@ func output(s string, a bool) {
 	}
 	me.output.SetText(outJunk)
 	log(outJunk)
+}
+
+func updateDNS() {
+	var aaaa []string
+	h := me.hostname
+	if (h == "") {
+		h = "unknown.lab.wit.org"
+		// h = "hpdevone.lab.wit.org"
+	}
+	aaaa = dnsAAAA(h)
+	log(SPEW, me)
+	if (aaaa == nil) {
+		log("There are no DNS AAAA records for hostname: ", h)
+	}
+	var broken int = 0
+	var all string
+	for _, s := range aaaa {
+		log("host", h, "DNS AAAA =", s)
+		all += s + "\n"
+		if ( me.ipmap[s] == nil) {
+			log("THIS IS THE WRONG AAAA DNS ENTRY:  host", h, "DNS AAAA =", s)
+			broken = 2
+		} else {
+			if (broken == 0) {
+				broken = 1
+			}
+		}
+	}
+	all = strings.TrimSuffix(all, "\r\n")
+	all = strings.TrimSuffix(all, "\n")
+	me.DnsAAAA.SetText(all)
+	if (broken == 1) {
+		me.DnsStatus.SetText("WORKING")
+	} else {
+		me.DnsStatus.SetText("BROKEN")
+		log("Need to run go-nsupdate here")
+	}
+
+	user, _ := user.Current()
+	spew.Dump(user)
+	log("os.Getuid =", user.Username, os.Getuid())
+	if (me.uid != nil) {
+		me.uid.SetText(user.Username + " (" + strconv.Itoa(os.Getuid()) + ")")
+	}
 }

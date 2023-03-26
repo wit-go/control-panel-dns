@@ -7,7 +7,7 @@ package main
 import 	(
 	"strconv"
 	"runtime"
-	// "net"
+	"time"
 	arg "github.com/alexflint/go-arg"
 	"git.wit.org/wit/gui"
 )
@@ -71,17 +71,29 @@ func checkNetworkChanges() {
 
 // Run this every once and a while
 func dnsTTL() {
+	me.changed = false
 	log("FQDN =", me.fqdn.GetText())
 	getHostname()
 	scanInterfaces()
 	for i, t := range me.ifmap {
 		log(strconv.Itoa(i) + " iface = " + t.iface.Name)
 	}
+
 	var aaaa []string
 	aaaa = realAAAA()
+	var all string
 	for _, s := range aaaa {
 		log("my actual AAAA = ",s)
-		// me.IPv6.AddText(s)
-		me.IPv6.SetText(s)
+		all += s + "\n"
+	}
+	me.IPv6.SetText(all)
+
+	if (me.changed) {
+		stamp := time.Now().Format("2006/01/02 15:04:05")
+		s := stamp + " Network things changed"
+		log(logError, "Network things changed on", stamp)
+		updateDNS()
+		me.output.SetText(s)
+
 	}
 }

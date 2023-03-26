@@ -14,11 +14,11 @@ type Host struct {
 	domainname	string			// kernel.org
 	// fqdn		string			// mirrors.kernel.org
 	dnsTTL		int			// Recheck DNS is working every TTL (in seconds)
+	changed		bool			// set to true if things changed
 	user		string			// name of the user
 	ipmap		map[string]*IPtype	// the current ip addresses
 	dnsmap		map[string]*IPtype	// the current dns addresses
 	ifmap		map[int]*IFtype		// the current interfaces
-	ipchange	bool			// set to true if things change
 	window		*gui.Node		// the main window
 	tab		*gui.Node		// the main dns tab
 	notes		*gui.Node		// using this to put notes here
