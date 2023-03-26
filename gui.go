@@ -14,12 +14,17 @@ import 	(
 
 // This initializes the first window
 func initGUI() {
+	/*
 	gui.Config.Title = "DNS and IPv6 Control Panel"
 	gui.Config.Width = 1024
 	gui.Config.Height = 480
 	gui.Config.Exit = myDefaultExit
+	*/
 
-	me.window = gui.NewWindow()
+	// me.window = gui.NewWindow()
+	me.window = myGui.New2().Window().Standard()
+	sleep(1)
+	me.window.Dump(true)
 	addDNSTab("DNS")
 
 	if (args.GuiDebug) {
@@ -179,6 +184,9 @@ func nsupdateGroup(w *gui.Node) {
 		if (me.uid != nil) {
 			me.uid.SetText(user.Username + " (" + strconv.Itoa(os.Getuid()) + ")")
 		}
+		me.tab.Margin()
+		me.tab.Pad()
+		grid.Pad()
 	})
 }
 

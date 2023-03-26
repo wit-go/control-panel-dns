@@ -1,3 +1,4 @@
 control-panel-dns
 /files/*
 /*.deb
+*.swp

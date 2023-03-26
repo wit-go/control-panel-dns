@@ -13,6 +13,7 @@ import 	(
 )
 
 var p *arg.Parser
+var myGui *gui.Node
 
 func main() {
 	p = arg.MustParse(&args)
@@ -24,7 +25,6 @@ func main() {
 	me.ifmap = make(map[int]*IFtype)
 	me.dnsTTL = 5		// recheck DNS is working every 2 minutes // TODO: watch rx packets?
 
-	go checkNetworkChanges()
 
 	log()
 	log(true, "this is true")
@@ -41,7 +41,12 @@ func main() {
 	log("Toolkit = ", args.Toolkit)
 	// gui.InitPlugins([]string{"andlabs"})
 	// gui.SetDebug(true)
-	gui.Main(initGUI)
+	// myGui = gui.Main(initGUI)
+	myGui = gui.Start()
+	sleep(1)
+	initGUI()
+	sleep(1)
+	checkNetworkChanges()
 }
 
 /*
