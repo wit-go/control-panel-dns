@@ -225,6 +225,10 @@ func scanInterfaces() {
 			all6 += s + "\n"
 		}
 	}
+	all4 = strings.TrimSuffix(all4, "\r\n")
+	all4 = strings.TrimSuffix(all4, "\n")
+	all6 = strings.TrimSuffix(all6, "\r\n")
+	all6 = strings.TrimSuffix(all6, "\n")
 	me.IPv4.SetText(all4)
 	me.IPv6.SetText(all6)
 }
