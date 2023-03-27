@@ -216,13 +216,14 @@ func scanInterfaces() {
 	var all4 string
 	var all6 string
 	for s, t := range me.ipmap {
-		log("HAVE name =", s, "IPv4 =", t.ipv4)
-		log("HAVE name =", s, "IPv6 =", t.ipv6)
 		if (t.ipv4) {
 			all4 += s + "\n"
-		}
-		if (t.ipv6) {
+			log("IPv4 =", s)
+		} else if (t.ipv6) {
 			all6 += s + "\n"
+			log("IPv6 =", s)
+		} else {
+			log("???? =", s)
 		}
 	}
 	all4 = strings.TrimSpace(all4)
