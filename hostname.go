@@ -22,7 +22,6 @@ func getHostname() {
 	s, err = fqdn.FqdnHostname()
 	if (err != nil) {
 		log("FQDN hostname error =", err)
-		exit()
 		return
 	}
 	if (me.fqdn != nil) {

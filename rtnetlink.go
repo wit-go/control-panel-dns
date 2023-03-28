@@ -9,7 +9,8 @@ func Example_listLink() {
 	// Dial a connection to the rtnetlink socket
 	conn, err := rtnetlink.Dial(nil)
 	if err != nil {
-		exit(err)
+		log(logError, "Example_listLink() failed", err)
+		return
 	}
 	defer conn.Close()
 

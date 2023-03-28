@@ -24,6 +24,7 @@ func Escalate() {
 		cmd.Stderr = os.Stderr
 		err := cmd.Run()
 		if err != nil {
+			log(logError, "exit in Escalate()")
 			exit(err)
 		}
 	}
@@ -45,7 +46,7 @@ func DumpPublicDNSZone(zone string) {
 func dumpIPs(host string) {
     ips, err := net.LookupIP(host)
         if err != nil {
-                exit(err)
+		log(logError, "dumpIPs() failed:", err)
         }
         for _, ip := range ips {
                 log(host, ip)

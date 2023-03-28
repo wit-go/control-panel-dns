@@ -25,5 +25,6 @@ func sleep(a ...any) {
 }
 
 func exit(a ...any) {
+	log(logError, "got to log() exit")
 	witlog.Exit(a...)
 }

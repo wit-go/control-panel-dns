@@ -53,6 +53,7 @@ func test() error {
 
 func mainBash() {
         if err := test(); err != nil {
+		log(logError, "exit in mainBash()")
                 exit(err)
         }
 }

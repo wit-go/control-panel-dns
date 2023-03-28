@@ -13,7 +13,8 @@ func watchSysClassNet() {
     // Create new watcher.
     watcher, err := fsnotify.NewWatcher()
     if err != nil {
-        exit(err)
+	    log(logError, "watchSysClassNet() failed:", err)
+	    return
     }
     defer watcher.Close()
 
@@ -41,7 +42,8 @@ func watchSysClassNet() {
     // Add a path.
     err = watcher.Add("/tmp")
     if err != nil {
-        exit(err)
+	    log(logError, "watchSysClassNet() watcher.Add() failed:", err)
+	    return
     }
 
     // Block main goroutine forever.

@@ -33,10 +33,8 @@ func main() {
 	sleep(.3)
 	sleep(.2)
 	sleep("done scanning net")
-	// exit("done scanning net")
 
 	// Example_listLink()
-	// exit()
 
 	log("Toolkit = ", args.Toolkit)
 	// gui.InitPlugins([]string{"andlabs"})

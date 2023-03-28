@@ -135,6 +135,7 @@ func nsupdateGroup(w *gui.Node) {
 	me.DnsStatus = grid.NewLabel("unknown")
 
 	g.NewButton("Update DNS", func () {
+		log("updateDNS()")
 		updateDNS()
 		me.tab.Margin()
 		me.tab.Pad()
@@ -160,7 +161,9 @@ func updateDNS() {
 		h = "unknown.lab.wit.org"
 		// h = "hpdevone.lab.wit.org"
 	}
+	log("dnsAAAA()()")
 	aaaa = dnsAAAA(h)
+	log("dnsAAAA()()")
 	log(SPEW, me)
 	if (aaaa == nil) {
 		log("There are no DNS AAAA records for hostname: ", h)
@@ -194,4 +197,5 @@ func updateDNS() {
 	if (me.uid != nil) {
 		me.uid.SetText(user.Username + " (" + strconv.Itoa(os.Getuid()) + ")")
 	}
+	log("updateDNS() END")
 }

@@ -23,7 +23,7 @@ func (h *Host) verifyETC() bool {
 func (h *Host) updateIPs(host string) {
     ips, err := net.LookupIP(host)
         if err != nil {
-                exit(err)
+                log(logError, "updateIPs failed", err)
         }
         for _, ip := range ips {
                 log(host, ip)
