@@ -12,6 +12,7 @@ type LogOptions struct {
 	VerboseDNS bool  `arg:"--verbose-dns" help:"debug your dns settings"`
 	LogFile string `help:"write all output to a file"`
 	// User string `arg:"env:USER"`
+	Display string `arg:"env:DISPLAY"`
 }
 
 var args struct {

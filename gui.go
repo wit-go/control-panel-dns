@@ -2,6 +2,7 @@
 package main
 
 import 	(
+	"fmt"
 	"os"
 	"os/user"
 	"strconv"
@@ -12,8 +13,8 @@ import 	(
 	"github.com/davecgh/go-spew/spew"
 )
 
-// This initializes the first window
-func initGUI() {
+// This setups up the dns control panel window
+func setupControlPanelWindow() {
 	me.window = myGui.New2().Window("DNS and IPv6 Control Panel").Standard()
 	me.window.Dump(true)
 
@@ -36,6 +37,14 @@ func addDNSTab(title string) {
 	g2.NewButton("gui.DebugWindow()", func () {
 		gui.DebugWindow()
 	})
+
+	g2.NewButton("Load 'gocui'", func () {
+		// this set the xterm and mate-terminal window title. maybe works generally?
+		fmt.Println("\033]0;" + title + "blah \007")
+		gui.StartS("gocui")
+		gui.Redraw("gocui")
+	})
+
 	g2.NewButton("Network Interfaces", func () {
 		for i, t := range me.ifmap {
 			log("name =", t.iface.Name)
@@ -106,7 +115,7 @@ func myDefaultExit(n *gui.Node) {
 func nsupdateGroup(w *gui.Node) {
 	g := w.NewGroup("dns update")
 
-	grid := g.NewGrid("fucknuts", 2, 2)
+	grid := g.NewGrid("gridnuts", 2, 2)
 
 	grid.SetNext(1,1)
 	grid.NewLabel("hostname =")

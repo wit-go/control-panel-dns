@@ -42,7 +42,10 @@ func main() {
 	// myGui = gui.Main(initGUI)
 	myGui = gui.Start()
 	sleep(1)
-	initGUI()
+	setupControlPanelWindow()
+	sleep(1)
+	myGui.LoadPlugin("gocui")
+	// gui.Redraw("gocui")
 	sleep(1)
 	checkNetworkChanges()
 }

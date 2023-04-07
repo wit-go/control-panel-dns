@@ -1,5 +1,5 @@
 run: build
-	./control-panel-dns
+	./control-panel-dns >/tmp/witgui.log.stderr 2>&1
 
 install:
 	go install -v go.wit.com/control-panel-dns@latest
@@ -91,3 +91,7 @@ sudo-cp:
 
 go-get:
 	go install -v check.lab.wit.org/gui
+
+log:
+	reset
+	tail -f /tmp/witgui.* /tmp/guilogfile
