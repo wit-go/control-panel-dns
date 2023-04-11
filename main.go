@@ -37,16 +37,25 @@ func main() {
 	// Example_listLink()
 
 	log("Toolkit = ", args.Toolkit)
-	// gui.InitPlugins([]string{"andlabs"})
-	// gui.SetDebug(true)
-	// myGui = gui.Main(initGUI)
-	myGui = gui.Start()
+	for i, t := range args.Toolkit {
+		log("trying to load plugin", i, t)
+		gui.LoadPlugin(t)
+	}
+
+	// will set all debugging flags
+	gui.SetDebug(true)
+
+	myGui = gui.New()
 	sleep(1)
 	setupControlPanelWindow()
 	sleep(1)
-	myGui.LoadPlugin("gocui")
-	// gui.Redraw("gocui")
-	sleep(1)
+	// sleep(1)
+	if (args.GuiDebug) {
+		gui.DebugWindow()
+	}
+	gui.ShowDebugValues()
+
+	// forever monitor for network and dns changes
 	checkNetworkChanges()
 }
 
@@ -70,7 +79,8 @@ func checkNetworkChanges() {
 	}
 }
 
-// Run this every once and a while
+// This checks for changes to the network settings
+// and verifies that DNS is working or not working
 func dnsTTL() {
 	me.changed = false
 	log("FQDN =", me.fqdn.GetText())

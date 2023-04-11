@@ -4,7 +4,6 @@ package main
 import 	(
 	"net"
 	"strings"
-	// "git.wit.org/wit/gui"
 )
 
 var DEBUGNET bool = false

@@ -8,8 +8,6 @@ import 	(
 	"os"
 	"os/exec"
 	"net"
-//	"git.wit.org/wit/gui"
-//	"github.com/davecgh/go-spew/spew"
 )
 
 func CheckSuperuser() bool {

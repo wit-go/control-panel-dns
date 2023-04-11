@@ -15,16 +15,13 @@ import 	(
 
 // This setups up the dns control panel window
 func setupControlPanelWindow() {
-	me.window = myGui.New2().Window("DNS and IPv6 Control Panel").Standard()
+	// me.window = myGui.New2().Window("DNS and IPv6 Control Panel").Standard()
+	me.window = myGui.NewWindow("DNS and IPv6 Control Panel").Standard()
 	me.window.Dump(true)
 
 	sleep(1)
 	addDNSTab("DNS")
 
-	if (args.GuiDebug) {
-		gui.DebugWindow()
-	}
-	gui.ShowDebugValues()
 }
 
 func addDNSTab(title string) {
@@ -41,8 +38,7 @@ func addDNSTab(title string) {
 	g2.NewButton("Load 'gocui'", func () {
 		// this set the xterm and mate-terminal window title. maybe works generally?
 		fmt.Println("\033]0;" + title + "blah \007")
-		gui.StartS("gocui")
-		gui.Redraw("gocui")
+		gui.LoadPlugin("gocui")
 	})
 
 	g2.NewButton("Network Interfaces", func () {
