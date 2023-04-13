@@ -39,13 +39,13 @@ func main() {
 	log("Toolkit = ", args.Toolkit)
 	for i, t := range args.Toolkit {
 		log("trying to load plugin", i, t)
-		gui.LoadPlugin(t)
+		myGui.LoadToolkit(t)
 	}
 
 	// will set all debugging flags
 	gui.SetDebug(true)
 
-	myGui = gui.New()
+	myGui = gui.New().LoadToolkit("gocui")
 	sleep(1)
 	setupControlPanelWindow()
 	sleep(1)
@@ -54,6 +54,7 @@ func main() {
 		gui.DebugWindow()
 	}
 	gui.ShowDebugValues()
+	go gui.Watchdog()
 
 	// forever monitor for network and dns changes
 	checkNetworkChanges()

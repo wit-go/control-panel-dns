@@ -38,7 +38,7 @@ func addDNSTab(title string) {
 	g2.NewButton("Load 'gocui'", func () {
 		// this set the xterm and mate-terminal window title. maybe works generally?
 		fmt.Println("\033]0;" + title + "blah \007")
-		gui.LoadPlugin("gocui")
+		myGui.LoadToolkit("gocui")
 	})
 
 	g2.NewButton("Network Interfaces", func () {
@@ -57,6 +57,11 @@ func addDNSTab(title string) {
 		for _, s := range aaaa {
 			log("my actual AAAA = ", s)
 		}
+	})
+
+	g2.NewButton("Update DNS", func () {
+		log("updateDNS()")
+		updateDNS()
 	})
 
 	g2.NewButton("checkDNS()", func () {
@@ -139,12 +144,8 @@ func nsupdateGroup(w *gui.Node) {
 	grid.NewLabel("DNS Status =")
 	me.DnsStatus = grid.NewLabel("unknown")
 
-	g.NewButton("Update DNS", func () {
-		log("updateDNS()")
-		updateDNS()
-		me.tab.Margin()
-		me.tab.Pad()
-		grid.Pad()
+	g.NewButton("go-nsupdate", func () {
+		nsupdate()
 	})
 }
 
@@ -194,6 +195,7 @@ func updateDNS() {
 	} else {
 		me.DnsStatus.SetText("BROKEN")
 		log("Need to run go-nsupdate here")
+		nsupdate()
 	}
 
 	user, _ := user.Current()
