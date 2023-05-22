@@ -25,36 +25,23 @@ func main() {
 	me.ifmap = make(map[int]*IFtype)
 	me.dnsTTL = 5		// recheck DNS is working every 2 minutes // TODO: watch rx packets?
 
-
-	log()
-	log(true, "this is true")
-	log(false, "this is false")
-	sleep(.4)
-	sleep(.3)
-	sleep(.2)
-	sleep("done scanning net")
-
-	// Example_listLink()
-
-	log("Toolkit = ", args.Toolkit)
-	for i, t := range args.Toolkit {
+	log("Toolkit = ", args.GuiToolkit)
+	for i, t := range args.GuiToolkit {
 		log("trying to load plugin", i, t)
 		myGui.LoadToolkit(t)
 	}
 
 	// will set all debugging flags
-	gui.SetDebug(true)
+	// gui.SetDebug(true)
 
 	myGui = gui.New().LoadToolkit("gocui")
 	sleep(1)
 	setupControlPanelWindow()
 	sleep(1)
-	// sleep(1)
 	if (args.GuiDebug) {
 		gui.DebugWindow()
 	}
 	gui.ShowDebugValues()
-	go gui.Watchdog()
 
 	// forever monitor for network and dns changes
 	checkNetworkChanges()
@@ -102,10 +89,7 @@ func dnsTTL() {
 
 	if (me.changed) {
 		stamp := time.Now().Format("2006/01/02 15:04:05")
-		s := stamp + " Network things changed"
 		log(logError, "Network things changed on", stamp)
 		updateDNS()
-		me.output.SetText(s)
-
 	}
 }

@@ -17,7 +17,7 @@ import 	(
 func setupControlPanelWindow() {
 	// me.window = myGui.New2().Window("DNS and IPv6 Control Panel").Standard()
 	me.window = myGui.NewWindow("DNS and IPv6 Control Panel").Standard()
-	me.window.Dump(true)
+	me.window.Dump()
 
 	sleep(1)
 	addDNSTab("DNS")
@@ -100,12 +100,14 @@ func addDNSTab(title string) {
 
 	nsupdateGroup(me.tab)
 
+	/*
 	tmp := me.tab.NewGroup("output")
 	me.output = tmp.NewTextbox("some output")
 	me.output.Custom = func() {
 		s := me.output.GetText()
 		log("output text =", s)
 	}
+	*/
 }
 
 func myDefaultExit(n *gui.Node) {
@@ -149,6 +151,7 @@ func nsupdateGroup(w *gui.Node) {
 	})
 }
 
+/*
 var outJunk string
 func output(s string, a bool) {
 	if (a) {
@@ -159,6 +162,7 @@ func output(s string, a bool) {
 	me.output.SetText(outJunk)
 	log(outJunk)
 }
+*/
 
 func updateDNS() {
 	var aaaa []string

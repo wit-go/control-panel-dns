@@ -22,7 +22,6 @@ type Host struct {
 	window		*gui.Node		// the main window
 	tab		*gui.Node		// the main dns tab
 	notes		*gui.Node		// using this to put notes here
-	output		*gui.Node		// Textbox for dumping output
 	uid		*gui.Node		// user
 	fqdn		*gui.Node		// display the full hostname
 	IPv4		*gui.Node		// show valid IPv4 addresses

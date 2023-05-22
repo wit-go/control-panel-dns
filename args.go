@@ -3,7 +3,7 @@ package main
 
 import 	(
 	"git.wit.org/wit/gui"
-	"git.wit.org/jcarr/dnssecsocket"
+	// "git.wit.org/jcarr/dnssecsocket"
 )
 
 type LogOptions struct {
@@ -17,10 +17,10 @@ type LogOptions struct {
 
 var args struct {
 	LogOptions
-	dnssecsocket.Args
+	// dnssecsocket.Args
 	gui.GuiArgs
 }
 
 func parsedown () {
-	dnssecsocket.Parse(args.VerboseDnssec)
+	// dnssecsocket.Parse(args.VerboseDnssec)
 }
