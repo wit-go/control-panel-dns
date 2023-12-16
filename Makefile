@@ -1,9 +1,13 @@
 run: build
-	./control-panel-dns >/tmp/witgui.log.stderr 2>&1
+	# ./control-panel-dns >/tmp/witgui.log.stderr 2>&1
+	./control-panel-dns
 
 install:
 	go install -v go.wit.com/control-panel-dns@latest
 	# go install -v git.wit.com/wit/control-panel-dns@latest
+
+gocui:
+	./control-panel-dns -gui gocui >/tmp/witgui.log.stderr 2>&1
 
 debug: build
 	./control-panel-dns --verbose --verbose-net --gui-debug
@@ -18,6 +22,8 @@ build-release:
 
 build:
 	reset
+	-mkdir -p plugins/
+	-cp ~/go/src/git.wit.org/wit/gui/toolkit/*.so plugins/
 	# GO111MODULE="off" go get -v -x .
 	GO111MODULE="off" go build -v -o control-panel-dns
 

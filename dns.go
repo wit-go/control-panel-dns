@@ -5,6 +5,7 @@
 package main
 
 import 	(
+	"log"
 	"net"
 )
 
@@ -23,16 +24,16 @@ func (h *Host) verifyETC() bool {
 func (h *Host) updateIPs(host string) {
     ips, err := net.LookupIP(host)
         if err != nil {
-                log(logError, "updateIPs failed", err)
+                log.Println(logError, "updateIPs failed", err)
         }
         for _, ip := range ips {
-                log(host, ip)
+                log.Println(host, ip)
         }
 }
 
 func (h *Host) setIPv4(ipv4s map[string]*IPtype) {
         for ip, t := range ipv4s {
-		log("IPv4", ip, t)
+		log.Println("IPv4", ip, t)
         }
 }
 
@@ -47,11 +48,11 @@ func (h *Host) checkDNS() {
 			ipt = "IPv6"
 		}
 		if (! t.IsReal()) {
-			log(args.VerboseDNS, "\tIP is not Real", ipt, i.Index, i.Name, s)
+			log.Println(args.VerboseDNS, "\tIP is not Real", ipt, i.Index, i.Name, s)
 			continue
 		}
 
-		log(args.VerboseDNS, "\tIP is Real    ", ipt, i.Index, i.Name, s)
+		log.Println(args.VerboseDNS, "\tIP is Real    ", ipt, i.Index, i.Name, s)
 		if (t.ipv6) {
 			ip6 = true
 		} else {
@@ -60,13 +61,13 @@ func (h *Host) checkDNS() {
 	}
 
 	if (ip4 == true) {
-		log(args.VerboseDNS, "IPv4 should work. Wow. You actually have a real IPv4 address")
+		log.Println(args.VerboseDNS, "IPv4 should work. Wow. You actually have a real IPv4 address")
 	} else {
-		log(args.VerboseDNS, "IPv4 is broken. (be nice and setup ipv4-only.wit.com)")
+		log.Println(args.VerboseDNS, "IPv4 is broken. (be nice and setup ipv4-only.wit.com)")
 	}
 	if (ip6 == true) {
-		log(args.VerboseDNS, "IPv6 should be working. Need to test it here.")
+		log.Println(args.VerboseDNS, "IPv6 should be working. Need to test it here.")
 	} else {
-		log(args.VerboseDNS, "IPv6 is broken. Need to fix it here.")
+		log.Println(args.VerboseDNS, "IPv6 is broken. Need to fix it here.")
 	}
 }

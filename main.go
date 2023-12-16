@@ -5,19 +5,21 @@
 package main
 
 import 	(
+	"log"
 	"strconv"
 	"runtime"
 	"time"
-	arg "github.com/alexflint/go-arg"
+	"embed"
 	"git.wit.org/wit/gui"
 )
 
-var p *arg.Parser
 var myGui *gui.Node
 
+//go:embed plugins/*.so
+var resToolkit embed.FS
+
 func main() {
-	p = arg.MustParse(&args)
-	parsedown()
+	// parsedown()
 
 	// initialize the maps to track IP addresses and network interfaces
 	me.ipmap = make(map[string]*IPtype)
@@ -25,16 +27,11 @@ func main() {
 	me.ifmap = make(map[int]*IFtype)
 	me.dnsTTL = 5		// recheck DNS is working every 2 minutes // TODO: watch rx packets?
 
-	log("Toolkit = ", args.GuiToolkit)
-	for i, t := range args.GuiToolkit {
-		log("trying to load plugin", i, t)
-		myGui.LoadToolkit(t)
-	}
-
 	// will set all debugging flags
 	// gui.SetDebug(true)
 
-	myGui = gui.New().LoadToolkit("gocui")
+	// myGui = gui.New().InitEmbed(resToolkit).LoadToolkit("gocui")
+	myGui = gui.New().Default()
 	sleep(1)
 	setupControlPanelWindow()
 	sleep(1)
@@ -60,7 +57,7 @@ func checkNetworkChanges() {
 			if (runtime.GOOS == "linux") {
 				dnsTTL()
 			} else {
-				log("Windows and MacOS don't work yet")
+				log.Println("Windows and MacOS don't work yet")
 			}
 			ttl = me.dnsTTL
 		}
@@ -71,25 +68,25 @@ func checkNetworkChanges() {
 // and verifies that DNS is working or not working
 func dnsTTL() {
 	me.changed = false
-	log("FQDN =", me.fqdn.GetText())
+	log.Println("FQDN =", me.fqdn.GetText())
 	getHostname()
 	scanInterfaces()
 	for i, t := range me.ifmap {
-		log(strconv.Itoa(i) + " iface = " + t.iface.Name)
+		log.Println(strconv.Itoa(i) + " iface = " + t.iface.Name)
 	}
 
 	var aaaa []string
 	aaaa = realAAAA()
 	var all string
 	for _, s := range aaaa {
-		log("my actual AAAA = ",s)
+		log.Println("my actual AAAA = ",s)
 		all += s + "\n"
 	}
 	// me.IPv6.SetText(all)
 
 	if (me.changed) {
 		stamp := time.Now().Format("2006/01/02 15:04:05")
-		log(logError, "Network things changed on", stamp)
+		log.Println(logError, "Network things changed on", stamp)
 		updateDNS()
 	}
 }

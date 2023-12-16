@@ -2,6 +2,7 @@
 package main
 
 import 	(
+	"log"
 	"fmt"
 	"os"
 	"os/user"
@@ -20,16 +21,17 @@ func setupControlPanelWindow() {
 	me.window.Dump()
 
 	sleep(1)
-	addDNSTab("DNS")
+	dnsTab("DNS")
+	debugTab("Debug")
 
 }
 
-func addDNSTab(title string) {
+func debugTab(title string) {
 	var g2 *gui.Node
 
-	me.tab = me.window.NewTab(title)
+	tab := me.window.NewTab(title)
 
-	g2 = me.tab.NewGroup("Real Stuff")
+	g2 = tab.NewGroup("Real Stuff")
 
 	g2.NewButton("gui.DebugWindow()", func () {
 		gui.DebugWindow()
@@ -43,9 +45,9 @@ func addDNSTab(title string) {
 
 	g2.NewButton("Network Interfaces", func () {
 		for i, t := range me.ifmap {
-			log("name =", t.iface.Name)
-			log("int =", i, "name =", t.name, t.iface)
-			log("iface = " + t.iface.Name)
+			log.Println("name =", t.iface.Name)
+			log.Println("int =", i, "name =", t.name, t.iface)
+			log.Println("iface = " + t.iface.Name)
 		}
 	})
 	g2.NewButton("Hostname", func () {
@@ -55,12 +57,12 @@ func addDNSTab(title string) {
 		var aaaa []string
 		aaaa = realAAAA()
 		for _, s := range aaaa {
-			log("my actual AAAA = ", s)
+			log.Println("my actual AAAA = ", s)
 		}
 	})
 
 	g2.NewButton("Update DNS", func () {
-		log("updateDNS()")
+		log.Println("updateDNS()")
 		updateDNS()
 	})
 
@@ -70,15 +72,15 @@ func addDNSTab(title string) {
 	g2.NewButton("os.User()", func () {
 		user, _ := user.Current()
 		spew.Dump(user)
-		log("os.Getuid =", user.Username, os.Getuid())
+		log.Println("os.Getuid =", user.Username, os.Getuid())
 		if (me.uid != nil) {
 			me.uid.SetText(user.Username + " (" + strconv.Itoa(os.Getuid()) + ")")
 		}
 	})
 	g2.NewButton("dig +trace", func () {
 		o := shell.Run("dig +trace +noadditional DS " + me.hostname + " @8.8.8.8")
-		log(o)
-		// log(o)
+		log.Println(o)
+		// log.Println(o)
 	})
 	g2.NewButton("Example_listLink()", func () {
 		Example_listLink()
@@ -91,32 +93,23 @@ func addDNSTab(title string) {
 		if err != nil {
 			return
 		}
-		log("host =", host)
+		log.Println("host =", host)
 	})
 	g2.NewButton("DumpPublicDNSZone(apple.com)", func () {
 		DumpPublicDNSZone("apple.com")
 		dumpIPs("www.apple.com")
 	})
-
-	nsupdateGroup(me.tab)
-
-	/*
-	tmp := me.tab.NewGroup("output")
-	me.output = tmp.NewTextbox("some output")
-	me.output.Custom = func() {
-		s := me.output.GetText()
-		log("output text =", s)
-	}
-	*/
 }
 
 func myDefaultExit(n *gui.Node) {
-        log("You can Do exit() things here")
+        log.Println("You can Do exit() things here")
 	os.Exit(0)
 }
 
-func nsupdateGroup(w *gui.Node) {
-	g := w.NewGroup("dns update")
+func dnsTab(title string) {
+	tab := me.window.NewTab(title)
+
+	g := tab.NewGroup("dns update")
 
 	grid := g.NewGrid("gridnuts", 2, 2)
 
@@ -146,9 +139,40 @@ func nsupdateGroup(w *gui.Node) {
 	grid.NewLabel("DNS Status =")
 	me.DnsStatus = grid.NewLabel("unknown")
 
-	g.NewButton("go-nsupdate", func () {
+	me.fix = g.NewButton("Fix", func () {
+		if (goodHostname(me.hostname)) {
+			log.Println("hostname is good:", me.hostname)
+		} else {
+			log.Println("you need to fix your hostname here", me.hostname)
+			return
+		}
 		nsupdate()
 	})
+	me.fix.Disable()
+
+	statusGrid(tab)
+
+}
+
+func statusGrid(n *gui.Node) {
+	problems := n.NewGroup("status")
+
+	gridP := problems.NewGrid("nuts", 2, 2)
+
+	gridP.NewLabel("DNS Status =")
+	gridP.NewLabel("unknown")
+
+	gridP.NewLabel("hostname =")
+	gridP.NewLabel("invalid")
+
+	gridP.NewLabel("dns provider =")
+	gridP.NewLabel("unknown")
+
+	gridP.NewLabel("IPv6 working =")
+	gridP.NewLabel("unknown")
+
+	gridP.NewLabel("dns resolution =")
+	gridP.NewLabel("unknown")
 }
 
 /*
@@ -160,7 +184,7 @@ func output(s string, a bool) {
 		outJunk = s
 	}
 	me.output.SetText(outJunk)
-	log(outJunk)
+	log.Println(outJunk)
 }
 */
 
@@ -171,20 +195,20 @@ func updateDNS() {
 		h = "unknown.lab.wit.org"
 		// h = "hpdevone.lab.wit.org"
 	}
-	log("dnsAAAA()()")
+	log.Println("dnsAAAA()()")
 	aaaa = dnsAAAA(h)
-	log("dnsAAAA()()")
-	log(SPEW, me)
+	log.Println("dnsAAAA()()")
+	log.Println(SPEW, me)
 	if (aaaa == nil) {
-		log("There are no DNS AAAA records for hostname: ", h)
+		log.Println("There are no DNS AAAA records for hostname: ", h)
 	}
 	var broken int = 0
 	var all string
 	for _, s := range aaaa {
-		log("host", h, "DNS AAAA =", s)
+		log.Println("host", h, "DNS AAAA =", s)
 		all += s + "\n"
 		if ( me.ipmap[s] == nil) {
-			log("THIS IS THE WRONG AAAA DNS ENTRY:  host", h, "DNS AAAA =", s)
+			log.Println("THIS IS THE WRONG AAAA DNS ENTRY:  host", h, "DNS AAAA =", s)
 			broken = 2
 		} else {
 			if (broken == 0) {
@@ -198,15 +222,16 @@ func updateDNS() {
 		me.DnsStatus.SetText("WORKING")
 	} else {
 		me.DnsStatus.SetText("BROKEN")
-		log("Need to run go-nsupdate here")
+		me.fix.Enable()
+		log.Println("Need to run go-nsupdate here")
 		nsupdate()
 	}
 
 	user, _ := user.Current()
 	spew.Dump(user)
-	log("os.Getuid =", user.Username, os.Getuid())
+	log.Println("os.Getuid =", user.Username, os.Getuid())
 	if (me.uid != nil) {
 		me.uid.SetText(user.Username + " (" + strconv.Itoa(os.Getuid()) + ")")
 	}
-	log("updateDNS() END")
+	log.Println("updateDNS() END")
 }

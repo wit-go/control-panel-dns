@@ -5,7 +5,10 @@
 
 package main
 
-// import "net"
+import (
+	"log"
+	"git.wit.org/wit/shell"
+)
 
 // will try to get this hosts FQDN
 import "github.com/Showmax/go-fqdn"
@@ -21,7 +24,7 @@ func getHostname() {
 	var s string = "gui.Label == nil"
 	s, err = fqdn.FqdnHostname()
 	if (err != nil) {
-		log("FQDN hostname error =", err)
+		log.Println("FQDN hostname error =", err)
 		return
 	}
 	if (me.fqdn != nil) {
@@ -31,19 +34,30 @@ func getHostname() {
 			me.changed = true
 		}
 	}
-	log("FQDN =", s)
+	log.Println("FQDN =", s)
+}
+
+// returns true if the hostname is good
+// check that all the OS settings are correct here
+// On Linux, /etc/hosts, /etc/hostname
+//      and domainname and hostname
+func goodHostname(h string) bool {
+	hostname := shell.Cat("/etc/hostname")	
+	log.Println("hostname =", hostname)
+
+	return false
 }
 
 func dnsAAAA(s string) []string {
 	var aaaa []string
 	// lookup the IP address from DNS
 	rrset := dnssecsocket.Dnstrace(s, "AAAA")
-	log(args.VerboseDNS, SPEW, rrset)
+	log.Println(args.VerboseDNS, SPEW, rrset)
 	for i, rr := range rrset {
-		log(args.VerboseDNS, "r.Answer =", i, rr)
+		log.Println(args.VerboseDNS, "r.Answer =", i, rr)
 		ipaddr := dns.Field(rr, 1)
 		aaaa = append(aaaa, ipaddr)
 	}
-	log(args.VerboseDNS, "aaaa =", aaaa)
+	log.Println(args.VerboseDNS, "aaaa =", aaaa)
 	return aaaa
 }

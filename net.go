@@ -2,6 +2,7 @@
 package main
 
 import 	(
+	"log"
 	"net"
 	"strings"
 )
@@ -17,21 +18,21 @@ func watchNetworkInterfaces() {
 	// Set up a notification channel
 	notification := make(chan net.Interface)
 
-	log(DEBUGNET, "watchNet()")
+	log.Println(DEBUGNET, "watchNet()")
 	// Start goroutine to watch for changes
 	go func() {
-		log(DEBUGNET, "watchNet() func")
+		log.Println(DEBUGNET, "watchNet() func")
 		for {
-			log(DEBUGNET, "forever loop start")
+			log.Println(DEBUGNET, "forever loop start")
 			// Check for changes in each interface
 			for _, i := range interfaces {
-				log(DEBUGNET, "something on i =", i)
+				log.Println(DEBUGNET, "something on i =", i)
 				if status := i.Flags & net.FlagUp; status != 0 {
 					notification <- i
-					log(DEBUGNET, "something on i =", i)
+					log.Println(DEBUGNET, "something on i =", i)
 				}
 			}
-			log(DEBUGNET, "forever loop end")
+			log.Println(DEBUGNET, "forever loop end")
 		}
 	}()
 }
@@ -43,20 +44,20 @@ func IsIPv6(address string) bool {
 
 func (t *IPtype) IsReal() bool {
 	if (t.ip.IsPrivate() || t.ip.IsLoopback() || t.ip.IsLinkLocalUnicast()) {
-		log(DEBUGNET, "\t\tIP is Real = false")
+		log.Println(DEBUGNET, "\t\tIP is Real = false")
 		return false
 	} else {
-		log(DEBUGNET, "\t\tIP is Real = true")
+		log.Println(DEBUGNET, "\t\tIP is Real = true")
 		return true
 	}
 }
 
 func IsReal(ip *net.IP) bool {
 	if (ip.IsPrivate() || ip.IsLoopback() || ip.IsLinkLocalUnicast()) {
-		log(DEBUGNET, "\t\tIP is Real = false")
+		log.Println(DEBUGNET, "\t\tIP is Real = false")
 		return false
 	} else {
-		log(DEBUGNET, "\t\tIP is Real = true")
+		log.Println(DEBUGNET, "\t\tIP is Real = true")
 		return true
 	}
 }
@@ -73,7 +74,7 @@ func renameInterface(i *net.Interface) {
 func checkInterface(i net.Interface) {
 	val, ok := me.ifmap[i.Index]
 	if ! ok {
-		log(i.Name, "is a new network interface. The linux kernel index =", i.Index)
+		log.Println(i.Name, "is a new network interface. The linux kernel index =", i.Index)
 		me.ifmap[i.Index] = new(IFtype)
 		me.ifmap[i.Index].gone = false
 		me.ifmap[i.Index].iface = &i
@@ -85,9 +86,9 @@ func checkInterface(i net.Interface) {
 		return
 	}
 	me.ifmap[i.Index].gone = false
-	log(args.VerboseNet, "me.ifmap[i] does exist. Need to compare everything.", i.Index, i.Name, val.iface.Index, val.iface.Name)
+	log.Println(args.VerboseNet, "me.ifmap[i] does exist. Need to compare everything.", i.Index, i.Name, val.iface.Index, val.iface.Name)
 	if (val.iface.Name != i.Name) {
-		log(val.iface.Name, "has changed to it's name to", i.Name)
+		log.Println(val.iface.Name, "has changed to it's name to", i.Name)
 		me.ifmap[i.Index].iface = &i
 		me.changed = true
 		if (me.Interfaces != nil) {
@@ -125,14 +126,14 @@ func checkDNS() (map[string]*IPtype, map[string]*IPtype) {
 			ipt = "IPv6"
 		}
 		if (t.IsReal()) {
-			log("\tIP is Real    ", ipt, i.Index, i.Name, s)
+			log.Println("\tIP is Real    ", ipt, i.Index, i.Name, s)
 			if (t.ipv6) {
 				ipv6s[s] = t
 			} else {
 				ipv4s[s] = t
 			}
 		} else {
-			log("\tIP is not Real", ipt, i.Index, i.Name, s)
+			log.Println("\tIP is not Real", ipt, i.Index, i.Name, s)
 		}
 	}
 	return ipv6s, ipv4s
@@ -140,14 +141,14 @@ func checkDNS() (map[string]*IPtype, map[string]*IPtype) {
 
 // Will figure out if an IP address is new
 func checkIP(ip *net.IPNet, i net.Interface) bool {
-	log(args.VerboseNet, "\t\taddr.(type) = *net.IPNet")
-	log(args.VerboseNet, "\t\taddr.(type) =", ip)
+	log.Println(args.VerboseNet, "\t\taddr.(type) = *net.IPNet")
+	log.Println(args.VerboseNet, "\t\taddr.(type) =", ip)
 	var realip string
 	realip = ip.IP.String()
 
 	val, ok := me.ipmap[realip]
 	if ok {
-		log(args.VerboseNet, val.ipnet.IP.String(), "is already a defined IP address")
+		log.Println(args.VerboseNet, val.ipnet.IP.String(), "is already a defined IP address")
 		me.ipmap[realip].gone = false
 		return false
 	}
@@ -174,14 +175,14 @@ func checkIP(ip *net.IPNet, i net.Interface) bool {
 		}
 	}
 	if (IsReal(&ip.IP)) {
-		log("\tIP is Real    ", t, i.Index, i.Name, realip)
+		log.Println("\tIP is Real    ", t, i.Index, i.Name, realip)
 	} else {
-		log("\tIP is not Real", t, i.Index, i.Name, realip)
+		log.Println("\tIP is not Real", t, i.Index, i.Name, realip)
 	}
-	log(args.VerboseNet, "\t\tIP is IsPrivate() =", ip.IP.IsPrivate())
-	log(args.VerboseNet, "\t\tIP is IsLoopback() =", ip.IP.IsLoopback())
-	log(args.VerboseNet, "\t\tIP is IsLinkLocalUnicast() =", ip.IP.IsLinkLocalUnicast())
-	// log("HERE HERE", "realip =", realip, "me.ip[realip]=", me.ipmap[realip])
+	log.Println(args.VerboseNet, "\t\tIP is IsPrivate() =", ip.IP.IsPrivate())
+	log.Println(args.VerboseNet, "\t\tIP is IsLoopback() =", ip.IP.IsLoopback())
+	log.Println(args.VerboseNet, "\t\tIP is IsLinkLocalUnicast() =", ip.IP.IsLinkLocalUnicast())
+	// log.Println("HERE HERE", "realip =", realip, "me.ip[realip]=", me.ipmap[realip])
 	return true
 }
 
@@ -189,25 +190,25 @@ func scanInterfaces() {
 	me.changed = false
 	ifaces, _ := net.Interfaces()
 	// me.ifnew = ifaces
-	log(DEBUGNET, SPEW, ifaces)
+	log.Println(DEBUGNET, SPEW, ifaces)
 	for _, i := range ifaces {
 		addrs, _ := i.Addrs()
-		// log("range ifaces = ", i)
+		// log.Println("range ifaces = ", i)
 		checkInterface(i)
-		log(args.VerboseNet, "*net.Interface.Name = ", i.Name, i.Index)
-		log(args.VerboseNet, SPEW, i)
-		log(DEBUGNET, SPEW, addrs)
+		log.Println(args.VerboseNet, "*net.Interface.Name = ", i.Name, i.Index)
+		log.Println(args.VerboseNet, SPEW, i)
+		log.Println(DEBUGNET, SPEW, addrs)
 		for _, addr := range addrs {
-			log(DEBUGNET, "\taddr =", addr)
-			log(DEBUGNET, SPEW, addrs)
+			log.Println(DEBUGNET, "\taddr =", addr)
+			log.Println(DEBUGNET, SPEW, addrs)
 			ips, _ := net.LookupIP(addr.String())
-			log(DEBUGNET, "\tLookupIP(addr) =", ips)
+			log.Println(DEBUGNET, "\tLookupIP(addr) =", ips)
 			switch v := addr.(type) {
 			case *net.IPNet:
 				checkIP(v, i)
-				// log("\t\tIP is () =", ip.())
+				// log.Println("\t\tIP is () =", ip.())
 			default:
-				log(DEBUGNET, "\t\taddr.(type) = NO IDEA WHAT TO DO HERE v =", v)
+				log.Println(DEBUGNET, "\t\taddr.(type) = NO IDEA WHAT TO DO HERE v =", v)
 			}
 		}
 	}
@@ -217,12 +218,12 @@ func scanInterfaces() {
 	for s, t := range me.ipmap {
 		if (t.ipv4) {
 			all4 += s + "\n"
-			log("IPv4 =", s)
+			log.Println("IPv4 =", s)
 		} else if (t.ipv6) {
 			all6 += s + "\n"
-			log("IPv6 =", s)
+			log.Println("IPv6 =", s)
 		} else {
-			log("???? =", s)
+			log.Println("???? =", s)
 		}
 	}
 	all4 = strings.TrimSpace(all4)
@@ -235,7 +236,7 @@ func scanInterfaces() {
 func deleteChanges() {
 	for i, t := range me.ifmap {
 		if (t.gone) {
-			log("DELETE int =", i, "name =", t.name, t.iface)
+			log.Println("DELETE int =", i, "name =", t.name, t.iface)
 			delete(me.ifmap, i)
 			me.changed = true
 		}
@@ -243,10 +244,10 @@ func deleteChanges() {
 	}
 	for s, t := range me.ipmap {
 		if (t.gone) {
-			log("DELETE name =", s, "IPv4 =", t.ipv4)
-			log("DELETE name =", s, "IPv6 =", t.ipv6)
-			log("DELETE name =", s, "iface =", t.iface)
-			log("DELETE name =", s, "ip =", t.ip)
+			log.Println("DELETE name =", s, "IPv4 =", t.ipv4)
+			log.Println("DELETE name =", s, "IPv6 =", t.ipv6)
+			log.Println("DELETE name =", s, "iface =", t.iface)
+			log.Println("DELETE name =", s, "ip =", t.ip)
 			delete(me.ipmap, s)
 			me.changed = true
 		}

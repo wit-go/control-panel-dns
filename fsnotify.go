@@ -3,7 +3,8 @@ package main
 // Watches for changes to a directory. Works cross-platform
 
 import (
-    "github.com/fsnotify/fsnotify"
+	"log"
+	"github.com/fsnotify/fsnotify"
 )
 
 // This would be a really dumb way to watch for new network interfaces
@@ -13,7 +14,7 @@ func watchSysClassNet() {
     // Create new watcher.
     watcher, err := fsnotify.NewWatcher()
     if err != nil {
-	    log(logError, "watchSysClassNet() failed:", err)
+	    log.Println(logError, "watchSysClassNet() failed:", err)
 	    return
     }
     defer watcher.Close()
@@ -26,15 +27,15 @@ func watchSysClassNet() {
                 if !ok {
                     return
                 }
-                log("event:", event)
+                log.Println("event:", event)
                 if event.Has(fsnotify.Write) {
-                    log("modified file:", event.Name)
+                    log.Println("modified file:", event.Name)
                 }
             case err, ok := <-watcher.Errors:
                 if !ok {
                     return
                 }
-                log("error:", err)
+                log.Println("error:", err)
             }
         }
     }()
@@ -42,7 +43,7 @@ func watchSysClassNet() {
     // Add a path.
     err = watcher.Add("/tmp")
     if err != nil {
-	    log(logError, "watchSysClassNet() watcher.Add() failed:", err)
+	    log.Println(logError, "watchSysClassNet() watcher.Add() failed:", err)
 	    return
     }
 
@@ -65,12 +66,12 @@ func fsnotifyNetworkInterfaceChanges() error {
 	for {
 		select {
 		case event := <-watcher.Events:
-			log("fsnotifyNetworkInterfaceChanges() event =", event)
+			log.Println("fsnotifyNetworkInterfaceChanges() event =", event)
 			if event.Op&fsnotify.Create == fsnotify.Create {
 					// Do something on network interface creation
 			}
 		case err := <-watcher.Errors:
-			log("fsnotifyNetworkInterfaceChanges() event err =", err)
+			log.Println("fsnotifyNetworkInterfaceChanges() event err =", err)
 			return err
 		}
 	}

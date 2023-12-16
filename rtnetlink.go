@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"github.com/jsimonetti/rtnetlink"
 )
 
@@ -9,7 +10,7 @@ func Example_listLink() {
 	// Dial a connection to the rtnetlink socket
 	conn, err := rtnetlink.Dial(nil)
 	if err != nil {
-		log(logError, "Example_listLink() failed", err)
+		log.Println(logError, "Example_listLink() failed", err)
 		return
 	}
 	defer conn.Close()
@@ -17,9 +18,9 @@ func Example_listLink() {
 	// Request a list of interfaces
 	msg, err := conn.Link.List()
 	if err != nil {
-		log(err)
+		log.Println(err)
 	}
 
-	log("%#v", msg)
-	log(SPEW, msg)
+	log.Println("%#v", msg)
+	log.Println(SPEW, msg)
 }

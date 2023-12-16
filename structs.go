@@ -30,6 +30,7 @@ type Host struct {
 	DnsAAAA		*gui.Node		// the actual DNS AAAA results
 	DnsA		*gui.Node		// the actual DNS A results (ignore for status since mostly never happens?)
 	DnsStatus	*gui.Node		// the current state of DNS
+	fix		*gui.Node		// button for the user to click
 }
 
 type IPtype struct {

@@ -2,6 +2,7 @@ package main
 
 import (
         "io"
+	"log"
         "os"
         "os/exec"
         "os/signal"
@@ -29,7 +30,7 @@ func test() error {
         go func() {
                 for range ch {
                         if err := pty.InheritSize(os.Stdin, ptmx); err != nil {
-                                log("error resizing pty: %s", err)
+                                log.Println("error resizing pty: %s", err)
                         }
                 }
         }()
@@ -53,7 +54,7 @@ func test() error {
 
 func mainBash() {
         if err := test(); err != nil {
-		log(logError, "exit in mainBash()")
+		log.Println(logError, "exit in mainBash()")
                 exit(err)
         }
 }

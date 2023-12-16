@@ -1,6 +1,7 @@
 package main
 
 import 	(
+	"log"
 	witlog "git.wit.org/wit/gui/log"
 )
 
@@ -15,16 +16,18 @@ var SPEW witlog.Spewt
 
 // var log interface{}
 
+/*
 func log(a ...any) {
 	witlog.Where = "wit/gui"
 	witlog.Log(a...)
 }
+*/
 
 func sleep(a ...any) {
 	witlog.Sleep(a...)
 }
 
 func exit(a ...any) {
-	log(logError, "got to log() exit")
+	log.Println(logError, "got to log() exit")
 	witlog.Exit(a...)
 }

@@ -6,6 +6,7 @@
 package main
 
 import (
+	"log"
 	"os"
 )
 
@@ -16,17 +17,17 @@ import (
 
 func nsupdate() {
 	var tsigSecret string
-	log(true, "nsupdate() START")
+	log.Println(true, "nsupdate() START")
 	cmd := "go-nsupdate --tsig-algorithm=hmac-sha512"
 	tsigSecret = os.Getenv("TIG_SECRET")
 	cmd += " --tig-secret=\"" + tsigSecret + "\""
 	cmd += " -i wlo1 " + me.hostname
-	log(true, "nsupdate() RUN:", cmd)
+	log.Println(true, "nsupdate() RUN:", cmd)
 
 	for s, t := range me.ipmap {
 		if (t.IsReal()) {
 			if (t.ipv6) {
-				log(true, "nsupdate() found real AAAA =", s, "on iface", t.iface.Name)
+				log.Println(true, "nsupdate() found real AAAA =", s, "on iface", t.iface.Name)
 			}
 		}
 	}

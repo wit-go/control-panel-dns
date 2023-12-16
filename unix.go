@@ -5,6 +5,7 @@
 package main
 
 import 	(
+	"log"
 	"os"
 	"os/exec"
 	"net"
@@ -22,7 +23,7 @@ func Escalate() {
 		cmd.Stderr = os.Stderr
 		err := cmd.Run()
 		if err != nil {
-			log(logError, "exit in Escalate()")
+			log.Println(logError, "exit in Escalate()")
 			exit(err)
 		}
 	}
@@ -37,17 +38,17 @@ func DumpPublicDNSZone(zone string) {
 		panic(err)
 	}
 	for _, entry := range entries {
-		log(entry)
+		log.Println(entry)
 	}
 }
 
 func dumpIPs(host string) {
     ips, err := net.LookupIP(host)
         if err != nil {
-		log(logError, "dumpIPs() failed:", err)
+		log.Println(logError, "dumpIPs() failed:", err)
         }
         for _, ip := range ips {
-                log(host, ip)
+                log.Println(host, ip)
         }
 }
 
