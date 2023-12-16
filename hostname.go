@@ -42,8 +42,18 @@ func getHostname() {
 // On Linux, /etc/hosts, /etc/hostname
 //      and domainname and hostname
 func goodHostname(h string) bool {
-	hostname := shell.Cat("/etc/hostname")	
+	hostname := shell.Chomp(shell.Cat("/etc/hostname"))
 	log.Println("hostname =", hostname)
+
+	hs := run("hostname -s")
+	dn := run("domainname")
+	log.Println("hostname short =", hs, "domainname =", dn)
+
+	tmp := hs + "." + dn
+	if (hostname == tmp) {
+		log.Println("hostname seems to be good", hostname)
+		return true
+	}
 
 	return false
 }

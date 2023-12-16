@@ -25,16 +25,16 @@ func main() {
 	me.ipmap = make(map[string]*IPtype)
 	me.dnsmap = make(map[string]*IPtype)
 	me.ifmap = make(map[int]*IFtype)
-	me.dnsTTL = 5		// recheck DNS is working every 2 minutes // TODO: watch rx packets?
+	me.dnsTTL = 2		// recheck DNS is working every 2 minutes // TODO: watch rx packets?
 
 	// will set all debugging flags
 	// gui.SetDebug(true)
 
 	// myGui = gui.New().InitEmbed(resToolkit).LoadToolkit("gocui")
 	myGui = gui.New().Default()
-	sleep(1)
+	sleep(.2)
 	setupControlPanelWindow()
-	sleep(1)
+	sleep(.2)
 	if (args.GuiDebug) {
 		gui.DebugWindow()
 	}
@@ -49,9 +49,8 @@ func main() {
 */
 func checkNetworkChanges() {
 	var ttl int = 0
-	var ttlsleep int = 5
 	for {
-		sleep(ttlsleep)
+		sleep(0.5)
 		ttl -= 1
 		if (ttl < 0) {
 			if (runtime.GOOS == "linux") {
