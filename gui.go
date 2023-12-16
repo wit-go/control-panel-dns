@@ -20,7 +20,7 @@ func setupControlPanelWindow() {
 	me.window = myGui.NewWindow("DNS and IPv6 Control Panel").Standard()
 	me.window.Dump()
 
-	sleep(1)
+	sleep(me.artificialSleep)
 	dnsTab("DNS")
 	debugTab("Debug")
 
@@ -99,6 +99,22 @@ func debugTab(title string) {
 		DumpPublicDNSZone("apple.com")
 		dumpIPs("www.apple.com")
 	})
+
+	g2.NewLabel("control panel TTL (in tenths of seconds)")
+	ttl := g2.NewSlider("dnsTTL", 1, 100)
+	ttl.Set(me.dnsTTL * 10)
+	ttl.Custom = func () {
+		me.dnsTTL = ttl.I / 10
+		log.Println("dnsTTL =", me.dnsTTL)
+	}
+
+	g2.NewLabel("control panel loop delay (in tenths of seconds)")
+	ttl2 := g2.NewSlider("dnsTTL", 1, 100)
+	ttl2.Set(me.dnsTTLsleep)
+	ttl2.Custom = func () {
+		me.dnsTTLsleep = float64(ttl2.I) / 10
+		log.Println("dnsTTLsleep =", me.dnsTTLsleep)
+	}
 }
 
 func myDefaultExit(n *gui.Node) {

@@ -32,9 +32,9 @@ func main() {
 
 	// myGui = gui.New().InitEmbed(resToolkit).LoadToolkit("gocui")
 	myGui = gui.New().Default()
-	sleep(.2)
+	sleep(me.artificialSleep)
 	setupControlPanelWindow()
-	sleep(.2)
+	sleep(me.artificialSleep)
 	if (args.GuiDebug) {
 		gui.DebugWindow()
 	}
@@ -50,7 +50,7 @@ func main() {
 func checkNetworkChanges() {
 	var ttl int = 0
 	for {
-		sleep(0.5)
+		sleep(me.dnsTTLsleep)
 		ttl -= 1
 		if (ttl < 0) {
 			if (runtime.GOOS == "linux") {

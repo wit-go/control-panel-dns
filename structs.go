@@ -13,12 +13,19 @@ type Host struct {
 	hostname	string			// mirrors
 	domainname	string			// kernel.org
 	// fqdn		string			// mirrors.kernel.org
-	dnsTTL		int			// Recheck DNS is working every TTL (in seconds)
+
+	dnsTTL		int	`default:3`	// Recheck DNS is working every TTL (in seconds)
+	dnsTTLsleep	float64			// sleep between loops
+	artificialSleep float64	`default:0.7`	// artificial sleep on startup
+	artificialS     string 	`default:0.7`	// artificial sleep on startup
+
 	changed		bool			// set to true if things changed
 	user		string			// name of the user
+
 	ipmap		map[string]*IPtype	// the current ip addresses
 	dnsmap		map[string]*IPtype	// the current dns addresses
 	ifmap		map[int]*IFtype		// the current interfaces
+
 	window		*gui.Node		// the main window
 	tab		*gui.Node		// the main dns tab
 	notes		*gui.Node		// using this to put notes here

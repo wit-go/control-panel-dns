@@ -1,3 +1,5 @@
+.PHONY: debian
+
 run: build
 	# ./control-panel-dns >/tmp/witgui.log.stderr 2>&1
 	./control-panel-dns
@@ -44,7 +46,7 @@ clean:
 	-rm -rf files/
 	-rm *.deb
 
-deb:
+debian:
 	cd debian && make
 	-wit mirrors
 
