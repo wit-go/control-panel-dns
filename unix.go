@@ -9,6 +9,11 @@ import 	(
 	"os"
 	"os/exec"
 	"net"
+	"bytes"
+	"fmt"
+	"strings"
+
+	"git.wit.org/wit/shell"
 )
 
 func CheckSuperuser() bool {
@@ -23,7 +28,7 @@ func Escalate() {
 		cmd.Stderr = os.Stderr
 		err := cmd.Run()
 		if err != nil {
-			log.Println(logError, "exit in Escalate()")
+			debug(LogError, "exit in Escalate()")
 			exit(err)
 		}
 	}
@@ -45,7 +50,7 @@ func DumpPublicDNSZone(zone string) {
 func dumpIPs(host string) {
     ips, err := net.LookupIP(host)
         if err != nil {
-		log.Println(logError, "dumpIPs() failed:", err)
+		debug(LogError, "dumpIPs() failed:", err)
         }
         for _, ip := range ips {
                 log.Println(host, ip)
@@ -63,4 +68,30 @@ func ddclient() {
 	check if ddupdate is installed, working, and/or configured
 */
 func ddupdate() {
+}
+
+func run(s string) string {
+	cmdArgs := strings.Fields(s)
+	// Define the command you want to run
+	// cmd := exec.Command(cmdArgs)
+	cmd := exec.Command(cmdArgs[0], cmdArgs[1:len(cmdArgs)]...)
+
+	// Create a buffer to capture the output
+	var out bytes.Buffer
+
+	// Set the output of the command to the buffer
+	cmd.Stdout = &out
+
+	// Run the command
+	err := cmd.Run()
+	if err != nil {
+		fmt.Println("Error running command:", err)
+		return ""
+	}
+
+	tmp := shell.Chomp(out.String())
+	// Output the results
+	debug(LogExec, "Command Output:", tmp)
+
+	return tmp
 }

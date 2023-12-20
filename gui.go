@@ -7,23 +7,67 @@ import 	(
 	"os"
 	"os/user"
 	"strconv"
-	"strings"
 	"net"
+	"strings"
+
 	"git.wit.org/wit/gui"
 	"git.wit.org/wit/shell"
+
 	"github.com/davecgh/go-spew/spew"
 )
 
 // This setups up the dns control panel window
 func setupControlPanelWindow() {
-	// me.window = myGui.New2().Window("DNS and IPv6 Control Panel").Standard()
-	me.window = myGui.NewWindow("DNS and IPv6 Control Panel").Standard()
-	me.window.Dump()
+	me.window = myGui.NewWindow("DNS and IPv6 Control Panel")
+	// me.window.Dump() // will dump out some info
 
+	debug("artificial sleep of:", me.artificialSleep)
 	sleep(me.artificialSleep)
 	dnsTab("DNS")
+	detailsTab("Details")
 	debugTab("Debug")
+}
 
+func detailsTab(title string) {
+	var g2 *gui.Node
+
+	tab := me.window.NewTab(title)
+
+	g2 = tab.NewGroup("Real Stuff")
+
+	grid := g2.NewGrid("gridnuts", 2, 2)
+
+	grid.SetNext(1,1)
+
+	grid.NewLabel("domainname =")
+	me.domainname = grid.NewLabel("domainname")
+
+	grid.NewLabel("hostname -s =")
+	me.hostshort = grid.NewLabel("hostname -s")
+
+	grid.NewLabel("NS records =")
+	me.NSrr = grid.NewLabel("NS RR's")
+
+	grid.NewLabel("UID =")
+	me.uid = grid.NewLabel("my uid")
+
+	grid.NewLabel("Current IPv4 =")
+	me.IPv4 = grid.NewLabel("?")
+
+	grid.NewLabel("Current IPv6 =")
+	me.IPv6 = grid.NewLabel("?")
+
+	grid.NewLabel("interfaces =")
+	me.Interfaces = grid.NewCombobox("Interfaces")
+
+	grid.NewLabel("refresh speed")
+	me.LocalSpeedActual = grid.NewLabel("unknown")
+
+	tab.Margin()
+	tab.Pad()
+
+	grid.Margin()
+	grid.Pad()
 }
 
 func debugTab(title string) {
@@ -50,25 +94,30 @@ func debugTab(title string) {
 			log.Println("iface = " + t.iface.Name)
 		}
 	})
+
 	g2.NewButton("Hostname", func () {
 		getHostname()
 	})
-	g2.NewButton("Actual AAAA", func () {
-		var aaaa []string
-		aaaa = realAAAA()
-		for _, s := range aaaa {
-			log.Println("my actual AAAA = ", s)
-		}
+
+	g2.NewButton("Actual AAAA & A", func () {
+		displayDNS() // doesn't re-query anything
 	})
 
-	g2.NewButton("Update DNS", func () {
+	g2.NewButton("dig A & AAAA DNS records", func () {
 		log.Println("updateDNS()")
 		updateDNS()
 	})
 
-	g2.NewButton("checkDNS()", func () {
-		checkDNS()
+	g2.NewButton("checkDNS:", func () {
+		ipv6s, ipv4s := checkDNS()
+		for s, _ := range ipv6s {
+			debug(LogNow, "check if", s, "is in DNS")
+		}
+		for s, _ := range ipv4s {
+			debug(LogNow, "check if", s, "is in DNS")
+		}
 	})
+
 	g2.NewButton("os.User()", func () {
 		user, _ := user.Current()
 		spew.Dump(user)
@@ -77,17 +126,21 @@ func debugTab(title string) {
 			me.uid.SetText(user.Username + " (" + strconv.Itoa(os.Getuid()) + ")")
 		}
 	})
+
 	g2.NewButton("dig +trace", func () {
 		o := shell.Run("dig +trace +noadditional DS " + me.hostname + " @8.8.8.8")
 		log.Println(o)
 		// log.Println(o)
 	})
+
 	g2.NewButton("Example_listLink()", func () {
 		Example_listLink()
 	})
+
 	g2.NewButton("Escalate()", func () {
 		Escalate()
 	})
+
 	g2.NewButton("LookupAddr(<raw ipv6>) == fire from /etc/hosts", func () {
 		host, err := net.LookupAddr("2600:1700:afd5:6000:b26e:bfff:fe80:3c52")
 		if err != nil {
@@ -95,14 +148,34 @@ func debugTab(title string) {
 		}
 		log.Println("host =", host)
 	})
+
 	g2.NewButton("DumpPublicDNSZone(apple.com)", func () {
 		DumpPublicDNSZone("apple.com")
 		dumpIPs("www.apple.com")
 	})
 
+	g2 = tab.NewGroup("debugging options")
+
+	// DEBUG flags
+	me.dbOn = g2.NewCheckbox("turn on debugging (will override all flags below)")
+	me.dbOn.Custom = func() {
+		DEBUGON = me.dbOn.B
+	}
+
+	me.dbNet = g2.NewCheckbox("turn on network debugging)")
+	me.dbNet.Custom = func() {
+		LogNet = me.dbNet.B
+	}
+
+	me.dbProc = g2.NewCheckbox("turn on /proc debugging)")
+	me.dbProc.Custom = func() {
+		LogProc = me.dbProc.B
+	}
+
+	// various timeout settings
 	g2.NewLabel("control panel TTL (in tenths of seconds)")
 	ttl := g2.NewSlider("dnsTTL", 1, 100)
-	ttl.Set(me.dnsTTL * 10)
+	ttl.Set(int(me.dnsTTL * 10))
 	ttl.Custom = func () {
 		me.dnsTTL = ttl.I / 10
 		log.Println("dnsTTL =", me.dnsTTL)
@@ -110,11 +183,54 @@ func debugTab(title string) {
 
 	g2.NewLabel("control panel loop delay (in tenths of seconds)")
 	ttl2 := g2.NewSlider("dnsTTL", 1, 100)
-	ttl2.Set(me.dnsTTLsleep)
+	ttl2.Set(int(me.dnsTTLsleep * 10))
 	ttl2.Custom = func () {
 		me.dnsTTLsleep = float64(ttl2.I) / 10
 		log.Println("dnsTTLsleep =", me.dnsTTLsleep)
 	}
+
+	g2.Margin()
+	g2.Pad()
+}
+
+// doesn't actually do any network traffic
+// it just updates the GUI
+func displayDNS() int {
+	var aaaa []string
+	aaaa = realAAAA() // your AAAA records right now
+	h := me.hostname
+	var all string
+	var broken int = 0
+	for _, s := range aaaa {
+		debug(LogNow, "host", h, "DNS AAAA =", s, "ipmap[s] =", me.ipmap[s])
+		all += s + "\n"
+		if ( me.ipmap[s] == nil) {
+			debug(LogError, "THIS IS THE WRONG AAAA DNS ENTRY:  host", h, "DNS AAAA =", s)
+			broken = 2
+		} else {
+			if (broken == 0) {
+				broken = 1
+			}
+		}
+	}
+	all = sortLines(all)
+	if (me.DnsAAAA.S != all) {
+		debug(LogError, "DnsAAAA.SetText() to:", all)
+		me.DnsAAAA.SetText(all)
+	}
+
+	var a []string
+	a = realA()
+	all = sortLines(strings.Join(a, "\n"))
+	if (all == "") {
+		debug(LogInfo, "THERE IS NOT a real A DNS ENTRY")
+		all = "CNAME ipv6.wit.com"
+	}
+	if (me.DnsA.S != all) {
+		debug(LogError, "DnsA.SetText() to:", all)
+		me.DnsA.SetText(all)
+	}
+	return broken
 }
 
 func myDefaultExit(n *gui.Node) {
@@ -125,17 +241,15 @@ func myDefaultExit(n *gui.Node) {
 func dnsTab(title string) {
 	tab := me.window.NewTab(title)
 
-	g := tab.NewGroup("dns update")
+	me.mainStatus = tab.NewGroup("dns update")
 
-	grid := g.NewGrid("gridnuts", 2, 2)
+	grid := me.mainStatus.NewGrid("gridnuts", 2, 2)
 
 	grid.SetNext(1,1)
+
 	grid.NewLabel("hostname =")
 	me.fqdn = grid.NewLabel("?")
 	me.hostname = ""
-
-	grid.NewLabel("UID =")
-	me.uid = grid.NewLabel("?")
 
 	grid.NewLabel("DNS AAAA =")
 	me.DnsAAAA = grid.NewLabel("?")
@@ -143,28 +257,39 @@ func dnsTab(title string) {
 	grid.NewLabel("DNS A =")
 	me.DnsA = grid.NewLabel("?")
 
-	grid.NewLabel("IPv4 =")
-	me.IPv4 = grid.NewLabel("?")
-
-	grid.NewLabel("IPv6 =")
-	me.IPv6 = grid.NewLabel("?")
-
-	grid.NewLabel("interfaces =")
-	me.Interfaces = grid.NewCombobox("Interfaces")
-
-	grid.NewLabel("DNS Status =")
-	me.DnsStatus = grid.NewLabel("unknown")
-
-	me.fix = g.NewButton("Fix", func () {
+	me.fix = me.mainStatus.NewButton("Fix", func () {
 		if (goodHostname(me.hostname)) {
-			log.Println("hostname is good:", me.hostname)
+			debug(LogInfo, "hostname is good:", me.hostname)
 		} else {
-			log.Println("you need to fix your hostname here", me.hostname)
+			debug(LogError, "FIX: you need to fix your hostname here", me.hostname)
 			return
 		}
-		nsupdate()
+		// check to see if the cloudflare window exists
+		/*
+		if (me.cloudflareW != nil) {
+			newRR.NameNode.SetText(me.hostname)
+			newRR.TypeNode.SetText("AAAA")
+			for s, t := range me.ipmap {
+				if (t.IsReal()) {
+					if (t.ipv6) {
+						newRR.ValueNode.SetText(s)
+						cloudflare.CreateCurlRR()
+						return
+					}
+				}
+			}
+			cloudflare.CreateCurlRR()
+			return
+		} else {
+		// nsupdate()
+		// me.fixProc.Disable()
+		}
+		*/
 	})
 	me.fix.Disable()
+
+	grid.Margin()
+	grid.Pad()
 
 	statusGrid(tab)
 
@@ -176,71 +301,65 @@ func statusGrid(n *gui.Node) {
 	gridP := problems.NewGrid("nuts", 2, 2)
 
 	gridP.NewLabel("DNS Status =")
-	gridP.NewLabel("unknown")
+	me.DnsStatus = gridP.NewLabel("unknown")
 
 	gridP.NewLabel("hostname =")
-	gridP.NewLabel("invalid")
+	me.hostnameStatus = gridP.NewLabel("invalid")
 
-	gridP.NewLabel("dns provider =")
-	gridP.NewLabel("unknown")
+	gridP.NewLabel("dns resolution")
+	me.DnsSpeed = gridP.NewLabel("unknown")
+
+	gridP.NewLabel("dns resolution speed")
+	me.DnsSpeedActual = gridP.NewLabel("unknown")
+
+	gridP.NewLabel("dns API provider =")
+	me.DnsAPI = gridP.NewLabel("unknown")
+
+	gridP.Margin()
+	gridP.Pad()
+
+	// TODO: these are notes for me things to figure out
+	ng := n.NewGroup("TODO:")
+	gridP = ng.NewGrid("nut2", 2, 2)
 
 	gridP.NewLabel("IPv6 working =")
 	gridP.NewLabel("unknown")
 
-	gridP.NewLabel("dns resolution =")
+	gridP.NewLabel("ping.wit.com =")
 	gridP.NewLabel("unknown")
+
+	gridP.NewLabel("ping6.wit.com =")
+	gridP.NewLabel("unknown")
+
+	problems.Margin()
+	problems.Pad()
+	gridP.Margin()
+	gridP.Pad()
 }
 
-/*
-var outJunk string
-func output(s string, a bool) {
-	if (a) {
-		outJunk += s
-	} else {
-		outJunk = s
-	}
-	me.output.SetText(outJunk)
-	log.Println(outJunk)
-}
-*/
-
+// run everything because something has changed
 func updateDNS() {
 	var aaaa []string
 	h := me.hostname
 	if (h == "") {
-		h = "unknown.lab.wit.org"
-		// h = "hpdevone.lab.wit.org"
+		h = "test.wit.com"
 	}
-	log.Println("dnsAAAA()()")
-	aaaa = dnsAAAA(h)
-	log.Println("dnsAAAA()()")
-	log.Println(SPEW, me)
+	// log.Println("digAAAA()")
+	aaaa = digAAAA(h)
+	debug(LogNow, "digAAAA() =", aaaa)
+	// log.Println(SPEW, me)
 	if (aaaa == nil) {
-		log.Println("There are no DNS AAAA records for hostname: ", h)
+		debug(LogError, "There are no DNS AAAA records for hostname: ", h)
 	}
-	var broken int = 0
-	var all string
-	for _, s := range aaaa {
-		log.Println("host", h, "DNS AAAA =", s)
-		all += s + "\n"
-		if ( me.ipmap[s] == nil) {
-			log.Println("THIS IS THE WRONG AAAA DNS ENTRY:  host", h, "DNS AAAA =", s)
-			broken = 2
-		} else {
-			if (broken == 0) {
-				broken = 1
-			}
-		}
-	}
-	all = strings.TrimSpace(all)
-	me.DnsAAAA.SetText(all)
+	broken := displayDNS() // update the GUI based on dig results
+
 	if (broken == 1) {
+		me.DnsStatus.SetText("PARTLY WORKING")
+	} else if (broken == 2) {
 		me.DnsStatus.SetText("WORKING")
 	} else {
 		me.DnsStatus.SetText("BROKEN")
 		me.fix.Enable()
-		log.Println("Need to run go-nsupdate here")
-		nsupdate()
 	}
 
 	user, _ := user.Current()
@@ -249,5 +368,29 @@ func updateDNS() {
 	if (me.uid != nil) {
 		me.uid.SetText(user.Username + " (" + strconv.Itoa(os.Getuid()) + ")")
 	}
+
+	// lookup the NS records for your domain
+	// if your host is test.wit.com, find the NS resource records for wit.com
+	lookupNS(me.domainname.S)
+
 	log.Println("updateDNS() END")
+}
+
+func suggestProcDebugging() {
+	if (me.fixProc != nil) {
+		// me.fixProc.Disable()
+		return
+	}
+
+	me.fixProc = me.mainStatus.NewButton("Try debugging Slow DNS lookups", func () {
+		debug("You're DNS lookups are very slow")
+		me.dbOn.Set(true)
+		me.dbProc.Set(true)
+
+		DEBUGON = true
+		LogProc = true
+		processName := getProcessNameByPort(53)
+		log.Println("Process with port 53:", processName)
+	})
+	// me.fixProc.Disable()
 }

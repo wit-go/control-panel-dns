@@ -7,6 +7,9 @@ package main
 import 	(
 	"log"
 	"net"
+	"strings"
+
+	"git.wit.org/wit/shell"
 )
 
 /*
@@ -24,7 +27,7 @@ func (h *Host) verifyETC() bool {
 func (h *Host) updateIPs(host string) {
     ips, err := net.LookupIP(host)
         if err != nil {
-                log.Println(logError, "updateIPs failed", err)
+                debug(LogError, "updateIPs failed", err)
         }
         for _, ip := range ips {
                 log.Println(host, ip)
@@ -69,5 +72,62 @@ func (h *Host) checkDNS() {
 		log.Println(args.VerboseDNS, "IPv6 should be working. Need to test it here.")
 	} else {
 		log.Println(args.VerboseDNS, "IPv6 is broken. Need to fix it here.")
+	}
+}
+
+// nsLookup performs an NS lookup on the given domain name.
+func lookupNS(domain string) {
+	var domains string
+
+	nsRecords, err := net.LookupNS(domain)
+	if err != nil {
+		return
+	}
+
+	var servers []string
+	for _, ns := range nsRecords {
+		servers = append(servers, ns.Host)
+	}
+
+	// checks to see if the NS records change
+	for _, server := range servers {
+		server = strings.TrimRight(server, ".")
+		if (me.nsmap[server] != domain) {
+			debug(LogChange, "lookupNS() domain", domain, "has NS", server)
+			me.nsmap[server] = domain
+			domains += server + "\n"
+		}
+	}
+
+	var tmp string
+	// checks to see if the NS records change
+	for s, d := range me.nsmap {
+		debug(LogChange, "lookupNS() domain =", d, "server =", s)
+		if (domain == d) {
+			tmp += s + "\n"
+			// figure out the provider (google, cloudflare, etc)
+			setProvider(s)
+		}
+	}
+	tmp = shell.Chomp(tmp)
+
+	if (tmp != me.NSrr.S) {
+		me.changed = true
+		debug(LogChange, "lookupNS() setting me.NSrr =", tmp)
+		me.NSrr.SetText(tmp)
+	}
+}
+
+// getDomain returns the second-to-last part of a domain name.
+func setProvider(hostname string) {
+	var provider string = ""
+	parts := strings.Split(hostname, ".")
+	if len(parts) >= 2 {
+		provider = parts[len(parts)-2]
+	}
+	if (me.DnsAPI.S != provider) {
+		me.changed = true
+		debug(LogChange, "setProvider() changed to =", provider)
+		me.DnsAPI.SetText(provider)
 	}
 }

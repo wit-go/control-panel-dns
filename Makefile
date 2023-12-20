@@ -8,7 +8,7 @@ install:
 	go install -v go.wit.com/control-panel-dns@latest
 	# go install -v git.wit.com/wit/control-panel-dns@latest
 
-gocui:
+gocui: build
 	./control-panel-dns -gui gocui >/tmp/witgui.log.stderr 2>&1
 
 debug: build

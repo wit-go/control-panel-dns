@@ -2,15 +2,22 @@ package main
 
 import 	(
 	"log"
+	"reflect"
 	witlog "git.wit.org/wit/gui/log"
 )
 
+var LogPrefix = "ipv6cp" // ipv6 control panel debugging line
+
 // various debugging flags
-var logNow bool = true	// useful for active development
-var logError bool = true
-var logWarn bool = false
-var logInfo bool = false
-var logVerbose bool = false
+var DEBUGON bool = true
+var LogNow bool = true	// useful for active development
+var LogError bool = true // probably always leave this one
+var LogChange bool = true // turn on /proc debugging output
+
+var LogInfo bool = false // general info
+var LogNet bool = false // general network debugging
+var LogProc bool = false // turn on /proc debugging output
+var LogExec bool = false // turn on os.Exec() debugging
 
 var SPEW witlog.Spewt
 
@@ -28,6 +35,25 @@ func sleep(a ...any) {
 }
 
 func exit(a ...any) {
-	log.Println(logError, "got to log() exit")
+	debug(LogError, "got to log() exit")
 	witlog.Exit(a...)
+}
+
+func debug(a ...any) {
+	if (! DEBUGON) {
+		return
+	}
+
+	if (a == nil) {
+		return
+	}
+	var tbool bool
+	if (reflect.TypeOf(a[0]) == reflect.TypeOf(tbool)) {
+		if (a[0] == false) {
+			return
+		}
+		a[0] = LogPrefix // ipv6 control panel debugging line
+	}
+
+	log.Println(a...)
 }

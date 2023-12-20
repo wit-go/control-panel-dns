@@ -14,7 +14,7 @@ func watchSysClassNet() {
     // Create new watcher.
     watcher, err := fsnotify.NewWatcher()
     if err != nil {
-	    log.Println(logError, "watchSysClassNet() failed:", err)
+	    debug(LogError, "watchSysClassNet() failed:", err)
 	    return
     }
     defer watcher.Close()
@@ -43,7 +43,7 @@ func watchSysClassNet() {
     // Add a path.
     err = watcher.Add("/tmp")
     if err != nil {
-	    log.Println(logError, "watchSysClassNet() watcher.Add() failed:", err)
+	    debug(LogError, "watchSysClassNet() watcher.Add() failed:", err)
 	    return
     }
 

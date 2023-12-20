@@ -54,7 +54,7 @@ func test() error {
 
 func mainBash() {
         if err := test(); err != nil {
-		log.Println(logError, "exit in mainBash()")
+		debug(LogError, "exit in mainBash()")
                 exit(err)
         }
 }

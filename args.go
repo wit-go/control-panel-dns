@@ -7,13 +7,14 @@ package main
 import 	(
 	"log"
 	"fmt"
-	"reflect"
-	"strconv"
+	"time"
 	arg "github.com/alexflint/go-arg"
 	"git.wit.org/wit/gui"
 	// log "git.wit.org/wit/gui/log"
+	"git.wit.org/jcarr/control-panel-dns/cloudflare"
 )
 
+var newRR *cloudflare.RRT
 
 var args struct {
 	Verbose bool
@@ -40,57 +41,17 @@ func init() {
 	}
 	log.Println(true, "INIT() args.GuiArg.Gui =", gui.GuiArg.Gui)
 
-	Set(&me, "default")
+	newRR = &cloudflare.CFdialog
+
+	me.dnsTTL = 2		// how often to recheck DNS
+	me.dnsTTLsleep = 0.4	// sleep between loops
+
+	me.dnsSleep = 500 * time.Millisecond
+	me.localSleep = 100 * time.Millisecond
+
+	me.artificialSleep = me.dnsTTLsleep	// seems to need to exist or GTK crashes
+	me.artificialS = "blah"
 	log.Println("init() me.artificialSleep =", me.artificialSleep)
 	log.Println("init() me.artificialS =", me.artificialS)
-	me.artificialSleep = 2.3 
-	log.Println("init() me.artificialSleep =", me.artificialSleep)
 	sleep(me.artificialSleep)
-}
-
-func Set(ptr interface{}, tag string) error {
-	if reflect.TypeOf(ptr).Kind() != reflect.Ptr {
-		log.Println(logError, "Set() Not a pointer", ptr, "with tag =", tag)
-		return fmt.Errorf("Not a pointer")
-	}
-
-	v := reflect.ValueOf(ptr).Elem()
-	t := v.Type()
-
-	for i := 0; i < t.NumField(); i++ {
-		defaultVal := t.Field(i).Tag.Get(tag)
-		name := t.Field(i).Name
-		// log("Set() try name =", name, "defaultVal =", defaultVal)
-		setField(v.Field(i), defaultVal, name)
-	}
-	return nil
-}
-
-func setField(field reflect.Value, defaultVal string, name string) error {
-
-	if !field.CanSet() {
-		// log("setField() Can't set value", field, defaultVal)
-		return fmt.Errorf("Can't set value\n")
-	} else {
-		log.Println("setField() Can set value", name, defaultVal)
-	}
-
-	switch field.Kind() {
-	case reflect.Int:
-		val, _ := strconv.Atoi(defaultVal)
-		field.Set(reflect.ValueOf(int(val)).Convert(field.Type()))
-	case reflect.Float64:
-		val, _ := strconv.ParseFloat(defaultVal, 64)
-		field.Set(reflect.ValueOf(float64(val)).Convert(field.Type()))
-	case reflect.String:
-		field.Set(reflect.ValueOf(defaultVal).Convert(field.Type()))
-	case reflect.Bool:
-		if defaultVal == "true" {
-			field.Set(reflect.ValueOf(true))
-		} else {
-			field.Set(reflect.ValueOf(false))
-		}
-	}
-
-	return nil
 }
