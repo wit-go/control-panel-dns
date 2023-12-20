@@ -21,6 +21,6 @@ to update the DNS server.
 Useful links and other
 external things which might be useful
 
-* [WIT GO projects](http://go.wit.org/)
-* [GOLANG GUI](https://github.com/wit-go/gui)
+* [WIT GO projects](http://go.wit.com/)
+* [GOLANG GUI](https://go.wit.com/gui)
 * [GO Style Guide](https://google.github.io/styleguide/go/index)

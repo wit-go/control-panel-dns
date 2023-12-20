@@ -13,7 +13,7 @@ import 	(
 	"fmt"
 	"strings"
 
-	"git.wit.org/wit/shell"
+	"go.wit.com/shell"
 )
 
 func CheckSuperuser() bool {
@@ -35,8 +35,8 @@ func Escalate() {
 }
 
 // You need permission to do a zone transfer. Otherwise:
-// dig +noall +answer +multiline lab.wit.org any 
-// dig +all +multiline fire.lab.wit.org # gives the zonefile header (ttl vals)
+// dig +noall +answer +multiline lab.wit.com any 
+// dig +all +multiline fire.lab.wit.com # gives the zonefile header (ttl vals)
 func DumpPublicDNSZone(zone string) {
 	entries, err := net.LookupHost(zone)
 	if err != nil {

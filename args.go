@@ -9,9 +9,9 @@ import 	(
 	"fmt"
 	"time"
 	arg "github.com/alexflint/go-arg"
-	"git.wit.org/wit/gui"
-	// log "git.wit.org/wit/gui/log"
-	"git.wit.org/jcarr/control-panel-dns/cloudflare"
+	"go.wit.com/gui"
+	// log "go.wit.com/gui/log"
+	"go.wit.com/control-panel-dns/cloudflare"
 )
 
 var newRR *cloudflare.RRT

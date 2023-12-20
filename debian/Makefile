@@ -21,7 +21,7 @@ clean:
 extract:
 	mkdir -p ../files/usr/bin
 	mkdir -p ../files/usr/lib/control-panel-dns/
-	-cp ~/go/src/git.wit.org/wit/gui/toolkit/*.so ../files/usr/lib/control-panel-dns/
+	-cp ~/go/src/go.wit.com/gui/toolkit/*.so ../files/usr/lib/control-panel-dns/
 	cp  ../README.md ../files/usr/lib/control-panel-dns/
 	cp  ../control-panel-dns ../files/usr/bin/
 

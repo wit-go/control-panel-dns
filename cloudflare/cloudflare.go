@@ -8,7 +8,7 @@ import 	(
 	"io/ioutil"
 	"net/http"
 
-	"git.wit.org/wit/gui"
+	"go.wit.com/gui"
 )
 
 /*

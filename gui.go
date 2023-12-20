@@ -10,8 +10,8 @@ import 	(
 	"net"
 	"strings"
 
-	"git.wit.org/wit/gui"
-	"git.wit.org/wit/shell"
+	"go.wit.com/gui"
+	"go.wit.com/shell"
 
 	"github.com/davecgh/go-spew/spew"
 )

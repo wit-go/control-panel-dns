@@ -3,7 +3,7 @@ package main
 import 	(
 	"log"
 	"reflect"
-	witlog "git.wit.org/wit/gui/log"
+	witlog "go.wit.com/gui/log"
 )
 
 var LogPrefix = "ipv6cp" // ipv6 control panel debugging line

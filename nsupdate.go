@@ -12,7 +12,7 @@ import (
 //	./go-nsupdate \
 //		--tsig-algorithm=hmac-sha512 \
 //		--tsig-secret="OWh5/ZHIyaz7B8J9m9ZDqZ8448Pke0PTpkYbZmFcOf5a6rEzgmcwrG91u1BHi1/4us+mKKEobDPLw1x6sD+ZJw==" \
-//		-i eno2 farm001.lab.wit.org
+//		-i eno2 farm001.lab.wit.com
 
 func nsupdate() {
 	var tsigSecret string

@@ -4,7 +4,7 @@ package main
 import 	(
 	"net"
 	"time"
-	"git.wit.org/wit/gui"
+	"go.wit.com/gui"
 	"github.com/miekg/dns"
 )
 

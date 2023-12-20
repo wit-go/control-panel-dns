@@ -9,7 +9,7 @@ import 	(
 	"net"
 	"strings"
 
-	"git.wit.org/wit/shell"
+	"go.wit.com/shell"
 )
 
 /*

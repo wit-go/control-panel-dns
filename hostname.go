@@ -6,12 +6,10 @@
 package main
 
 import (
-	"git.wit.org/wit/shell"
+	"go.wit.com/shell"
 
-	// dnssec IPv6 socket library
-	"git.wit.org/jcarr/dnssecsocket"
-
-	"git.wit.org/jcarr/control-panel-dns/cloudflare"
+	"go.wit.com/control-panel-dns/cloudflare"
+	"go.wit.com/control-panel-dns/dnssecsocket"
 )
 
 // will try to get this hosts FQDN
