@@ -5,6 +5,7 @@ import 	(
 	"net"
 	"time"
 	"go.wit.com/gui"
+	"go.wit.com/control-panel-dns/cloudflare"
 	"github.com/miekg/dns"
 )
 
@@ -18,11 +19,13 @@ type Host struct {
 	hostnameStatus	*gui.Node		// is the hostname configured correctly in the OS?
 	// fqdn		string			// mirrors.kernel.org
 
-	dnsTTL		int	`default:"3"`	// Recheck DNS is working every TTL (in seconds)
-	dnsTTLsleep	float64			// sleep between loops
+//	dnsTTL		int	`default:"3"`	// Recheck DNS is working every TTL (in seconds)
+//	dnsTTLsleep	float64			// sleep between loops
 	artificialSleep float64	`default:"0.7"`	// artificial sleep on startup
 	artificialS     string 	`default:"abc"`	// artificial sleep on startup
 
+	ttl		*cloudflare.Duration
+	dnsTtl		*cloudflare.Duration
 	dnsSleep	time.Duration
 	localSleep	time.Duration
 

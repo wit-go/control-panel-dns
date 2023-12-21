@@ -69,8 +69,14 @@ func timeFunction(f func()) time.Duration {
 	return time.Since(startTime) // Calculate the elapsed time
 }
 */
+	timer2 := time.NewTimer(time.Second)
+	go func() {
+		<-timer2.C
+		fmt.Println("Timer 2 fired")
+	}()
+
 	for {
-		sleep(me.dnsTTLsleep)
+		time.Sleep(me.ttl.Duration)
 		if (time.Since(lastLocal) > me.localSleep) {
 			if (runtime.GOOS == "linux") {
 				duration := timeFunction(linuxLoop)
@@ -82,10 +88,17 @@ func timeFunction(f func()) time.Duration {
 			}
 			lastLocal = time.Now()
 		}
-		if (time.Since(lastDNS) > me.dnsSleep) {
+		if (time.Since(lastDNS) > me.dnsTtl.Duration) {
 			DNSloop()
 			lastDNS = time.Now()
 		}
+
+		/*
+		stop2 := timer2.Stop()
+		if stop2 {
+			fmt.Println("Timer 2 stopped")
+		}
+		*/
 	}
 }
 

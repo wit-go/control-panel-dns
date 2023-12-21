@@ -10,11 +10,7 @@ import 	(
 	"time"
 	arg "github.com/alexflint/go-arg"
 	"go.wit.com/gui"
-	// log "go.wit.com/gui/log"
-	"go.wit.com/control-panel-dns/cloudflare"
 )
-
-var newRR *cloudflare.RRT
 
 var args struct {
 	Verbose bool
@@ -29,7 +25,6 @@ var args struct {
 	User string `arg:"env:USER"`
 	Demo bool `help:"run a demo"`
 	gui.GuiArgs
-	// log.LogArgs
 }
 
 func init() {
@@ -41,15 +36,13 @@ func init() {
 	}
 	log.Println(true, "INIT() args.GuiArg.Gui =", gui.GuiArg.Gui)
 
-	newRR = &cloudflare.CFdialog
-
-	me.dnsTTL = 2		// how often to recheck DNS
-	me.dnsTTLsleep = 0.4	// sleep between loops
+//	me.dnsTTL = 2		// how often to recheck DNS
+//	me.dnsTTLsleep = 0.4	// sleep between loops
 
 	me.dnsSleep = 500 * time.Millisecond
 	me.localSleep = 100 * time.Millisecond
 
-	me.artificialSleep = me.dnsTTLsleep	// seems to need to exist or GTK crashes
+	me.artificialSleep = 0.4	// seems to need to exist or GTK crashes. TODO: fix andlabs plugin
 	me.artificialS = "blah"
 	log.Println("init() me.artificialSleep =", me.artificialSleep)
 	log.Println("init() me.artificialS =", me.artificialS)

@@ -4,6 +4,7 @@ package main
 import 	(
 	"log"
 	"fmt"
+	"time"
 	"os"
 	"os/user"
 	"strconv"
@@ -12,6 +13,7 @@ import 	(
 
 	"go.wit.com/gui"
 	"go.wit.com/shell"
+	"go.wit.com/control-panel-dns/cloudflare"
 
 	"github.com/davecgh/go-spew/spew"
 )
@@ -172,22 +174,13 @@ func debugTab(title string) {
 		LogProc = me.dbProc.B
 	}
 
-	// various timeout settings
-	g2.NewLabel("control panel TTL (in tenths of seconds)")
-	ttl := g2.NewSlider("dnsTTL", 1, 100)
-	ttl.Set(int(me.dnsTTL * 10))
-	ttl.Custom = func () {
-		me.dnsTTL = ttl.I / 10
-		log.Println("dnsTTL =", me.dnsTTL)
-	}
+	// makes a slider widget
+	me.ttl = cloudflare.NewDurationSlider(g2, "Loop Timeout", 10 * time.Millisecond, 5 * time.Second)
+	me.ttl.Set(300 * time.Millisecond)
 
-	g2.NewLabel("control panel loop delay (in tenths of seconds)")
-	ttl2 := g2.NewSlider("dnsTTL", 1, 100)
-	ttl2.Set(int(me.dnsTTLsleep * 10))
-	ttl2.Custom = func () {
-		me.dnsTTLsleep = float64(ttl2.I) / 10
-		log.Println("dnsTTLsleep =", me.dnsTTLsleep)
-	}
+	// makes a slider widget
+	me.dnsTtl = cloudflare.NewDurationSlider(g2, "DNS Timeout", 800 * time.Millisecond, 300 * time.Second)
+	me.dnsTtl.Set(60 * time.Second)
 
 	g2.Margin()
 	g2.Pad()
