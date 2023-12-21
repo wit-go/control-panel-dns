@@ -103,3 +103,14 @@ go-get:
 log:
 	reset
 	tail -f /tmp/witgui.* /tmp/guilogfile
+
+# sync repo to the github backup
+github:
+	-git remote add github git@github.com:wit-go/control-panel-dns.git
+	-git branch -M main
+	git push origin main
+	git push origin devel
+	git push origin --tags
+	git push github main
+	git push github devel
+	git push github --tags
