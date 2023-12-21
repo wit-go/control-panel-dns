@@ -4,63 +4,12 @@ package cloudflare
 import 	(
 	"log"
 	"os"
-	"bytes"
-	"io/ioutil"
-	"net/http"
 
 	"go.wit.com/gui"
 )
 
-/*
-curl --request POST \
-  --url https://api.cloudflare.com/client/v4/zones/zone_identifier/dns_records \
-  --header 'Content-Type: application/json' \
-  --header 'X-Auth-Email: ' \
-  --data '{
-  "content": "198.51.100.4",
-  "name": "example.com",
-  "proxied": false,
-  "type": "A",
-  "comment": "Domain verification record",
-  "tags": [
-    "owner:dns-team"
-  ],
-  "ttl": 3600
-}'
-*/
-
-// CFdialog is everything you need forcreating 
-// a new record: name, TTL, type (CNAME, A, etc)
-var CFdialog RRT
-
-// Resource Record (used in a DNS zonefile)
-type RRT struct {
-	cloudflareW *gui.Node	// the window node
-	cloudflareB *gui.Node	// the cloudflare button
-
-	TypeNode *gui.Node	// CNAME, A, AAAA, ...
-	NameNode *gui.Node	// www, mail, ...
-	ValueNode *gui.Node	// 4.2.2.2, "dkim stuff", etc
-
-	proxyNode *gui.Node	// If cloudflare is a port 80 & 443 proxy
-	ttlNode *gui.Node	// just set to 1 which means automatic to cloudflare
-	curlNode *gui.Node	// shows you what you could run via curl
-	resultNode *gui.Node	// what the cloudflare API returned
-	saveNode *gui.Node	// button to send it to cloudflare
-
-	zoneNode *gui.Node	// "wit.com"
-	zoneIdNode *gui.Node	// cloudflare zone ID
-	apiNode *gui.Node	// cloudflare API key (from environment var CF_API_KEY)
-	emailNode *gui.Node	// cloudflare email (from environment var CF_API_EMAIL)
-
-	ID     string
-	Type   string
-	Name   string
-	Content string
-	ProxyS string
-	Proxied bool
-	Proxiable bool
-	Ttl string
+func init() {
+	Config = make(map[string]*ConfigT)
 }
 
 func CreateRR(myGui *gui.Node, zone string, zoneID string) {
@@ -76,8 +25,6 @@ func CreateRR(myGui *gui.Node, zone string, zoneID string) {
 		CFdialog.cloudflareW = nil
 		CFdialog.cloudflareB.Enable()
 	}
-
-	CFdialog.ID = zoneID
 
 	group := CFdialog.cloudflareW.NewGroup("Create a new DNS Resource Record (rr)")
 
@@ -100,6 +47,10 @@ func CreateRR(myGui *gui.Node, zone string, zoneID string) {
 	CFdialog.apiNode = grid.NewLabel("type")
 	CFdialog.apiNode.SetText(os.Getenv("CF_API_KEY"))
 
+	grid.NewLabel("Resource Record ID")
+	CFdialog.rrNode = grid.NewLabel("type")
+	CFdialog.rrNode.SetText(os.Getenv("cloudflare RR id"))
+
 	grid.NewLabel("Record Type")
 	CFdialog.TypeNode = grid.NewCombobox("type")
 	CFdialog.TypeNode.AddText("A")
@@ -109,7 +60,7 @@ func CreateRR(myGui *gui.Node, zone string, zoneID string) {
 	CFdialog.TypeNode.AddText("MX")
 	CFdialog.TypeNode.AddText("NS")
 	CFdialog.TypeNode.Custom = func () {
-		CreateCurlRR()
+		DoChange()
 	}
 	CFdialog.TypeNode.SetText("AAAA")
 
@@ -122,7 +73,7 @@ func CreateRR(myGui *gui.Node, zone string, zoneID string) {
 	CFdialog.NameNode.AddText("blog")
 	CFdialog.NameNode.AddText("ns1")
 	CFdialog.NameNode.Custom = func () {
-		CreateCurlRR()
+		DoChange()
 	}
 	CFdialog.NameNode.SetText("www")
 
@@ -131,7 +82,7 @@ func CreateRR(myGui *gui.Node, zone string, zoneID string) {
 	CFdialog.proxyNode.AddText("On")
 	CFdialog.proxyNode.AddText("Off")
 	CFdialog.proxyNode.Custom = func () {
-		CreateCurlRR()
+		DoChange()
 	}
 	CFdialog.proxyNode.SetText("Off")
 
@@ -141,15 +92,18 @@ func CreateRR(myGui *gui.Node, zone string, zoneID string) {
 	CFdialog.ValueNode.AddText("2001:4860:4860::8888")
 	CFdialog.ValueNode.AddText("ipv6.wit.com")
 	CFdialog.ValueNode.Custom = func () {
-		CreateCurlRR()
+		DoChange()
 	}
 	CFdialog.ValueNode.SetText("127.0.0.1")
 	CFdialog.ValueNode.Expand()
 
+	grid.NewLabel("URL")
+	CFdialog.urlNode = grid.NewLabel("URL")
+
 	group.NewLabel("curl")
 	CFdialog.curlNode = group.NewTextbox("curl")
 	CFdialog.curlNode.Custom = func () {
-		CreateCurlRR()
+		DoChange()
 	}
 	CFdialog.curlNode.SetText("put the curl text here")
 
@@ -157,17 +111,22 @@ func CreateRR(myGui *gui.Node, zone string, zoneID string) {
 	CFdialog.resultNode.SetText("API response will show here")
 
 	CFdialog.saveNode = group.NewButton("Save", func () {
-		url, data := CreateCurlRR()
-		result := curl(url, data)
+		dnsRow := DoChange()
+		result := curlPost(dnsRow)
 		CFdialog.resultNode.SetText(result)
+		// CreateCurlRR()
+		// url, data := CreateCurlRR()
+		// result := curl(url, data)
+		// CFdialog.resultNode.SetText(result)
 	})
-	CFdialog.saveNode.Disable()
+	// CFdialog.saveNode.Disable()
 
 	group.Pad()
 	grid.Pad()
 	grid.Expand()
 }
 
+/*
 func CreateCurlRR() (string, string) {
 	// enable the Save/Create Button
 	if (CFdialog.saveNode != nil) {
@@ -211,7 +170,7 @@ func CreateCurlRR() (string, string) {
 	log.Println("http PUT url =", url)
 	// log.Println("http PUT data =", data)
 	// spew.Dump(data)
-	pretty, _ := formatJSON(string(data))
+	pretty, _ := FormatJSON(string(data))
 	log.Println("http URL =", url)
 	log.Println("http PUT data =", pretty)
 	if (CFdialog.curlNode != nil) {
@@ -220,38 +179,4 @@ func CreateCurlRR() (string, string) {
 
 	return url, tmp
 }
-
-func curl(url string, tmp string) string {
-	var authKey string = CFdialog.apiNode.S
-	var email string = CFdialog.emailNode.S
-
-	log.Println("curl() START")
-	data := []byte(tmp)
-	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(data))
-
-	// Set headers
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Auth-Key", authKey)
-	req.Header.Set("X-Auth-Email", email)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Println(err)
-		return ""
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Println(err)
-		return ""
-	}
-	// log.Println("http PUT body =", body)
-	// spew.Dump(body)
-
-	log.Println("result =", string(body))
-	log.Println("curl() END")
-	pretty, _ := formatJSON(string(body))
-	return pretty
-}
+*/

@@ -6,7 +6,7 @@ import 	(
 )
 
 // formatJSON takes an unformatted JSON string and returns a formatted version.
-func formatJSON(unformattedJSON string) (string, error) {
+func FormatJSON(unformattedJSON string) (string, error) {
 	var jsonData interface{}
 
 	// Decode the JSON string into an interface
