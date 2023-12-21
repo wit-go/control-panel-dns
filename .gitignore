@@ -3,3 +3,5 @@ control-panel-dns
 /*.deb
 *.swp
 /plugins/*
+
+examples/cloudflare/cloudflare
