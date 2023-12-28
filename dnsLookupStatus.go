@@ -13,19 +13,23 @@
 package main
 
 import (
-	"log"
+	"os"
 	"fmt"
 	"time"
 	"strconv"
+	"reflect"
 
-	"github.com/miekg/dns"
+	"go.wit.com/log"
 	"go.wit.com/gui"
 	"go.wit.com/control-panel-dns/cloudflare"
 	"go.wit.com/shell"
+
+	"github.com/miekg/dns"
 )
 
 type digStatus struct {
 	ready		bool
+	hidden		bool
 	statusIPv4	string
 	statusIPv6	string
 
@@ -48,6 +52,9 @@ type digStatus struct {
 	dsGoogle	*dnsStatus
 	DnsDigUDP	*gui.Node
 	DnsDigTCP	*gui.Node
+
+	httpGoWitCom	*cloudflare.OneLiner
+	statusHTTP	*cloudflare.OneLiner
 }
 
 type dnsStatus struct {
@@ -83,61 +90,72 @@ func NewDigStatusWindow(p *gui.Node) *digStatus {
 	ds = new(digStatus)
 
 	ds.ready = false
+	ds.hidden = true
 
 	ds.window = p.NewWindow("DNS Lookup Status")
+	ds.window.Custom = func () {
+		ds.hidden = true
+		ds.window.Hide()
+	}
 	ds.box = ds.window.NewBox("hBox", true)
 
 	// summary of the current state of things
 	ds.summary = ds.box.NewGroup("Summary")
+	g := ds.summary.NewGrid("LookupStatus", 2, 2)
+	g.Pad()
 
-	b := ds.summary.NewBox("hBox", true)
-	ds.status = cloudflare.NewOneLiner(b, "status")
-	ds.status.Set("unknown")
-
-	b = ds.summary.NewBox("hBox", true)
-	ds.statusAAAA = cloudflare.NewOneLiner(b, "IPv6 status")
-	ds.statusAAAA.Set("unknown")
-
-	b = ds.summary.NewBox("hBox", true)
-	ds.speed = cloudflare.NewOneLiner(b, "speed")
-	ds.speed.Set("unknown")
-
-	b = ds.summary.NewBox("hBox", true)
-	ds.speedActual = cloudflare.NewOneLiner(b, "actual")
-	ds.speedActual.Set("unknown")
+	ds.status	= cloudflare.NewOneLiner(g, "status").Set("unknown")
+	ds.statusAAAA	= cloudflare.NewOneLiner(g, "IPv6 status").Set("unknown")
+	ds.statusHTTP	= cloudflare.NewOneLiner(g, "IPv6 via HTTP").Set("unknown")
+	ds.speed	= cloudflare.NewOneLiner(g, "speed").Set("unknown")
+	ds.speedActual	= cloudflare.NewOneLiner(g, "actual").Set("unknown")
 
 	// make the area to store the raw details
 	ds.details = ds.box.NewGroup("Details")
-	ds.dsLocalhost = NewDnsStatus(ds.details, "(localhost)", "127.0.0.1:53", "go.wit.com")
-	ds.dsLocalNetwork = NewDnsStatus(ds.details, "(Local Network)", "172.22.0.1:53", "go.wit.com")
-	ds.dsCloudflare = NewDnsStatus(ds.details, "(cloudflare)", "1.1.1.1:53", "go.wit.com")
-	ds.dsGoogle = NewDnsStatus(ds.details, "(google)", "8.8.8.8:53", "go.wit.com")
+	ds.dsLocalhost		= NewDnsStatus(ds.details, "(localhost)", "127.0.0.1:53", "go.wit.com")
+	ds.dsLocalNetwork	= NewDnsStatus(ds.details, "(Local Network)", "172.22.0.1:53", "go.wit.com")
+	ds.dsCloudflare		= NewDnsStatus(ds.details, "(cloudflare)", "1.1.1.1:53", "go.wit.com")
+	ds.dsGoogle		= NewDnsStatus(ds.details, "(google)", "8.8.8.8:53", "go.wit.com")
 	ds.makeDnsStatusGrid()
+	ds.makeHttpStatusGrid()
 
+	ds.hidden = false
+	ds.ready = true
 	return ds
 }
 
 func (ds *digStatus) Update() {
-	duration := timeFunction(func () { ds.updateDnsStatus() })
+	log.Info("digStatus() Update() START")
+	if ds == nil {
+		log.Error("digStatus() Update() ds == nil")
+		return
+	}
+	duration := timeFunction(func () {
+		ds.updateDnsStatus()
+	})
 	s := fmt.Sprint(duration)
-	ds.speedActual.Set(s)
+	// ds.speedActual.Set(s)
+	me.digStatus.set(ds.speedActual, s)
 
 	if (duration > 500 * time.Millisecond ) {
-		ds.speed.Set("SLOW")
+		me.digStatus.set(ds.speed, "SLOW")
 	} else if (duration > 100 * time.Millisecond ) {
-		ds.speed.Set("OK")
+		me.digStatus.set(ds.speed, "OK")
 	} else {
-		ds.speed.Set("FAST")
+		me.digStatus.set(ds.speed, "FAST")
 	}
+	log.Info("digStatus() Update() END")
 }
 
 // Returns true if the status is valid
 func (ds *digStatus) Ready() bool {
+	if ds == nil {return false}
 	return ds.ready
 }
 
 // Returns true if IPv4 is working
 func (ds *digStatus) IPv4() bool {
+	if ! ds.Ready() {return false}
 	if (ds.statusIPv4 == "OK") {
 		return true
 	}
@@ -149,6 +167,7 @@ func (ds *digStatus) IPv4() bool {
 
 // Returns true if IPv6 is working
 func (ds *digStatus) IPv6() bool {
+	if ! ds.Ready() {return false}
 	if (ds.statusIPv6 == "GOOD") {
 		return true
 	}
@@ -156,23 +175,69 @@ func (ds *digStatus) IPv6() bool {
 }
 
 func (ds *digStatus) setIPv4(s string) {
-	ds.status.Set(s)
 	ds.statusIPv4 = s
+	if ! ds.Ready() {return}
+	me.digStatus.set(ds.status, s)
 }
 
 func (ds *digStatus) setIPv6(s string) {
-	ds.statusAAAA.Set(s)
 	ds.statusIPv6 = s
+	if ! ds.Ready() {return}
+	me.digStatus.set(ds.statusAAAA, s)
+}
+
+func (ds *digStatus) set(a any, s string) {
+	if ! ds.Ready() {return}
+	if ds.hidden {
+		return
+	}
+	if a == nil {
+		return
+	}
+	var n *gui.Node
+	if reflect.TypeOf(a) == reflect.TypeOf(n) {
+		n = a.(*gui.Node)
+		n.SetText(s)
+		return
+	}
+	var ol *cloudflare.OneLiner
+	if reflect.TypeOf(a) == reflect.TypeOf(ol) {
+		ol = a.(*cloudflare.OneLiner)
+		ol.Set(s)
+		return
+	}
+	log.Error("unknown type TypeOf(a) =", reflect.TypeOf(a), "a =", a)
+	os.Exit(0)
 }
 
 func (ds *digStatus) updateDnsStatus() {
 	var cmd, out string
 	var ipv4, ipv6 bool
 
-	ipv4, ipv6 = ds.dsLocalhost.Update()
-	ipv4, ipv6 = ds.dsLocalNetwork.Update()
-	ipv4, ipv6 = ds.dsCloudflare.Update()
-	ipv4, ipv6 = ds.dsGoogle.Update()
+	log.Info("updateDnsStatus() START")
+	if (ds == nil) {
+		log.Error("updateDnsStatus() not initialized yet. ds == nil")
+		return
+	}
+
+	if (! ds.ready) {
+		log.Error("updateDnsStatus() not ready yet")
+		return
+	}
+
+	ipv4, ipv6 = ds.dsLocalhost.update()
+	ipv4, ipv6 = ds.dsLocalNetwork.update()
+	ipv4, ipv6 = ds.dsCloudflare.update()
+	ipv4, ipv6 = ds.dsGoogle.update()
+
+	if ds.checkLookupDoH("go.wit.com") {
+		log.Println("updateDnsStatus() HTTP DNS lookups working")
+		me.digStatus.set(ds.statusHTTP, "WORKING")
+	} else {
+		log.Println("updateDnsStatus() HTTP DNS lookups not working")
+		log.Println("updateDnsStatus() It's really unlikely you are on the internet")
+		me.digStatus.set(ds.statusHTTP, "BROKEN")
+	}
 
 	if (ipv4) {
 		log.Println("updateDnsStatus() IPv4 A lookups working")
@@ -193,14 +258,12 @@ func (ds *digStatus) updateDnsStatus() {
 	cmd = "dig +noall +answer www.wit.com A"
 	out = shell.Run(cmd)
 	log.Println("makeDnsStatusGrid() dig", out)
-	ds.DnsDigUDP.SetText(out)
+	me.digStatus.set(ds.DnsDigUDP, out)
 
 	cmd = "dig +noall +answer www.wit.com AAAA"
 	out = shell.Run(cmd)
 	log.Println("makeDnsStatusGrid() dig", out)
-	ds.DnsDigTCP.SetText(out)
-
-	ds.ready = true
+	me.digStatus.set(ds.DnsDigTCP, out)
 }
 
 // Makes a DNS Status Grid
@@ -242,69 +305,80 @@ func NewDnsStatus(p *gui.Node, title string, server string, hostname string) *dn
 
 // special thanks to the Element Hotel wifi in Philidelphia that allowed me to
 // easily debug this code since the internet connection here blocks port 53 traffic
-func (ds *dnsStatus) Update() (bool, bool) {
+func (ds *dnsStatus) update() (bool, bool) {
 	var results []string
 	var a bool = false
 	var aaaa bool = false
 
-	log.Println("dnsStatus.Update() For server", ds.server, "on", ds.hostname)
+	log.Println("dnsStatus.update() For server", ds.server, "on", ds.hostname)
 	results, _ = dnsUdpLookup(ds.server, ds.hostname, dns.TypeA)
-	log.Println("dnsStatus.Update() UDP type A =", results)
+	log.Println("dnsStatus.update() UDP type A =", results)
 
 	if (len(results) == 0) {
-		ds.udpA.SetText("BROKEN")
+		me.digStatus.set(ds.udpA, "BROKEN")
 		ds.aFailc += 1
 	} else {
-		ds.udpA.SetText("WORKING")
+		me.digStatus.set(ds.udpA, "WORKING")
 		ds.aSuccessc += 1
 		a = true
 	}
 
 	results, _ = dnsTcpLookup(ds.server, ds.hostname, dns.TypeA)
-	log.Println("dnsStatus.Update() TCP type A =", results)
+	log.Println("dnsStatus.update() TCP type A =", results)
 
 	if (len(results) == 0) {
-		ds.tcpA.SetText("BROKEN")
+		me.digStatus.set(ds.tcpA, "BROKEN")
 		ds.aFailc += 1
 	} else {
-		ds.tcpA.SetText("WORKING")
+		me.digStatus.set(ds.tcpA, "WORKING")
 		ds.aSuccessc += 1
 		a = true
 	}
 
-	ds.aFail.SetText(strconv.Itoa(ds.aFailc))
-	ds.aSuccess.SetText(strconv.Itoa(ds.aSuccessc))
+	me.digStatus.set(ds.aFail, strconv.Itoa(ds.aFailc))
+	me.digStatus.set(ds.aSuccess,strconv.Itoa(ds.aSuccessc))
 
 	results, _ = dnsUdpLookup(ds.server, ds.hostname, dns.TypeAAAA)
-	log.Println("dnsStatus.Update() UDP type AAAA =", results)
+	log.Println("dnsStatus.update() UDP type AAAA =", results)
 
 	if (len(results) == 0) {
-		ds.udpAAAA.SetText("BROKEN")
+		me.digStatus.set(ds.udpAAAA, "BROKEN")
 		ds.aaaaFailc += 1
-		ds.aaaaFail.SetText(strconv.Itoa(ds.aaaaFailc))
+		me.digStatus.set(ds.aaaaFail, strconv.Itoa(ds.aaaaFailc))
 	} else {
-		ds.udpAAAA.SetText("WORKING")
+		me.digStatus.set(ds.udpAAAA, "WORKING")
 		ds.aaaaSuccessc += 1
 		aaaa = true
 	}
 
 	results, _ = dnsTcpLookup(ds.server, ds.hostname, dns.TypeAAAA)
-	log.Println("dnsStatus.Update() UDP type AAAA =", results)
+	log.Println("dnsStatus.update() UDP type AAAA =", results)
 
 	if (len(results) == 0) {
-		ds.tcpAAAA.SetText("BROKEN")
+		me.digStatus.set(ds.tcpAAAA, "BROKEN")
 		ds.aaaaFailc += 1
-		ds.aaaaFail.SetText(strconv.Itoa(ds.aaaaFailc))
+		me.digStatus.set(ds.aaaaFail, strconv.Itoa(ds.aaaaFailc))
 	} else {
-		ds.tcpAAAA.SetText("WORKING")
+		me.digStatus.set(ds.tcpAAAA, "WORKING")
 		ds.aaaaSuccessc += 1
 		aaaa = true
 	}
 
-	ds.aaaaFail.SetText(strconv.Itoa(ds.aaaaFailc))
-	ds.aaaaSuccess.SetText(strconv.Itoa(ds.aaaaSuccessc))
+	me.digStatus.set(ds.aaaaFail, strconv.Itoa(ds.aaaaFailc))
+	me.digStatus.set(ds.aaaaSuccess,strconv.Itoa(ds.aaaaSuccessc))
 
 	return a, aaaa
+}
+
+func (ds *digStatus) makeHttpStatusGrid() {
+	group := ds.details.NewGroup("dns.google.com via HTTPS")
+	grid := group.NewGrid("LookupStatus", 2, 2)
+
+	ds.httpGoWitCom = cloudflare.NewOneLiner(grid, "go.wit.com")
+	me.digStatus.set(ds.httpGoWitCom, "unknown")
+
+	group.Pad()
+	grid.Pad()
 }
 
 func (ds *digStatus) makeDnsStatusGrid() {
@@ -317,14 +391,14 @@ func (ds *digStatus) makeDnsStatusGrid() {
 	ds.DnsDigUDP = grid.NewLabel("?")
 	out = shell.Run(cmd)
 	log.Println("makeDnsStatusGrid() dig", out)
-	ds.DnsDigUDP.SetText(out)
+	me.digStatus.set(ds.DnsDigUDP, out)
 
 	cmd = "dig +noall +answer go.wit.com AAAA"
 	grid.NewLabel(cmd)
 	ds.DnsDigTCP = grid.NewLabel("?")
 	out = shell.Run(cmd)
 	log.Println("makeDnsStatusGrid() dig", out)
-	ds.DnsDigTCP.SetText(out)
+	me.digStatus.set(ds.DnsDigTCP, out)
 
 	group.Pad()
 	grid.Pad()
@@ -367,4 +441,39 @@ func dnsTcpLookup(server string, domain string, recordType uint16) ([]string, er
 	}
 
 	return records, nil
+}
+
+func (ds *digStatus) checkLookupDoH(hostname string) bool {
+	var status bool = false
+
+	domain := "go.wit.com"
+	ipv6Addresses, err := dnsAAAAlookupDoH(domain)
+	if err != nil {
+		log.Error(err, "checkLookupDoH()")
+		return status
+	}
+
+	log.Println("IPv6 Addresses for %s:\n", domain)
+	for _, addr := range ipv6Addresses {
+		log.Println(addr)
+		me.digStatus.set(ds.httpGoWitCom, addr)
+		status = true
+	}
+	return status
+}
+
+func (ds *digStatus) Show() {
+	log.Info("digStatus.Show() window")
+	if me.digStatus.hidden {
+		me.digStatus.window.Show()
+	}
+	me.digStatus.hidden = false
+}
+
+func (ds *digStatus) Hide() {
+	log.Info("digStatus.Hide() window")
+	if ! me.digStatus.hidden {
+		me.digStatus.window.Hide()
+	}
+	me.digStatus.hidden = true
 }

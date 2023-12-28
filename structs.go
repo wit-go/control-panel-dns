@@ -76,6 +76,7 @@ type Host struct {
 
 	digStatus	*digStatus
 	statusIPv6	*cloudflare.OneLiner
+	digStatusButton *gui.Node
 }
 
 type IPtype struct {

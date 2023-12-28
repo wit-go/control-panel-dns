@@ -137,8 +137,8 @@ func digAAAA(hostname string) []string {
 	log.Println("digAAAA() has BLAH =", blah)
 
 	if (len(blah) == 0) {
-		log.Println("digAAAA() RUNNING dnsLookupDoH(domain)")
-		ipv6Addresses, _ = dnsLookupDoH(hostname)
+		log.Println("digAAAA() RUNNING dnsAAAAlookupDoH(domain)")
+		ipv6Addresses, _ = dnsAAAAlookupDoH(hostname)
 		log.Println("digAAAA() has ipv6Addresses =", strings.Join(ipv6Addresses, " "))
 		log.Printf("digAAAA() IPv6 Addresses for %s:\n", hostname)
 		for _, addr := range ipv6Addresses {
@@ -159,13 +159,13 @@ func dnsHttpsLookup(domain string, recordType uint16) ([]string, error) {
 	dnsLookupDoH(domain string) ([]string, error) {
 	ipv6Addresses, err := dnsLookupDoH(domain)
 	if err != nil {
-		fmt.Println("Error:", err)
+		log.Println("Error:", err)
 		return
 	}
 
-	fmt.Printf("IPv6 Addresses for %s:\n", domain)
+	log.Printf("IPv6 Addresses for %s:\n", domain)
 	for _, addr := range ipv6Addresses {
-		fmt.Println(addr)
+		log.Println(addr)
 	}
 }
 */

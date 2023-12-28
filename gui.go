@@ -2,7 +2,6 @@
 package main
 
 import 	(
-	"log"
 	"fmt"
 	"time"
 	"os"
@@ -12,6 +11,7 @@ import 	(
 	"strings"
 
 	"go.wit.com/gui"
+	"go.wit.com/log"
 	"go.wit.com/shell"
 	"go.wit.com/control-panel-dns/cloudflare"
 )
@@ -29,7 +29,7 @@ func setupControlPanelWindow() {
 	detailsTab("Details")
 	debugTab("Debug")
 
-	me.digStatus = NewDigStatusWindow(me.window)
+	// me.digStatus = NewDigStatusWindow(me.window)
 }
 
 func detailsTab(title string) {
@@ -307,6 +307,23 @@ func dnsTab(title string) {
 		*/
 	})
 	me.fix.Disable()
+
+	me.digStatusButton = me.mainStatus.NewButton("Show DNS Lookup Status", func () {
+		if (me.digStatus == nil) {
+			log.Info("drawing the digStatus window START")
+			me.digStatus = NewDigStatusWindow(me.window)
+			log.Info("drawing the digStatus window END")
+			me.digStatusButton.SetText("Hide DNS Lookup Status")
+		} else {
+			if me.digStatus.hidden {
+				me.digStatusButton.SetText("Hide DNS Lookup Status")
+				me.digStatus.Show()
+			} else {
+				me.digStatusButton.SetText("Show DNS Lookup Status")
+				me.digStatus.Hide()
+			}
+		}
+	})
 
 	grid.Margin()
 	grid.Pad()

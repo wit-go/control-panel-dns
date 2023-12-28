@@ -2,8 +2,7 @@
 package cloudflare
 
 import 	(
-	"log"
-
+	"go.wit.com/log"
 	"go.wit.com/gui"
 )
 
@@ -18,10 +17,17 @@ type OneLiner struct {
 	Custom func()
 }
 
-func (n *OneLiner) Set(value string) {
+func (n *OneLiner) Get() string {
+	return n.value
+}
+
+func (n *OneLiner) Set(value string) *OneLiner {
 	log.Println("OneLiner.Set() =", value)
-	n.v.Set(value)
+	if (n.v != nil) {
+		n.v.Set(value)
+	}
 	n.value = value
+	return n
 }
 
 func NewOneLiner(n *gui.Node, name string) *OneLiner {

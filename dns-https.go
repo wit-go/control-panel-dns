@@ -1,18 +1,37 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
+	"go.wit.com/log"
 	"io/ioutil"
+	"encoding/json"
 	"net/http"
 )
 
+/*
+func getAAAArecords() {
+	hostname := "go.wit.com"
+	ipv6Addresses, err := dnsLookupDoH(hostname)
+	if err != nil {
+		log.Error(err, "getAAAArecords")
+		return
+	}
+
+	fmt.Printf("IPv6 Addresses for %s:\n", hostname)
+	for _, addr := range ipv6Addresses {
+		log.Println(addr)
+	}
+}
+*/
+
 // dnsLookupDoH performs a DNS lookup for AAAA records over HTTPS.
-func dnsLookupDoH(domain string) ([]string, error) {
+func dnsAAAAlookupDoH(domain string) ([]string, error) {
 	var ipv6Addresses []string
 
 	// Construct the URL for a DNS query with Google's DNS-over-HTTPS API
 	url := fmt.Sprintf("https://dns.google/resolve?name=%s&type=AAAA", domain)
+
+	log.Println("curl", url)
 
 	// Perform the HTTP GET request
 	resp, err := http.Get(url)
@@ -44,19 +63,3 @@ func dnsLookupDoH(domain string) ([]string, error) {
 
 	return ipv6Addresses, nil
 }
-
-/*
-func main() {
-	domain := "google.com"
-	ipv6Addresses, err := dnsLookupDoH(domain)
-	if err != nil {
-		fmt.Println("Error:", err)
-		return
-	}
-
-	fmt.Printf("IPv6 Addresses for %s:\n", domain)
-	for _, addr := range ipv6Addresses {
-		fmt.Println(addr)
-	}
-}
-*/

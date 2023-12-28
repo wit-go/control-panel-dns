@@ -13,6 +13,7 @@ import 	(
 	"time"
 	"embed"
 
+	"go.wit.com/log"
 	"go.wit.com/gui"
 	"github.com/miekg/dns"
 )
@@ -35,21 +36,13 @@ func main() {
 	me.ipv4s = make(map[string]dns.RR)
 	me.ipv6s = make(map[string]dns.RR)
 
-	// will set all debugging flags
-	// gui.SetDebug(true)
+	// send all log() output to a file in /tmp
+	log.SetTmp()
 
-	// myGui = gui.New().InitEmbed(resToolkit).LoadToolkit("gocui")
 	myGui = gui.New().Default()
 
 	sleep(me.artificialSleep)
 	setupControlPanelWindow()
-
-	/*
-	if (args.GuiDebug) {
-		gui.DebugWindow()
-	}
-	gui.ShowDebugValues()
-	*/
 
 	// forever monitor for network and dns changes
 	sleep(me.artificialSleep)
@@ -83,13 +76,7 @@ func (c *Cron) run() {
 func checkNetworkChanges() {
 	var lastLocal time.Time = time.Now()
 	var lastDNS time.Time = time.Now()
-	/*
-func timeFunction(f func()) time.Duration {
-	startTime := time.Now() // Record the start time
-	f()                     // Execute the function
-	return time.Since(startTime) // Calculate the elapsed time
-}
-*/
+
 	timer2 := time.NewTimer(time.Second)
 	go func() {
 		<-timer2.C
