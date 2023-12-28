@@ -1,10 +1,10 @@
 run: build
-	./cloudflare
+	./control-panel-cloudflare
 
 build-release:
 	go get -v -u -x .
 	go build
-	./cloudflare
+	./control-panel-cloudflare
 
 build:
 	GO111MODULE="off" go get -v -x .
@@ -18,7 +18,7 @@ log:
 	tail -f /tmp/witgui.* /tmp/guilogfile
 
 gocui: build
-	./cloudflare -gui gocui >/tmp/witgui.log.stderr 2>&1
+	./control-panel-cloudflare -gui gocui >/tmp/witgui.log.stderr 2>&1
 
 quiet:
-	./cloudflare >/tmp/witgui.log.stderr 2>&1
+	./control-panel-cloudflare >/tmp/witgui.log.stderr 2>&1

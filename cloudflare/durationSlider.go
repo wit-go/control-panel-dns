@@ -9,6 +9,8 @@ import 	(
 	"go.wit.com/gui"
 )
 
+// TODO: use: https://github.com/robfig/cron/
+
 //	ttl := cloudflare.DurationSlider(g2, "control panel TTL (in tenths of seconds)", 10 * time.Millisecond, 5 * time.Second)
 //	ttl.Set(200 * time.Millisecond)
 

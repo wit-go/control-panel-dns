@@ -59,6 +59,27 @@ func main() {
 /*
 	Poll for changes to the networking settings
 */
+
+/* https://github.com/robfig/cron/blob/master/cron.go
+
+// Run the cron scheduler, or no-op if already running.
+func (c *Cron) Run() {
+	c.runningMu.Lock()
+	if c.running {
+		c.runningMu.Unlock()
+		return
+	}
+	c.running = true
+	c.runningMu.Unlock()
+	c.run()
+}
+
+// run the scheduler.. this is private just due to the need to synchronize
+// access to the 'running' state variable.
+func (c *Cron) run() {
+	c.logger.Info("start")
+*/
+
 func checkNetworkChanges() {
 	var lastLocal time.Time = time.Now()
 	var lastDNS time.Time = time.Now()
@@ -119,12 +140,12 @@ func DNSloop() {
 	} else if (duration > 100 * time.Millisecond ) {
 		newSpeed = "OK"
 		if (me.fixProc != nil) {
-			me.fixProc.Disable()
+			// me.fixProc.Disable()
 		}
 	} else {
 		newSpeed = "FAST"
 		if (me.fixProc != nil) {
-			me.fixProc.Disable()
+			// me.fixProc.Disable()
 		}
 	}
 	if (newSpeed != me.DnsSpeedLast) {
@@ -156,7 +177,7 @@ func linuxLoop() {
 	}
 
 	var aaaa []string
-	aaaa = realAAAA()
+	aaaa = dhcpAAAA()
 	var all string
 	for _, s := range aaaa {
 		debug(LogNet, "my actual AAAA = ",s)

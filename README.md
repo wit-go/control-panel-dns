@@ -21,6 +21,7 @@ to update the DNS server.
 Useful links and other
 external things which might be useful
 
+* [DNS Resource Record Types](https://en.wikipedia.org/wiki/List_of_DNS_record_types)
 * [WIT GO projects](http://go.wit.com/)
 * [GOLANG GUI](https://go.wit.com/gui)
 * [GO Style Guide](https://google.github.io/styleguide/go/index)

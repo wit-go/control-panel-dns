@@ -20,19 +20,6 @@ var myGui *gui.Node
 
 // var cloudflareURL string = "https://api.cloudflare.com/client/v4/zones/"
 
-/*
-var zonedrop *gui.Node
-var domainWidget *gui.Node
-var masterSave *gui.Node
-
-var zoneWidget *gui.Node
-var authWidget *gui.Node
-var emailWidget *gui.Node
-
-var loadButton *gui.Node
-var saveButton *gui.Node
-*/
-
 func main() {
 	// parse the config file
 	readConfig()
@@ -41,7 +28,8 @@ func main() {
 	myGui = gui.New().Default()
 
 	// draw the cloudflare control panel window
-	cloudflare.MakeCloudflareWindow(myGui)
+	win := cloudflare.MakeCloudflareWindow(myGui)
+	win.SetText(title)
 
 	// This is just a optional goroutine to watch that things are alive
 	gui.Watchdog()

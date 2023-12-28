@@ -6,17 +6,22 @@
 package main
 
 import (
+	"log"
+//	"net"
+	"strings"
+
 	"go.wit.com/shell"
 
 	"go.wit.com/control-panel-dns/cloudflare"
-	"go.wit.com/control-panel-dns/dnssecsocket"
+
+	"github.com/miekg/dns"
 )
 
 // will try to get this hosts FQDN
 import "github.com/Showmax/go-fqdn"
 
 // this is the king of dns libraries
-import "github.com/miekg/dns"
+// import "github.com/miekg/dns"
 
 
 func getHostname() {
@@ -98,6 +103,7 @@ func goodHostname(h string) bool {
 	return false
 }
 
+/*
 func digAAAA(s string) []string {
 	var aaaa []string
 	// lookup the IP address from DNS
@@ -114,5 +120,52 @@ func digAAAA(s string) []string {
 		me.ipv6s[ipaddr] = rr
 	}
 	debug(true, args.VerboseDNS, "aaaa =", aaaa)
+	log.Println("digAAAA() returned =", aaaa)
+	log.Println("digAAAA() me.ipv6s =", me.ipv6s)
+	os.Exit(0)
 	return aaaa
 }
+*/
+
+func digAAAA(hostname string) []string {
+	var blah, ipv6Addresses []string
+	// domain := hostname
+	recordType := dns.TypeAAAA // dns.TypeTXT
+
+	// Cloudflare's DNS server
+	blah, _ = dnsUdpLookup("1.1.1.1:53", hostname, recordType)
+	log.Println("digAAAA() has BLAH =", blah)
+
+	if (len(blah) == 0) {
+		log.Println("digAAAA() RUNNING dnsLookupDoH(domain)")
+		ipv6Addresses, _ = dnsLookupDoH(hostname)
+		log.Println("digAAAA() has ipv6Addresses =", strings.Join(ipv6Addresses, " "))
+		log.Printf("digAAAA() IPv6 Addresses for %s:\n", hostname)
+		for _, addr := range ipv6Addresses {
+			log.Println(addr)
+		}
+		return ipv6Addresses
+	}
+
+	// TODO: check digDoH vs blah, if so, then port 53 TCP and/or UDP is broken or blocked
+	log.Println("digAAAA() has BLAH =", blah)
+
+	return blah
+}
+
+/*
+func dnsHttpsLookup(domain string, recordType uint16) ([]string, error) {
+	domain := "google.com"
+	dnsLookupDoH(domain string) ([]string, error) {
+	ipv6Addresses, err := dnsLookupDoH(domain)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	fmt.Printf("IPv6 Addresses for %s:\n", domain)
+	for _, addr := range ipv6Addresses {
+		fmt.Println(addr)
+	}
+}
+*/

@@ -10,11 +10,20 @@ import 	(
 	"github.com/davecgh/go-spew/spew"
 )
 
+/*
+    This function should run each time
+    the user chanegs anything in the GUi
+    or each time something in general changes
+   
+    It returns a RR record which then can be
+    turned into JSON and sent via http
+    to cloudflare's API
+*/
 func DoChange() *RRT {
 	var dnsRow *RRT
 	dnsRow = new(RRT)
 
-	log.Println("Look for changes in row", dnsRow.ID)
+	log.Println("DoChange() START")
 	if (CFdialog.proxyNode.S == "On") {
 		dnsRow.Proxied = true
 	} else {
@@ -88,21 +97,6 @@ func SetRow(dnsRow *RRT) {
 		log.Println("http PUT curl =", pretty)
 		CFdialog.curlNode.SetText(pretty)
 	}
-
-	return
-	log.Println("UPDATE VALUE", CFdialog.NameNode.Name, CFdialog.TypeNode.Name, "to", CFdialog.ValueNode.S)
-	stuff, result := httpPut(dnsRow)
-	if (CFdialog.curlNode != nil) {
-		pretty, _ := FormatJSON(stuff)
-		log.Println("http PUT curl =", pretty)
-		CFdialog.curlNode.SetText(pretty)
-	}
-	if (CFdialog.resultNode != nil) {
-		pretty, _ := FormatJSON(result)
-		log.Println("http PUT result =", pretty)
-		CFdialog.resultNode.SetText(pretty)
-	}
-	// CFdialog.saveNode.Disable()
 }
 
 func GetZonefile(c *ConfigT) *DNSRecords {

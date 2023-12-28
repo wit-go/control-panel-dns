@@ -50,7 +50,7 @@ type dialogT struct {
 	ttlNode *gui.Node	// just set to 1 which means automatic to cloudflare
 	curlNode *gui.Node	// shows you what you could run via curl
 	resultNode *gui.Node	// what the cloudflare API returned
-	saveNode *gui.Node	// button to send it to cloudflare
+	SaveNode *gui.Node	// button to send it to cloudflare
 
 	zoneNode *gui.Node	// "wit.com"
 	zoneIdNode *gui.Node	// cloudflare zone ID

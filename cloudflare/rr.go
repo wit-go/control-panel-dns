@@ -1,4 +1,9 @@
-// This is a simple example
+/*
+	This will let you edit a single Resource Record within
+	a DNS zone file. For example:
+	google-dns.wit.com.     1       IN      A       8.8.8.8
+*/
+
 package cloudflare
 
 import 	(
@@ -110,7 +115,7 @@ func CreateRR(myGui *gui.Node, zone string, zoneID string) {
 	CFdialog.resultNode = group.NewTextbox("result")
 	CFdialog.resultNode.SetText("API response will show here")
 
-	CFdialog.saveNode = group.NewButton("Save", func () {
+	CFdialog.SaveNode = group.NewButton("Save curlPost()", func () {
 		dnsRow := DoChange()
 		result := curlPost(dnsRow)
 		CFdialog.resultNode.SetText(result)
@@ -120,63 +125,33 @@ func CreateRR(myGui *gui.Node, zone string, zoneID string) {
 		// CFdialog.resultNode.SetText(result)
 	})
 	// CFdialog.saveNode.Disable()
+	group.NewButton("New RR doCurl(PUT)", func () {
+		rr := DoChange()
+
+		rr.url = "https://api.cloudflare.com/client/v4/zones/" + rr.ZoneID + "/dns_records"
+
+		result := doCurl("POST", rr)
+		CFdialog.resultNode.SetText(result)
+
+		pretty, _ := FormatJSON(result)
+		log.Println(pretty)
+	})
+
+	group.NewButton("Update RR doCurl(PUT)", func () {
+		rr := DoChange()
+
+		rr.url = "https://api.cloudflare.com/client/v4/zones/" + rr.ZoneID + "/dns_records/" + rr.ID
+
+		result := doCurl("PUT", rr)
+		CFdialog.resultNode.SetText(result)
+
+		pretty, _ := FormatJSON(result)
+		log.Println(pretty)
+	})
+	// CFdialog.saveNode.Disable()
+
 
 	group.Pad()
 	grid.Pad()
 	grid.Expand()
 }
-
-/*
-func CreateCurlRR() (string, string) {
-	// enable the Save/Create Button
-	if (CFdialog.saveNode != nil) {
-		CFdialog.saveNode.Enable()
-	}
-
-	if (CFdialog.TypeNode != nil) {
-		CFdialog.Type = CFdialog.TypeNode.S
-	}
-	if (CFdialog.NameNode != nil) {
-		CFdialog.Name = CFdialog.NameNode.S
-	}
-	if (CFdialog.proxyNode != nil) {
-		if (CFdialog.proxyNode.S == "On") {
-			CFdialog.ProxyS = "true"
-		} else {
-			CFdialog.ProxyS = "false"
-		}
-	}
-	if (CFdialog.ValueNode != nil) {
-		CFdialog.Content = CFdialog.ValueNode.S
-	}
-	CFdialog.Ttl = "3600"
-
-	var url string = "https://api.cloudflare.com/client/v4/zones/" + CFdialog.ID + "/dns_records"
-	// https://api.cloudflare.com/client/v4/zones/zone_identifier/dns_records \
-	// var authKey string = os.Getenv("CF_API_KEY")
-	// var email string = os.Getenv("CF_API_EMAIL")
-
-	// make a json record to send on port 80 to cloudflare
-	var tmp string
-	tmp = `{"content": "` + CFdialog.Content + `", `
-	tmp += `"name": "` + CFdialog.Name + `", `
-	tmp += `"type": "` + CFdialog.Type + `", `
-	tmp += `"ttl": ` +  CFdialog.Ttl + `, `
-	tmp += `"proxied": ` +  CFdialog.ProxyS + `, `
-	tmp += `"comment": "WIT DNS Control Panel"`
-	tmp +=  `}`
-	data := []byte(tmp)
-
-	log.Println("http PUT url =", url)
-	// log.Println("http PUT data =", data)
-	// spew.Dump(data)
-	pretty, _ := FormatJSON(string(data))
-	log.Println("http URL =", url)
-	log.Println("http PUT data =", pretty)
-	if (CFdialog.curlNode != nil) {
-		CFdialog.curlNode.SetText("URL: " + url + "\n" + pretty)
-	}
-
-	return url, tmp
-}
-*/

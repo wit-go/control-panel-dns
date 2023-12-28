@@ -4,4 +4,4 @@ control-panel-dns
 *.swp
 /plugins/*
 
-examples/cloudflare/cloudflare
+examples/control-panel-cloudflare/control-panel-cloudflare

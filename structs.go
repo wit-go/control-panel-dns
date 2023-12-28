@@ -57,6 +57,7 @@ type Host struct {
 	NSrr		*gui.Node		// NS resource records for the domain name
 	DnsAPI		*gui.Node		// what DNS API to use?
 	DnsAAAA		*gui.Node		// the actual DNS AAAA results
+	workingIPv6	*gui.Node		// currently working AAAA
 	DnsA		*gui.Node		// the actual DNS A results (ignore for status since mostly never happens?)
 	DnsStatus	*gui.Node		// the current state of DNS
 	DnsSpeed	*gui.Node		// 'FAST', 'OK', 'SLOW', etc
@@ -72,6 +73,9 @@ type Host struct {
 	dbOn		*gui.Node		// button for setting debugging on
 	dbNet		*gui.Node		// button for setting network debugging on
 	dbProc		*gui.Node		// button for setting proc debugging on
+
+	digStatus	*digStatus
+	statusIPv6	*cloudflare.OneLiner
 }
 
 type IPtype struct {

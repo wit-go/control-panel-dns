@@ -3,7 +3,6 @@ package cloudflare
 
 import 	(
 	"log"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"bytes"
@@ -27,45 +26,43 @@ curl --request POST \
 }'
 */
 
-func httpPut(dnsRow *RRT) (string, string) {
-	var url string = cloudflareURL + dnsRow.ZoneID + "/dns_records/" + dnsRow.ID
-	var authKey string = dnsRow.Auth
-	var email string = dnsRow.Email
+func doCurl(method string, rr *RRT) string {
+	var err error
+	var req *http.Request
 
-	var tmp string
-	tmp = makeJSON(dnsRow)
-	data := []byte(tmp)
+	data := []byte(rr.data)
 
-	log.Println("http PUT url =", url)
-	// log.Println("http PUT data =", data)
-	// spew.Dump(data)
-	pretty, _ := FormatJSON(string(data))
-	log.Println("http PUT data =", pretty)
-
-	req, err := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(data))
+	if (method == "PUT") {
+		req, err = http.NewRequest(http.MethodPut, rr.url, bytes.NewBuffer(data))
+	} else {
+		req, err = http.NewRequest(http.MethodPost, rr.url, bytes.NewBuffer(data))
+	}
 
 	// Set headers
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Auth-Key", authKey)
-	req.Header.Set("X-Auth-Email", email)
+	req.Header.Set("X-Auth-Key", rr.Auth)
+	req.Header.Set("X-Auth-Email", rr.Email)
+
+	log.Println("http PUT url =", rr.url)
+	log.Println("http PUT Auth =", rr.Auth)
+	log.Println("http PUT Email =", rr.Email)
+	log.Println("http PUT data =", rr.data)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println(err)
-		return tmp, fmt.Sprintf("blah err =", err)
+		return ""
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Println(err)
-		return tmp, fmt.Sprintf("blah err =", err)
+		return ""
 	}
-	// log.Println("http PUT body =", body)
-	// spew.Dump(body)
 
-	return tmp, string(body)
+	return string(body)
 }
 
 func curlPost(dnsRow *RRT) string {
@@ -75,10 +72,10 @@ func curlPost(dnsRow *RRT) string {
 	url := dnsRow.url
 	tmp := dnsRow.data
 
-	log.Println("curl() START")
-	log.Println("curl() authkey = ", authKey)
-	log.Println("curl() email   = ", email)
-	log.Println("curl() url     = ", url)
+	log.Println("curlPost() START")
+	log.Println("curlPost() authkey = ", authKey)
+	log.Println("curlPost() email   = ", email)
+	log.Println("curlPost() url     = ", url)
 	data := []byte(tmp)
 	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(data))
 

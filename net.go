@@ -97,7 +97,11 @@ func checkInterface(i net.Interface) {
 	}
 }
 
-func realAAAA() []string {
+/*
+	These are the real IP address you have been
+	given from DHCP
+*/
+func dhcpAAAA() []string {
 	var aaaa []string
 
 	for s, t := range me.ipmap {

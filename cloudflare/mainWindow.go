@@ -9,7 +9,7 @@ import 	(
 )
 
 // This creates a window
-func MakeCloudflareWindow(n *gui.Node) {
+func MakeCloudflareWindow(n *gui.Node) *gui.Node {
 	CFdialog.rootGui = n
 	var t *gui.Node
 
@@ -54,6 +54,7 @@ func MakeCloudflareWindow(n *gui.Node) {
 	showCloudflareCredentials(more)
 
 	makeDebugWindow(CFdialog.mainWindow)
+	return CFdialog.mainWindow
 }
 
 func makeConfigWindow(n *gui.Node) {

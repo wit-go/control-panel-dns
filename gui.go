@@ -14,8 +14,6 @@ import 	(
 	"go.wit.com/gui"
 	"go.wit.com/shell"
 	"go.wit.com/control-panel-dns/cloudflare"
-
-	"github.com/davecgh/go-spew/spew"
 )
 
 // This setups up the dns control panel window
@@ -25,9 +23,13 @@ func setupControlPanelWindow() {
 
 	debug("artificial sleep of:", me.artificialSleep)
 	sleep(me.artificialSleep)
+
+	// setup the main tab
 	dnsTab("DNS")
 	detailsTab("Details")
 	debugTab("Debug")
+
+	me.digStatus = NewDigStatusWindow(me.window)
 }
 
 func detailsTab(title string) {
@@ -58,6 +60,9 @@ func detailsTab(title string) {
 
 	grid.NewLabel("Current IPv6 =")
 	me.IPv6 = grid.NewLabel("?")
+
+	grid.NewLabel("Working Real IPv6 =")
+	me.workingIPv6 = grid.NewLabel("?")
 
 	grid.NewLabel("interfaces =")
 	me.Interfaces = grid.NewCombobox("Interfaces")
@@ -122,7 +127,6 @@ func debugTab(title string) {
 
 	g2.NewButton("os.User()", func () {
 		user, _ := user.Current()
-		spew.Dump(user)
 		log.Println("os.Getuid =", user.Username, os.Getuid())
 		if (me.uid != nil) {
 			me.uid.SetText(user.Username + " (" + strconv.Itoa(os.Getuid()) + ")")
@@ -132,7 +136,6 @@ func debugTab(title string) {
 	g2.NewButton("dig +trace", func () {
 		o := shell.Run("dig +trace +noadditional DS " + me.hostname + " @8.8.8.8")
 		log.Println(o)
-		// log.Println(o)
 	})
 
 	g2.NewButton("Example_listLink()", func () {
@@ -186,30 +189,54 @@ func debugTab(title string) {
 	g2.Pad()
 }
 
+// will return a AAAA value that needs to be deleted
+func deleteAAA() string {
+	var aaaa []string
+	aaaa = dhcpAAAA() // your AAAA IP addresses right now
+	for _, s := range aaaa {
+		debug(LogNow, "DNS AAAA =", s)
+		if ( me.ipmap[s] == nil) {
+			return s
+		}
+	}
+	return ""
+}
+
+// will return a AAAA value that needs to be added
+func missingAAAA() string {
+	var aaaa []string
+	aaaa = dhcpAAAA() // your AAAA IP addresses right now
+	for _, s := range aaaa {
+		debug(LogNow, "missing AAAA =", s)
+		return s
+	}
+	return ""
+}
+
 // doesn't actually do any network traffic
 // it just updates the GUI
-func displayDNS() int {
+func displayDNS() string {
 	var aaaa []string
-	aaaa = realAAAA() // your AAAA records right now
+	aaaa = dhcpAAAA() // your AAAA records right now
 	h := me.hostname
 	var all string
-	var broken int = 0
+	var broken string = "unknown"
 	for _, s := range aaaa {
 		debug(LogNow, "host", h, "DNS AAAA =", s, "ipmap[s] =", me.ipmap[s])
 		all += s + "\n"
 		if ( me.ipmap[s] == nil) {
 			debug(LogError, "THIS IS THE WRONG AAAA DNS ENTRY:  host", h, "DNS AAAA =", s)
-			broken = 2
+			broken = "wrong AAAA entry"
 		} else {
-			if (broken == 0) {
-				broken = 1
+			if (broken == "unknown") {
+				broken = "needs update"
 			}
 		}
 	}
 	all = sortLines(all)
-	if (me.DnsAAAA.S != all) {
-		debug(LogError, "DnsAAAA.SetText() to:", all)
-		me.DnsAAAA.SetText(all)
+	if (me.workingIPv6.S != all) {
+		debug(LogError, "workingIPv6.SetText() to:", all)
+		me.workingIPv6.SetText(all)
 	}
 
 	var a []string
@@ -296,6 +323,9 @@ func statusGrid(n *gui.Node) {
 	gridP.NewLabel("DNS Status =")
 	me.DnsStatus = gridP.NewLabel("unknown")
 
+	me.statusIPv6 = cloudflare.NewOneLiner(gridP, "IPv6 working")
+	me.statusIPv6.Set("known")
+
 	gridP.NewLabel("hostname =")
 	me.hostnameStatus = gridP.NewLabel("invalid")
 
@@ -314,9 +344,6 @@ func statusGrid(n *gui.Node) {
 	// TODO: these are notes for me things to figure out
 	ng := n.NewGroup("TODO:")
 	gridP = ng.NewGrid("nut2", 2, 2)
-
-	gridP.NewLabel("IPv6 working =")
-	gridP.NewLabel("unknown")
 
 	gridP.NewLabel("ping.wit.com =")
 	gridP.NewLabel("unknown")
@@ -337,26 +364,63 @@ func updateDNS() {
 	if (h == "") {
 		h = "test.wit.com"
 	}
+
+	me.digStatus.Update()
+
 	// log.Println("digAAAA()")
 	aaaa = digAAAA(h)
 	debug(LogNow, "digAAAA() =", aaaa)
+
 	// log.Println(SPEW, me)
 	if (aaaa == nil) {
 		debug(LogError, "There are no DNS AAAA records for hostname: ", h)
-	}
-	broken := displayDNS() // update the GUI based on dig results
+		me.DnsAAAA.SetText("(none)")
+		if (cloudflare.CFdialog.TypeNode != nil) {
+			cloudflare.CFdialog.TypeNode.SetText("AAAA new")
+		}
 
-	if (broken == 1) {
-		me.DnsStatus.SetText("PARTLY WORKING")
-	} else if (broken == 2) {
-		me.DnsStatus.SetText("WORKING")
-	} else {
-		me.DnsStatus.SetText("BROKEN")
-		me.fix.Enable()
+		if (cloudflare.CFdialog.NameNode != nil) {
+			cloudflare.CFdialog.NameNode.SetText(me.hostname)
+		}
+
+		d := deleteAAA()
+		if (d != "") {
+			if (cloudflare.CFdialog.ValueNode != nil) {
+				cloudflare.CFdialog.ValueNode.SetText(d)
+			}
+		}
+		m := missingAAAA()
+		if (m != "") {
+			if (cloudflare.CFdialog.ValueNode != nil) {
+				cloudflare.CFdialog.ValueNode.SetText(m)
+			}
+			/*
+			 rr := &cloudflare.RRT{
+				Type:	"AAAA",
+				Name:	me.hostname,
+				Ttl:	"Auto",
+				Proxied:	false,
+				Content:	m,
+			}
+			cloudflare.Update(rr)
+			*/
+		}
 	}
+	status := displayDNS() // update the GUI based on dig results
+	me.DnsStatus.SetText(status)
+
+	if me.digStatus.Ready() {
+		if me.digStatus.IPv6() {
+			me.statusIPv6.Set("IPv6 WORKING")
+		} else {
+			me.statusIPv6.Set("Need VPN")
+		}
+	}
+
+
+	// me.fix.Enable()
 
 	user, _ := user.Current()
-	spew.Dump(user)
 	log.Println("os.Getuid =", user.Username, os.Getuid())
 	if (me.uid != nil) {
 		me.uid.SetText(user.Username + " (" + strconv.Itoa(os.Getuid()) + ")")
