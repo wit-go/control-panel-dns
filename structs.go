@@ -5,7 +5,7 @@ import 	(
 	"net"
 	"time"
 	"go.wit.com/gui"
-	"go.wit.com/control-panel-dns/cloudflare"
+	"go.wit.com/gui/gadgets"
 	"github.com/miekg/dns"
 )
 
@@ -24,8 +24,8 @@ type Host struct {
 	artificialSleep float64	`default:"0.7"`	// artificial sleep on startup
 	artificialS     string 	`default:"abc"`	// artificial sleep on startup
 
-	ttl		*cloudflare.Duration
-	dnsTtl		*cloudflare.Duration
+	ttl		*gadgets.Duration
+	dnsTtl		*gadgets.Duration
 	dnsSleep	time.Duration
 	localSleep	time.Duration
 
@@ -75,7 +75,7 @@ type Host struct {
 	dbProc		*gui.Node		// button for setting proc debugging on
 
 	digStatus	*digStatus
-	statusIPv6	*cloudflare.OneLiner
+	statusIPv6	*gadgets.OneLiner
 	digStatusButton *gui.Node
 
 	hostnameStatus		*hostnameStatus

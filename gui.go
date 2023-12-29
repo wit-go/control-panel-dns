@@ -11,6 +11,7 @@ import 	(
 	"strings"
 
 	"go.wit.com/gui"
+	"go.wit.com/gui/gadgets"
 	"go.wit.com/log"
 	"go.wit.com/shell"
 	"go.wit.com/control-panel-dns/cloudflare"
@@ -178,11 +179,11 @@ func debugTab(title string) {
 	}
 
 	// makes a slider widget
-	me.ttl = cloudflare.NewDurationSlider(g2, "Loop Timeout", 10 * time.Millisecond, 5 * time.Second)
+	me.ttl = gadgets.NewDurationSlider(g2, "Loop Timeout", 10 * time.Millisecond, 5 * time.Second)
 	me.ttl.Set(300 * time.Millisecond)
 
 	// makes a slider widget
-	me.dnsTtl = cloudflare.NewDurationSlider(g2, "DNS Timeout", 800 * time.Millisecond, 300 * time.Second)
+	me.dnsTtl = gadgets.NewDurationSlider(g2, "DNS Timeout", 800 * time.Millisecond, 300 * time.Second)
 	me.dnsTtl.Set(60 * time.Second)
 
 	g2.Margin()
@@ -358,7 +359,7 @@ func statusGrid(n *gui.Node) {
 	gridP.NewLabel("DNS Status =")
 	me.DnsStatus = gridP.NewLabel("unknown")
 
-	me.statusIPv6 = cloudflare.NewOneLiner(gridP, "IPv6 working")
+	me.statusIPv6 = gadgets.NewOneLiner(gridP, "IPv6 working")
 	me.statusIPv6.Set("known")
 
 	gridP.NewLabel("hostname =")

@@ -21,7 +21,7 @@ import (
 
 	"go.wit.com/log"
 	"go.wit.com/gui"
-	"go.wit.com/control-panel-dns/cloudflare"
+	"go.wit.com/gui/gadgets"
 	"go.wit.com/shell"
 
 	"github.com/miekg/dns"
@@ -40,10 +40,10 @@ type digStatus struct {
 	box	*gui.Node
 
 	summary		*gui.Node
-	status		*cloudflare.OneLiner
-	statusAAAA	*cloudflare.OneLiner
-	speed		*cloudflare.OneLiner
-	speedActual	*cloudflare.OneLiner
+	status		*gadgets.OneLiner
+	statusAAAA	*gadgets.OneLiner
+	speed		*gadgets.OneLiner
+	speedActual	*gadgets.OneLiner
 
 	details		*gui.Node
 	dsLocalhost	*dnsStatus
@@ -53,8 +53,8 @@ type digStatus struct {
 	DnsDigUDP	*gui.Node
 	DnsDigTCP	*gui.Node
 
-	httpGoWitCom	*cloudflare.OneLiner
-	statusHTTP	*cloudflare.OneLiner
+	httpGoWitCom	*gadgets.OneLiner
+	statusHTTP	*gadgets.OneLiner
 }
 
 type dnsStatus struct {
@@ -104,11 +104,11 @@ func NewDigStatusWindow(p *gui.Node) *digStatus {
 	g := ds.summary.NewGrid("LookupStatus", 2, 2)
 	g.Pad()
 
-	ds.status	= cloudflare.NewOneLiner(g, "status").Set("unknown")
-	ds.statusAAAA	= cloudflare.NewOneLiner(g, "IPv6 status").Set("unknown")
-	ds.statusHTTP	= cloudflare.NewOneLiner(g, "IPv6 via HTTP").Set("unknown")
-	ds.speed	= cloudflare.NewOneLiner(g, "speed").Set("unknown")
-	ds.speedActual	= cloudflare.NewOneLiner(g, "actual").Set("unknown")
+	ds.status	= gadgets.NewOneLiner(g, "status").Set("unknown")
+	ds.statusAAAA	= gadgets.NewOneLiner(g, "IPv6 status").Set("unknown")
+	ds.statusHTTP	= gadgets.NewOneLiner(g, "IPv6 via HTTP").Set("unknown")
+	ds.speed	= gadgets.NewOneLiner(g, "speed").Set("unknown")
+	ds.speedActual	= gadgets.NewOneLiner(g, "actual").Set("unknown")
 
 	// make the area to store the raw details
 	ds.details = ds.box.NewGroup("Details")
@@ -200,9 +200,9 @@ func (ds *digStatus) set(a any, s string) {
 		n.SetText(s)
 		return
 	}
-	var ol *cloudflare.OneLiner
+	var ol *gadgets.OneLiner
 	if reflect.TypeOf(a) == reflect.TypeOf(ol) {
-		ol = a.(*cloudflare.OneLiner)
+		ol = a.(*gadgets.OneLiner)
 		ol.Set(s)
 		return
 	}
@@ -374,7 +374,7 @@ func (ds *digStatus) makeHttpStatusGrid() {
 	group := ds.details.NewGroup("dns.google.com via HTTPS")
 	grid := group.NewGrid("LookupStatus", 2, 2)
 
-	ds.httpGoWitCom = cloudflare.NewOneLiner(grid, "go.wit.com")
+	ds.httpGoWitCom = gadgets.NewOneLiner(grid, "go.wit.com")
 	me.digStatus.set(ds.httpGoWitCom, "unknown")
 
 	group.Pad()
