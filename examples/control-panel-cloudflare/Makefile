@@ -17,8 +17,11 @@ log:
 	reset
 	tail -f /tmp/witgui.* /tmp/guilogfile
 
+debug: build
+	./control-panel-cloudflare --gui-debug
+
 gocui: build
-	./control-panel-cloudflare -gui gocui >/tmp/witgui.log.stderr 2>&1
+	./control-panel-cloudflare --gui gocui >/tmp/witgui.log.stderr 2>&1
 
 quiet:
 	./control-panel-cloudflare >/tmp/witgui.log.stderr 2>&1

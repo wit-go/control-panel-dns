@@ -6,6 +6,7 @@ import 	(
 	"log"
 
 	"go.wit.com/gui"
+	"go.wit.com/gui/gadgets"
 )
 
 // This creates a window
@@ -79,7 +80,19 @@ func makeConfigWindow(n *gui.Node) {
 	grid.NewLabel("Cloudflare API")
 	grid.NewLabel(url)
 
+	hostname := gadgets.NewBasicEntry(grid, "hostname")
+	zone := gadgets.NewBasicEntry(grid, "domain name")
+
 	grid.Pad()
+
+	vb.NewButton("Lookup Hostname", func () {
+		log.Println("Find all the Resource Records for hostname:", hostname.Get())
+		log.Println("Find all the Resource Records for zone:", zone.Get())
+		GetZones(aw.S, ew.S)
+		for d, v := range Config {
+			log.Println("Zone =", d, "v =", v)
+		}
+	})
 
 	vb.NewButton("getZones()", func () {
 		log.Println("getZones()")

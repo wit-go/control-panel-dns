@@ -1,4 +1,3 @@
-// This is a simple example
 package main
 
 import 	(
@@ -9,6 +8,8 @@ import 	(
 
 	"go.wit.com/control-panel-dns/cloudflare"
 )
+
+var configfile string = ".config/wit/cloudflare"
 
 func saveConfig() {
 	log.Println("TODO")

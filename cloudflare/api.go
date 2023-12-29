@@ -2,12 +2,11 @@
 package cloudflare
 
 import 	(
-	"log"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
 
-	"github.com/davecgh/go-spew/spew"
+	"go.wit.com/log"
 )
 
 /*
@@ -205,7 +204,7 @@ func GetZones(auth, email string) *DNSRecords {
 
 	// log.Println("getZones() worked", records)
 	// log.Println("spew dump:")
-	spew.Dump(records)
+	// spew.Dump(records)
 	for _, record := range records.Result {
 		log.Println("spew record:", record)
 		log.Println("record:", record.Name, record.ID)
