@@ -14,7 +14,7 @@ import (
 
 	"go.wit.com/log"
 	"go.wit.com/gui"
-	"go.wit.com/control-panel-dns/cloudflare"
+	"go.wit.com/gui/gadgets"
 )
 
 type hostnameStatus struct {
@@ -25,21 +25,21 @@ type hostnameStatus struct {
 
 	window	*gui.Node
 
-	status		*cloudflare.OneLiner
-	summary		*cloudflare.OneLiner
-	speed		*cloudflare.OneLiner
-	speedActual	*cloudflare.OneLiner
+	status		*gadgets.OneLiner
+	summary		*gadgets.OneLiner
+	speed		*gadgets.OneLiner
+	speedActual	*gadgets.OneLiner
 
-	dnsA		*cloudflare.OneLiner
-	dnsAAAA		*cloudflare.OneLiner
-	dnsAPI		*cloudflare.OneLiner
+	dnsA		*gadgets.OneLiner
+	dnsAAAA		*gadgets.OneLiner
+	dnsAPI		*gadgets.OneLiner
 
-	statusIPv4	*cloudflare.OneLiner
-	statusIPv6	*cloudflare.OneLiner
+	statusIPv4	*gadgets.OneLiner
+	statusIPv6	*gadgets.OneLiner
 
 	// Details Group
-	currentIPv4	*cloudflare.OneLiner
-	currentIPv6	*cloudflare.OneLiner
+	currentIPv4	*gadgets.OneLiner
+	currentIPv6	*gadgets.OneLiner
 }
 
 func NewHostnameStatusWindow(p *gui.Node) *hostnameStatus {
@@ -59,9 +59,9 @@ func NewHostnameStatusWindow(p *gui.Node) *hostnameStatus {
 	group := box.NewGroup("Summary")
 	grid := group.NewGrid("LookupStatus", 2, 2)
 
-	hs.status	= cloudflare.NewOneLiner(grid, "status").Set("unknown")
-	hs.statusIPv4	= cloudflare.NewOneLiner(grid, "IPv4").Set("unknown")
-	hs.statusIPv6	= cloudflare.NewOneLiner(grid, "IPv6").Set("unknown")
+	hs.status	= gadgets.NewOneLiner(grid, "status").Set("unknown")
+	hs.statusIPv4	= gadgets.NewOneLiner(grid, "IPv4").Set("unknown")
+	hs.statusIPv6	= gadgets.NewOneLiner(grid, "IPv6").Set("unknown")
 
 	group.Pad()
 	grid.Pad()
@@ -69,14 +69,14 @@ func NewHostnameStatusWindow(p *gui.Node) *hostnameStatus {
 	group = box.NewGroup("Details")
 	grid = group.NewGrid("LookupDetails", 2, 2)
 
-	hs.currentIPv4	= cloudflare.NewOneLiner(grid, "Current IPv4")
-	hs.currentIPv6	= cloudflare.NewOneLiner(grid, "Current IPv6")
+	hs.currentIPv4	= gadgets.NewOneLiner(grid, "Current IPv4")
+	hs.currentIPv6	= gadgets.NewOneLiner(grid, "Current IPv6")
 
-	hs.dnsAPI	= cloudflare.NewOneLiner(grid, "dns API provider").Set("unknown")
-	hs.dnsA		= cloudflare.NewOneLiner(grid, "dns IPv4 resource records").Set("unknown")
-	hs.dnsAAAA	= cloudflare.NewOneLiner(grid, "dns IPv6 resource records").Set("unknown")
-	hs.speed	= cloudflare.NewOneLiner(grid, "speed").Set("unknown")
-	hs.speedActual	= cloudflare.NewOneLiner(grid, "actual").Set("unknown")
+	hs.dnsAPI	= gadgets.NewOneLiner(grid, "dns API provider").Set("unknown")
+	hs.dnsA		= gadgets.NewOneLiner(grid, "dns IPv4 resource records").Set("unknown")
+	hs.dnsAAAA	= gadgets.NewOneLiner(grid, "dns IPv6 resource records").Set("unknown")
+	hs.speed	= gadgets.NewOneLiner(grid, "speed").Set("unknown")
+	hs.speedActual	= gadgets.NewOneLiner(grid, "actual").Set("unknown")
 
 	group.Pad()
 	grid.Pad()
@@ -159,9 +159,9 @@ func (hs *hostnameStatus) set(a any, s string) {
 		n.SetText(s)
 		return
 	}
-	var ol *cloudflare.OneLiner
+	var ol *gadgets.OneLiner
 	if reflect.TypeOf(a) == reflect.TypeOf(ol) {
-		ol = a.(*cloudflare.OneLiner)
+		ol = a.(*gadgets.OneLiner)
 		if ol == nil {
 			log.Println("ol = nil", reflect.TypeOf(a), "a =", a)
 			return
