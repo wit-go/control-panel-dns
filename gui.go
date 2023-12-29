@@ -308,20 +308,38 @@ func dnsTab(title string) {
 	})
 	me.fix.Disable()
 
-	me.digStatusButton = me.mainStatus.NewButton("Show DNS Lookup Status", func () {
+	me.digStatusButton = me.mainStatus.NewButton("Resolver Status", func () {
 		if (me.digStatus == nil) {
 			log.Info("drawing the digStatus window START")
-			me.digStatus = NewDigStatusWindow(me.window)
+			me.digStatus = NewDigStatusWindow(myGui)
 			log.Info("drawing the digStatus window END")
 			me.digStatusButton.SetText("Hide DNS Lookup Status")
+			me.digStatus.Update()
+			return
+		}
+		if me.digStatus.hidden {
+			me.digStatusButton.SetText("Hide Resolver Status")
+			me.digStatus.Show()
+			me.digStatus.Update()
 		} else {
-			if me.digStatus.hidden {
-				me.digStatusButton.SetText("Hide DNS Lookup Status")
-				me.digStatus.Show()
-			} else {
-				me.digStatusButton.SetText("Show DNS Lookup Status")
-				me.digStatus.Hide()
-			}
+			me.digStatusButton.SetText("Resolver Status")
+			me.digStatus.Hide()
+		}
+	})
+	me.hostnameStatusButton = me.mainStatus.NewButton("Show hostname DNS Status", func () {
+		if (me.hostnameStatus == nil) {
+			me.hostnameStatus = NewHostnameStatusWindow(myGui)
+			me.hostnameStatusButton.SetText("Hide " + me.hostname + " DNS Status")
+			me.hostnameStatus.Update()
+			return
+		}
+		if me.hostnameStatus.hidden {
+			me.hostnameStatusButton.SetText("Hide " + me.hostname + " DNS Status")
+			me.hostnameStatus.Show()
+			me.hostnameStatus.Update()
+		} else {
+			me.hostnameStatusButton.SetText("Show " + me.hostname + " DNS Status")
+			me.hostnameStatus.Hide()
 		}
 	})
 
@@ -344,7 +362,7 @@ func statusGrid(n *gui.Node) {
 	me.statusIPv6.Set("known")
 
 	gridP.NewLabel("hostname =")
-	me.hostnameStatus = gridP.NewLabel("invalid")
+	me.hostnameStatusOLD = gridP.NewLabel("invalid")
 
 	gridP.NewLabel("dns resolution")
 	me.DnsSpeed = gridP.NewLabel("unknown")
@@ -383,6 +401,7 @@ func updateDNS() {
 	}
 
 	me.digStatus.Update()
+	me.hostnameStatus.Update()
 
 	// log.Println("digAAAA()")
 	aaaa = digAAAA(h)

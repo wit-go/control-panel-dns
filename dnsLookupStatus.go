@@ -92,7 +92,7 @@ func NewDigStatusWindow(p *gui.Node) *digStatus {
 	ds.ready = false
 	ds.hidden = true
 
-	ds.window = p.NewWindow("DNS Lookup Status")
+	ds.window = p.NewWindow("DNS Resolver Status")
 	ds.window.Custom = func () {
 		ds.hidden = true
 		ds.window.Hide()

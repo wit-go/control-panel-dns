@@ -16,7 +16,7 @@ type Host struct {
 	hostname	string			// mirrors
 	domainname	*gui.Node		// kernel.org
 	hostshort	*gui.Node		// hostname -s
-	hostnameStatus	*gui.Node		// is the hostname configured correctly in the OS?
+	hostnameStatusOLD	*gui.Node		// is the hostname configured correctly in the OS?
 	// fqdn		string			// mirrors.kernel.org
 
 //	dnsTTL		int	`default:"3"`	// Recheck DNS is working every TTL (in seconds)
@@ -77,6 +77,9 @@ type Host struct {
 	digStatus	*digStatus
 	statusIPv6	*cloudflare.OneLiner
 	digStatusButton *gui.Node
+
+	hostnameStatus		*hostnameStatus
+	hostnameStatusButton	*gui.Node
 }
 
 type IPtype struct {

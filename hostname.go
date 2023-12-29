@@ -1,28 +1,18 @@
-// inspired from:
-// https://github.com/mactsouk/opensource.com.git
-// and
-// https://coderwall.com/p/wohavg/creating-a-simple-tcp-server-in-go
-
+// figures out if your hostname is valid
+// then checks if your DNS is setup correctly
 package main
 
 import (
-	"log"
-//	"net"
 	"strings"
 
+	"go.wit.com/log"
 	"go.wit.com/shell"
-
 	"go.wit.com/control-panel-dns/cloudflare"
 
 	"github.com/miekg/dns"
+	// will try to get this hosts FQDN
+	"github.com/Showmax/go-fqdn"
 )
-
-// will try to get this hosts FQDN
-import "github.com/Showmax/go-fqdn"
-
-// this is the king of dns libraries
-// import "github.com/miekg/dns"
-
 
 func getHostname() {
 	var err error
@@ -59,15 +49,15 @@ func getHostname() {
 	test = hshort + "." + dn
 	if (me.hostname != test) {
 		debug(LogInfo, "me.hostname", me.hostname, "does not equal", test)
-		if (me.hostnameStatus.S != "BROKEN") {
+		if (me.hostnameStatusOLD.S != "BROKEN") {
 			debug(LogChange, "me.hostname", me.hostname, "does not equal", test)
 			me.changed = true
-			me.hostnameStatus.SetText("BROKEN")
+			me.hostnameStatusOLD.SetText("BROKEN")
 		}
 	} else {
-		if (me.hostnameStatus.S != "VALID") {
+		if (me.hostnameStatusOLD.S != "VALID") {
 			debug(LogChange, "me.hostname", me.hostname, "is valid")
-			me.hostnameStatus.SetText("VALID")
+			me.hostnameStatusOLD.SetText("VALID")
 			me.changed = true
 		}
 		// enable the cloudflare button if the provider is cloudflare
@@ -140,7 +130,6 @@ func digAAAA(hostname string) []string {
 		log.Println("digAAAA() RUNNING dnsAAAAlookupDoH(domain)")
 		ipv6Addresses, _ = dnsAAAAlookupDoH(hostname)
 		log.Println("digAAAA() has ipv6Addresses =", strings.Join(ipv6Addresses, " "))
-		log.Printf("digAAAA() IPv6 Addresses for %s:\n", hostname)
 		for _, addr := range ipv6Addresses {
 			log.Println(addr)
 		}

@@ -4,4 +4,5 @@ control-panel-dns
 *.swp
 /plugins/*
 
+examples/control-panel-digitalocean/control-panel-digitalocean
 examples/control-panel-cloudflare/control-panel-cloudflare
