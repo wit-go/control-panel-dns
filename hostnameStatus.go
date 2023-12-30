@@ -15,6 +15,7 @@ import (
 	"go.wit.com/log"
 	"go.wit.com/gui"
 	"go.wit.com/gui/gadgets"
+	"go.wit.com/control-panel-dns/cloudflare"
 )
 
 type hostnameStatus struct {
@@ -25,21 +26,31 @@ type hostnameStatus struct {
 
 	window	*gui.Node
 
+	// Primary Directives
 	status		*gadgets.OneLiner
 	summary		*gadgets.OneLiner
-	speed		*gadgets.OneLiner
-	speedActual	*gadgets.OneLiner
-
-	dnsA		*gadgets.OneLiner
-	dnsAAAA		*gadgets.OneLiner
-	dnsAPI		*gadgets.OneLiner
-
 	statusIPv4	*gadgets.OneLiner
 	statusIPv6	*gadgets.OneLiner
 
 	// Details Group
+	hostShort	*gadgets.OneLiner
+	domainname	*gadgets.OneLiner
+
+	// what the current IP address your network has given you
 	currentIPv4	*gadgets.OneLiner
 	currentIPv6	*gadgets.OneLiner
+
+	// what the DNS servers have
+	dnsA		*gadgets.OneLiner
+	dnsAAAA		*gadgets.OneLiner
+	dnsAPI		*gadgets.OneLiner
+
+	speed		*gadgets.OneLiner
+	speedActual	*gadgets.OneLiner
+
+	// Actions
+	dnsValue	*gui.Node
+	dnsAction	*gui.Node
 }
 
 func NewHostnameStatusWindow(p *gui.Node) *hostnameStatus {
@@ -69,14 +80,34 @@ func NewHostnameStatusWindow(p *gui.Node) *hostnameStatus {
 	group = box.NewGroup("Details")
 	grid = group.NewGrid("LookupDetails", 2, 2)
 
+	hs.hostShort	= gadgets.NewOneLiner(grid, "hostname -s")
+	hs.domainname	= gadgets.NewOneLiner(grid, "domain name")
 	hs.currentIPv4	= gadgets.NewOneLiner(grid, "Current IPv4")
 	hs.currentIPv6	= gadgets.NewOneLiner(grid, "Current IPv6")
 
 	hs.dnsAPI	= gadgets.NewOneLiner(grid, "dns API provider").Set("unknown")
 	hs.dnsA		= gadgets.NewOneLiner(grid, "dns IPv4 resource records").Set("unknown")
 	hs.dnsAAAA	= gadgets.NewOneLiner(grid, "dns IPv6 resource records").Set("unknown")
+
 	hs.speed	= gadgets.NewOneLiner(grid, "speed").Set("unknown")
 	hs.speedActual	= gadgets.NewOneLiner(grid, "actual").Set("unknown")
+
+	group.Pad()
+	grid.Pad()
+
+	group = box.NewGroup("Actions")
+	grid = group.NewGrid("LookupDetails", 2, 2)
+
+	hs.dnsValue	= grid.NewLabel("3.4.5.6")
+	hs.dnsAction	= grid.NewButton("CHECK",  func () {
+		log.Info("should", hs.dnsAction.S, "here for", hs.dnsValue.S)
+		if (hs.dnsAction.S == "DELETE") {
+			hs.deleteDNSrecord(hs.dnsValue.S)
+		}
+		if (hs.dnsAction.S == "CREATE") {
+			hs.createDNSrecord(hs.dnsValue.S)
+		}
+	})
 
 	group.Pad()
 	grid.Pad()
@@ -84,6 +115,42 @@ func NewHostnameStatusWindow(p *gui.Node) *hostnameStatus {
 	hs.hidden = false
 	hs.ready = true
 	return hs
+}
+
+func (hs *hostnameStatus) Domain() string {
+	if ! hs.Ready() {return ""}
+	return hs.domainname.Get()
+}
+
+func (hs *hostnameStatus) API() string {
+	if ! hs.Ready() {return ""}
+	return hs.dnsAPI.Get()
+}
+
+func (hs *hostnameStatus) deleteDNSrecord(value string) bool {
+	log.Info("deleteDNSrecord() START for", value)
+	log.Info("deleteDNSrecord() hostname =", me.hostname)
+	log.Info("deleteDNSrecord() domain =", hs.Domain())
+	log.Info("deleteDNSrecord() DNS API Provider =", hs.API())
+
+	if (hs.API() == "cloudflare") {
+		log.Info("deleteDNSrecord() Try to delete via cloudflare")
+		return cloudflare.Delete(hs.Domain(), me.hostname, value)
+	}
+	return false
+}
+
+func (hs *hostnameStatus) createDNSrecord(value string) bool {
+	log.Info("createDNSrecord() START for", value)
+	log.Info("createDNSrecord() hostname =", me.hostname)
+	log.Info("createDNSrecord() domain =", hs.Domain())
+	log.Info("createDNSrecord() DNS API Provider =", hs.API())
+
+	if (hs.API() == "cloudflare") {
+		log.Info("createDNSrecord() Try to delete via cloudflare")
+		return cloudflare.Create(hs.Domain(), me.hostname, value)
+	}
+	return false
 }
 
 func (hs *hostnameStatus) Update() {
@@ -174,23 +241,45 @@ func (hs *hostnameStatus) set(a any, s string) {
 	os.Exit(0)
 }
 
+// figure out if I'm missing any IPv6 address in DNS
+func (hs *hostnameStatus) missingAAAA() bool {
+	var aaaa []string
+	aaaa = dhcpAAAA()
+	for _, s := range aaaa {
+		debug(LogNet, "my actual AAAA = ",s)
+		hs.dnsValue.SetText(s)
+		hs.dnsAction.SetText("CREATE")
+		return true
+	}
+
+	return false
+}
+
 func (hs *hostnameStatus) updateStatus() {
 	var s string
 	var vals []string
 	log.Info("updateStatus() START")
 	if ! hs.Ready() { return }
 
+	hs.hostShort.Set(me.hostshort.S)
+	hs.domainname.Set(me.domainname.S)
+
 	vals = lookupDoH(hs.hostname, "AAAA")
 
-	log.Println("IPv6 Addresses for ", hs.hostname, "=", vals)
+	log.Println("DNS IPv6 Addresses for ", hs.hostname, "=", vals)
 	if len(vals) == 0 {
 		s = "(none)"
-		hs.setIPv6("NEED VPN")
+		hs.setIPv6("Check for real IPv6 addresses here")
+		if hs.missingAAAA() {
+			hs.setIPv6("Add the missing IPv6 address")
+		}
 	} else {
 		for _, addr := range vals {
 			log.Println(addr)
 			s += addr + " (DELETE)"
 			hs.setIPv6("NEEDS DELETE")
+			hs.dnsValue.SetText(addr)
+			hs.dnsAction.SetText("DELETE")
 		}
 	}
 	hs.set(hs.dnsAAAA, s)

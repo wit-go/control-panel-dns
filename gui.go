@@ -2,7 +2,6 @@
 package main
 
 import 	(
-	"fmt"
 	"time"
 	"os"
 	"os/user"
@@ -84,16 +83,6 @@ func debugTab(title string) {
 	tab := me.window.NewTab(title)
 
 	g2 = tab.NewGroup("Real Stuff")
-
-	g2.NewButton("gui.DebugWindow()", func () {
-		gui.DebugWindow()
-	})
-
-	g2.NewButton("Load 'gocui'", func () {
-		// this set the xterm and mate-terminal window title. maybe works generally?
-		fmt.Println("\033]0;" + title + "blah \007")
-		myGui.LoadToolkit("gocui")
-	})
 
 	g2.NewButton("Network Interfaces", func () {
 		for i, t := range me.ifmap {

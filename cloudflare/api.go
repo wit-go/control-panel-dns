@@ -99,7 +99,7 @@ func SetRow(dnsRow *RRT) {
 }
 
 func GetZonefile(c *ConfigT) *DNSRecords {
-	var url = cloudflareURL + c.ZoneID + "/dns_records/"
+	var url = cloudflareURL + c.ZoneID + "/dns_records/?per_page=100"
 	log.Println("getZonefile()", c.Domain, url)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -162,7 +162,7 @@ func makeJSON(dnsRow *RRT) string {
 
 // https://api.cloudflare.com/client/v4/zones
 func GetZones(auth, email string) *DNSRecords {
-	var url = "https://api.cloudflare.com/client/v4/zones"
+	var url = "https://api.cloudflare.com/client/v4/zones?per_page=100"
 	log.Println("getZones()", url)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {

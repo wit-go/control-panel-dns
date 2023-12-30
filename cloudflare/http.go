@@ -2,10 +2,11 @@
 package cloudflare
 
 import 	(
-	"log"
 	"io/ioutil"
 	"net/http"
 	"bytes"
+
+	"go.wit.com/log"
 )
 
 /*
@@ -25,6 +26,88 @@ curl --request POST \
   "ttl": 3600
 }'
 */
+
+func doCurlDelete(auth string, email string, zoneId string, rrId string) string {
+	var err error
+	var req *http.Request
+
+	if zoneId == "" {
+		log.Warn("doCurlDelete() zoneId == nil")
+		return ""
+	}
+
+	if rrId == "" {
+		log.Warn("doCurlDelete() rrId == nil")
+		return ""
+	}
+
+	data := []byte("")
+
+	url := "https://api.cloudflare.com/client/v4/zones/" + zoneId + "/dns_records/" + rrId
+
+	req, err = http.NewRequest(http.MethodDelete, url, bytes.NewBuffer(data))
+
+	// Set headers
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Auth-Key", auth)
+	req.Header.Set("X-Auth-Email", email)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println(err)
+		return ""
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Println(err)
+		return ""
+	}
+
+	return string(body)
+}
+
+func doCurlCreate(auth string, email string, zoneId string, data string) string {
+	var err error
+	var req *http.Request
+
+	if zoneId == "" {
+		log.Warn("doCurlDelete() zoneId == nil")
+		return ""
+	}
+
+	url := "https://api.cloudflare.com/client/v4/zones/" + zoneId + "/dns_records/"
+
+	log.Info("doCurlCreate() POST url =", url)
+	log.Info("doCurlCreate() POST Auth =", auth)
+	log.Info("doCurlCreate() POST Email =", email)
+	log.Info("doCurlCreate() POST data =", data)
+
+	req, err = http.NewRequest(http.MethodPost, url, bytes.NewBuffer( []byte(data) ))
+
+	// Set headers
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Auth-Key", auth)
+	req.Header.Set("X-Auth-Email", email)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println(err)
+		return ""
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Println(err)
+		return ""
+	}
+
+	return string(body)
+}
 
 func doCurl(method string, rr *RRT) string {
 	var err error

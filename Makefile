@@ -2,7 +2,7 @@
 
 run: build
 	# ./control-panel-dns >/tmp/witgui.log.stderr 2>&1
-	./control-panel-dns
+	./control-panel-dns --gui-debug
 
 install:
 	go install -v go.wit.com/control-panel-dns@latest
