@@ -1,18 +1,5 @@
 package main
 
-import (
-	"context"
-	"fmt"
-	"os"
-
-	"golang.org/x/oauth2"
-
-	"go.wit.com/log"
-	"go.wit.com/gui"
-	"github.com/digitalocean/godo"
-	"go.wit.com/control-panel-dns/digitalocean"
-)
-
 /*
 // createDroplet creates a new droplet in the specified region with the given name.
 func createDroplet(token, name, region, size, image string) (*godo.Droplet, error) {
@@ -48,25 +35,8 @@ func createDroplet(token, name, region, size, image string) (*godo.Droplet, erro
 }
 */
 
+/*
 func oldMain() {
-	// Your personal API token from DigitalOcean.
-	token := os.Getenv("DIGITALOCEAN_TOKEN")
-	if token == "" {
-		log.Fatal("Please set your DigitalOcean API token in the DIGITALOCEAN_TOKEN environment variable")
-	}
-
-	// List droplets and their IP addresses.
-	err := digitalocean.ListDroplets(token)
-	if err != nil {
-		log.Fatalf("Error listing droplets: %s\n", err)
-	}
-
-	// This is just a optional goroutine to watch that things are alive
-	gui.Watchdog()
-	gui.StandardExit()
-
-	os.Exit(0)
-
 	// Parameters for the droplet you wish to create.
 	name := "ipv6.wit.com"
 	region := "nyc1" // New York City region.
@@ -113,3 +83,4 @@ func createDropletNew(token, name, region, size, image string) (*godo.Droplet, e
 
 	return newDroplet, nil
 }
+*/

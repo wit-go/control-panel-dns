@@ -27,6 +27,7 @@ func New(p *gui.Node) *DigitalOcean {
 	myDo.grid = myDo.group.NewGrid("grid", 2, 1).Pad()
 
 	myDo.ready = true
+	myDo.Hide()
 	return myDo
 }
 
@@ -56,10 +57,12 @@ func (d *DigitalOcean) Hide() {
 
 func (d *DigitalOcean) Update() bool {
 	if ! d.Ready() {return false}
-	err := ListDroplets(d.token)
-	if err != nil {
-		log.Error(err, "Error listing droplets")
+	if ! d.ListDroplets() {
+		log.Error(d.err, "Error listing droplets")
 		return false
+	}
+	for _, droplet := range d.droplets {
+		d.NewDroplet(droplet)
 	}
 	return true
 }

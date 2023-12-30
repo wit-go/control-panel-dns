@@ -10,9 +10,9 @@ import (
 )
 
 // ListDroplets fetches and prints out the droplets along with their IPv4 and IPv6 addresses.
-func ListDroplets(token string) error {
+func (d *DigitalOcean) ListDroplets() bool {
 	// OAuth token for authentication.
-	tokenSource := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
+	tokenSource := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: d.token})
 
 	// OAuth2 client.
 	oauthClient := oauth2.NewClient(context.Background(), tokenSource)
@@ -24,13 +24,13 @@ func ListDroplets(token string) error {
 	ctx := context.TODO()
 
 	// List all droplets.
-	droplets, _, err := client.Droplets.List(ctx, &godo.ListOptions{})
-	if err != nil {
-		return err
+	d.droplets, _, d.err = client.Droplets.List(ctx, &godo.ListOptions{})
+	if d.err != nil {
+		return false
 	}
 
 	// Iterate over droplets and print their details.
-	for _, droplet := range droplets {
+	for _, droplet := range d.droplets {
 		fmt.Printf("Droplet: %s\n", droplet.Name)
 		for _, network := range droplet.Networks.V4 {
 			if network.Type == "public" {
@@ -45,5 +45,5 @@ func ListDroplets(token string) error {
 		fmt.Println("-------------------------")
 	}
 
-	return nil
+	return true
 }
