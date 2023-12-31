@@ -41,6 +41,8 @@ type ipButton struct {
 }
 
 type Droplet struct {
+	ID		int
+
 	ready		bool
 	hidden		bool
 	err		error

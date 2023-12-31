@@ -20,6 +20,7 @@ func (d *DigitalOcean) NewDroplet(dd *godo.Droplet) *Droplet {
 	droplet := new(Droplet)
 	droplet.ready = false
 	droplet.poll = dd // the information polled from the digital ocean API
+	droplet.ID = dd.ID
 
 	if (d.dGrid == nil) {
 		d.dGrid = d.group.NewGrid("grid", 9, 1).Pad()
@@ -104,11 +105,13 @@ func (d *Droplet) Update(dpoll *godo.Droplet) {
 func (d *Droplet) PowerOn() {
 	if ! d.Exists() {return}
 	log.Info("droplet.PowerOn() should do it here")
+	myDo.PowerOn(d.ID)
 }
 
 func (d *Droplet) PowerOff() {
 	if ! d.Exists() {return}
 	log.Info("droplet.PowerOff() here")
+	myDo.PowerOff(d.ID)
 }
 
 func (d *Droplet) Destroy() {

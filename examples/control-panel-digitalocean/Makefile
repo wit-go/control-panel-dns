@@ -1,6 +1,6 @@
 # export GO111MODULE="off"
 run: build
-	./control-panel-digitalocean --gui-debug
+	./control-panel-digitalocean --gui-debug --log-debug
 
 build-release:
 	go get -v -u -x .

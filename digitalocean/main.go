@@ -58,18 +58,21 @@ func (d *DigitalOcean) Hide() {
 
 func (d *DigitalOcean) Update() bool {
 	if ! d.Ready() {return false}
-	if ! d.ListDroplets() {
+	d.ListSSHKeyID()
+	if d.ListDroplets() {
+		for _, droplet := range d.dpolled {
+			// check if the droplet ID already exists
+			if (d.dropMap[droplet.ID] == nil) {
+				d.dropMap[droplet.ID] = d.NewDroplet(&droplet)
+			} else {
+				log.Info("droplet.Update()", droplet.ID, droplet.Name, "already exists")
+				d.dropMap[droplet.ID].Update(&droplet)
+				continue
+			}
+		}
+	} else {
 		log.Error(d.err, "Error listing droplets")
 		return false
-	}
-	for _, droplet := range d.dpolled {
-		// check if the droplet ID already exists
-		if (d.dropMap[droplet.ID] != nil) {
-			log.Info("droplet.Update()", droplet.ID, droplet.Name, "already exists")
-			d.dropMap[droplet.ID].Update(&droplet)
-			continue
-		}
-		d.dropMap[droplet.ID] = d.NewDroplet(&droplet)
 	}
 	return true
 }
