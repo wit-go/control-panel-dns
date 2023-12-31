@@ -49,6 +49,7 @@ type windowCreate struct {
 
 	tag		*gadgets.OneLiner
 	name		*gadgets.BasicEntry
+	zone		*gadgets.BasicDropdown
 }
 
 type ipButton struct {

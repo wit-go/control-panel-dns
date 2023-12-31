@@ -45,11 +45,12 @@ func createDroplet(token, name, region, size, image string) (*godo.Droplet, erro
 }
 */
 
-func (d *DigitalOcean) Create(name string) {
-	region := "nyc1" // New York City region.
+func (d *DigitalOcean) Create(name string, region string) {
+	// region := "nyc1" // New York City region.
 	size := "s-1vcpu-1gb" // Size of the droplet.
 	image := "ubuntu-20-04-x64" // Image slug for Ubuntu 20.04 (LTS) x64.
 
+	return
 	// Create a new droplet.
 	droplet, err := d.createDropletNew(name, region, size, image)
 	if err != nil {
@@ -126,9 +127,36 @@ func InitCreateWindow() *windowCreate {
 	
 	myCreate.name = gadgets.NewBasicEntry(myCreate.grid, "Name").Set("test.wit.com")
 
+
+	myCreate.zone = gadgets.NewBasicDropdown(myCreate.grid, "Region")
+
+	regions := myDo.listRegions()
+
+	// Print details of each region.
+	log.Info("Available Regions:")
+	for i, region := range regions {
+		log.Infof("i: %d, Slug: %s, Name: %s, Available: %v\n", i, region.Slug, region.Name, region.Available)
+		log.Spew(i, region)
+		myCreate.zone.Add(region.Name)
+	}
+
+	var zone godo.Region
+	myCreate.zone.Custom = func() {
+		s := myCreate.zone.Get()
+		log.Info("create droplet region changed to:", s)
+		for _, region := range regions {
+			if s == region.Name {
+				log.Info("Found region! slug =", region.Slug, region)
+				zone = region
+			}
+		}
+	}
+
 	myCreate.grid.NewLabel("makes a new droplet")
 	myCreate.grid.NewButton("Create", func () {
-		myDo.Create(myCreate.name.Get())
+		name := myCreate.name.Get()
+		log.Info("create droplet name =", name, "zone =", zone.Slug)
+		myDo.Create(name, zone.Slug)
 	})
 
 	myCreate.ready = true
