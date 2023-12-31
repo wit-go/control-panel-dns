@@ -48,11 +48,13 @@ type windowCreate struct {
 	grid	*gui.Node
 
 	regionSelected	godo.Region
+	regionSlug	string
 	tag		*gadgets.OneLiner
 	name		*gadgets.BasicEntry
 	region		*gadgets.BasicDropdown
 	size		*gadgets.BasicCombobox
 	memory		*gadgets.BasicDropdown
+	image		*gadgets.BasicCombobox
 	// nvme		*gadgets.BasicCheckbox
 }
 

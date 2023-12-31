@@ -46,22 +46,19 @@ func createDroplet(token, name, region, size, image string) (*godo.Droplet, erro
 }
 */
 
-func (d *DigitalOcean) Create(name string, region string, size string) {
-	// region := "nyc1" // New York City region.
-	// size := "s-1vcpu-1gb" // Size of the droplet.
-	image := "ubuntu-20-04-x64" // Image slug for Ubuntu 20.04 (LTS) x64.
-
+func (d *DigitalOcean) Create(name string, region string, size string, image string) {
 	// Create a new droplet.
 	droplet, err := d.createDropletNew(name, region, size, image)
 	if err != nil {
-		log.Fatalf("Something went wrong: %s\n", err)
+		log.Fatalf("digitalocean.Create() Something went wrong: %s\n", err)
 	}
 
-	log.Printf("Created droplet ID %d with name %s\n", droplet.ID, droplet.Name)
+	log.Infof("digitalocean.Create() droplet ID %d with name %s\n", droplet.ID, droplet.Name)
 }
 
 // createDroplet creates a new droplet in the specified region with the given name.
 func (d *DigitalOcean) createDropletNew(name, region, size, image string) (*godo.Droplet, error) {
+	log.Infof("digitalocean.createDropletNew() START name =", name)
 	// Create an OAuth2 token.
 	tokenSource := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: d.token})
 
@@ -72,6 +69,7 @@ func (d *DigitalOcean) createDropletNew(name, region, size, image string) (*godo
 	client := godo.NewClient(oauthClient)
 
 	var sshKeys []godo.DropletCreateSSHKey
+	log.Info("digitalocean.createDropletNew() about to get keys. client =", client)
 
 	// Find the key by name.
 	for i, key := range d.sshKeys {
@@ -101,7 +99,9 @@ func (d *DigitalOcean) createDropletNew(name, region, size, image string) (*godo
 
 	// Create the droplet.
 	ctx := context.TODO()
+	log.Info("digitalocean.createDropletNew() about to do client.Create(). ctx =", ctx)
 	newDroplet, _, err := client.Droplets.Create(ctx, createRequest)
+	log.Infof("digitalocean.createDropletNew() END newDroplet =", newDroplet)
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +142,11 @@ func InitCreateWindow() *windowCreate {
 		if len(region.Sizes) == 0 {
 			log.Info("Skipping region. No available sizes region =", region.Name)
 		} else {
-			myCreate.region.Add(region.Name)
+			s := region.Name + " (" + region.Slug + ")"
+			if (myCreate.regionSlug == "") {
+				myCreate.regionSlug = region.Slug
+			}
+			myCreate.region.Add(s)
 		}
 	}
 
@@ -151,7 +155,7 @@ func InitCreateWindow() *windowCreate {
 		log.Info("create droplet region changed to:", s)
 		for _, region := range regions {
 			if s == region.Name {
-				log.Info("Found region! slug =", region.Slug, region)
+				log.Info("Found region! slug =", myCreate.regionSlug, region)
 				myCreate.regionSelected = region
 				log.Info("Found region! Now update all the sizes count =", len(region.Sizes))
 				for _, size := range region.Sizes {
@@ -169,6 +173,7 @@ func InitCreateWindow() *windowCreate {
 		size := myCreate.size.Get()
 		log.Info("Create() need to verify size exists in region. Digital Ocean size.Slug =", size)
 	}
+	myCreate.size.Set("s-1vcpu-1gb")
 
 	myCreate.memory = gadgets.NewBasicDropdown(myCreate.grid, "Memory")
 	myCreate.memory.Add("1 GB")
@@ -188,6 +193,11 @@ func InitCreateWindow() *windowCreate {
 		myCreate.UpdateSize()
 	}
 
+	myCreate.image = gadgets.NewBasicCombobox(myCreate.grid, "Image")
+	myCreate.image.Add("debian-12-x64")
+	myCreate.image.Add("ubuntu-20-04-x64")
+	myCreate.image.Set("debian-12-x64")
+
 	// myCreate.nvme = gadgets.NewBasicCheckbox(myCreate.grid, "NVMe")
 
 	myCreate.group.NewLabel("Create Droplet")
@@ -200,9 +210,15 @@ func InitCreateWindow() *windowCreate {
 	box.NewButton("Create", func () {
 		name := myCreate.name.Get()
 		size := myCreate.size.Get()
-		region := myCreate.regionSelected.Slug
-		log.Info("create droplet name =", name, "region =", region, "size =", size)
-		myDo.Create(name, region, size)
+		region := myCreate.regionSlug
+		image := myCreate.image.Get()
+		if (region == "") {
+			log.Info("Create() droplet name =", name, "region =", region, "size =", size, "image", image)
+			log.Info("Create() region lookup failed")
+			return
+		}
+		log.Info("Create() droplet name =", name, "region =", region, "size =", size, "image", image)
+		myDo.Create(name, region, size, image)
 		myCreate.Hide()
 	})
 
