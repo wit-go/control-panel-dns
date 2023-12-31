@@ -23,7 +23,7 @@ func New(p *gui.Node) *DigitalOcean {
 	myDo.window = p.NewWindow("DigitalOcean Control Panel")
 
 	// make a group label and a grid
-	myDo.group = myDo.window.NewGroup("data").Pad()
+	myDo.group = myDo.window.NewGroup("droplets:").Pad()
 	myDo.grid = myDo.group.NewGrid("grid", 2, 1).Pad()
 
 	myDo.ready = true
@@ -62,7 +62,7 @@ func (d *DigitalOcean) Update() bool {
 		return false
 	}
 	for _, droplet := range d.droplets {
-		d.NewDroplet(droplet)
+		d.NewDroplet(&droplet)
 	}
 	return true
 }

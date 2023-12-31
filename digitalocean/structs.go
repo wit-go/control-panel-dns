@@ -43,7 +43,7 @@ type Droplet struct {
 	hidden		bool
 	err		error
 
-	poll		godo.Droplet // store what the digital ocean API returned
+	poll		*godo.Droplet // store what the digital ocean API returned
 
 	name		*gui.Node
 
