@@ -54,5 +54,11 @@ func cloudApp(n *gui.Node) *gui.Node {
 	})
 	grid.NewLabel("polls DO via the API to find the state of all your droplets")
 
+	grid.NewButton("Create", func () {
+		// myDo.Create("jcarr.wit.com")
+		digitalocean.InitCreateWindow()
+	})
+	grid.NewLabel("makes a new droplet")
+
 	return win
 }

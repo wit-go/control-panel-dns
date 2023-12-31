@@ -2,9 +2,7 @@ package digitalocean
 
 import (
 	"context"
-
 	"golang.org/x/oauth2"
-
 	"github.com/digitalocean/godo"
 
 	"go.wit.com/log"
@@ -22,16 +20,19 @@ func (d *DigitalOcean) ListSSHKeyID() error {
 		return err
 	}
 
+	d.sshKeys = keys
+
 	// Find the key by name.
-	for i, key := range keys {
-		log.Info("found ssh i =", i)
-		log.Info("found ssh key.Name =", key.Name)
-		log.Info("found ssh key.Fingerprint =", key.Fingerprint)
-		log.Info("found ssh key:", key)
-	//	if key.Name == name {
-	//		return key.Fingerprint, nil
-	//	}
+	for _, key := range keys {
+		log.Info("found ssh", key.Name)
+		log.Verbose("found ssh key:", key)
 	}
+	/*
+	sshKeys := []godo.DropletCreateSSHKey{
+		{ID: 22994569},
+		{ID: 333},
+	}
+	*/
 
 	// return fmt.Errorf("SSH Key not found")
 	return nil

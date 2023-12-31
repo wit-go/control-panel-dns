@@ -116,7 +116,8 @@ func (d *Droplet) PowerOff() {
 
 func (d *Droplet) Destroy() {
 	if ! d.Exists() {return}
-	log.Info("droplet.Connect() ssh here")
+	log.Info("droplet.Destroy() ID =", d.ID, "Name =", d.name)
+	myDo.deleteDroplet(d)
 }
 
 /*

@@ -18,8 +18,10 @@ type DigitalOcean struct {
 
 	token		string // You're Digital Ocean API key
 	dpolled		[]godo.Droplet
+	sshKeys		[]godo.Key
 
 	dropMap		map[int]*Droplet
+	create		*windowCreate
 
 	parent	*gui.Node // should be the root of the 'gui' package binary tree
 	window	*gui.Node // our window for displaying digital ocean droplets
@@ -33,6 +35,20 @@ type DigitalOcean struct {
 	summary		*gadgets.OneLiner
 	statusIPv4	*gadgets.OneLiner
 	statusIPv6	*gadgets.OneLiner
+}
+
+type windowCreate struct {
+	ready		bool
+	hidden		bool
+	err		error
+
+	parent	*gui.Node // should be the root of the 'gui' package binary tree
+	window	*gui.Node // our window for displaying digital ocean droplets
+	group	*gui.Node
+	grid	*gui.Node
+
+	tag		*gadgets.OneLiner
+	name		*gadgets.BasicEntry
 }
 
 type ipButton struct {

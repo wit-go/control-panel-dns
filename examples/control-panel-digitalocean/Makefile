@@ -1,5 +1,6 @@
 # export GO111MODULE="off"
 run: build
+	reset
 	./control-panel-digitalocean --gui-debug --log-debug
 
 build-release:
