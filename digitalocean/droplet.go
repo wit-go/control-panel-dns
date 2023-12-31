@@ -99,6 +99,16 @@ func (d *Droplet) On() bool {
 
 func (d *Droplet) HasIPv4() bool {
 	if ! d.Ready() {return false}
+	if d.ipv4.GetText() == "" {
+		return false
+	}
+	return true
+}
+func (d *Droplet) HasIPv6() bool {
+	if ! d.Ready() {return false}
+	if d.ipv6.GetText() == "" {
+		return false
+	}
 	return true
 }
 
@@ -118,6 +128,14 @@ func (d *Droplet) Connect() {
 	if d.HasIPv4() {
 		ipv4 := d.GetIPv4()
 		log.Info("droplet has IPv4 =", ipv4)
+		xterm("ssh root@" + ipv4)
+		return
+	}
+	if d.HasIPv6() {
+		ipv6 := d.GetIPv6()
+		log.Info("droplet has IPv6 =", ipv6)
+		xterm("ssh root@[" + ipv6 + "]")
+		return
 	}
 	log.Info("droplet.Connect() here", d.GetIPv4(), d.GetIPv6())
 }
