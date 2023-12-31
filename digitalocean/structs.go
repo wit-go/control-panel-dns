@@ -17,12 +17,14 @@ type DigitalOcean struct {
 	err		error
 
 	token		string // You're Digital Ocean API key
-	droplets	[]godo.Droplet
+	dpolled		[]godo.Droplet
+
+	dropMap		map[int]*Droplet
 
 	parent	*gui.Node // should be the root of the 'gui' package binary tree
 	window	*gui.Node // our window for displaying digital ocean droplets
-	group	*gui.Node // our window for displaying digital ocean droplets
-	grid	*gui.Node // our window for displaying digital ocean droplets
+	group	*gui.Node
+	grid	*gui.Node
 
 	dGrid	*gui.Node // the grid for the droplets
 
@@ -46,6 +48,12 @@ type Droplet struct {
 	poll		*godo.Droplet // store what the digital ocean API returned
 
 	name		*gui.Node
+	status		*gui.Node
+	destroy		*gui.Node
+	connect		*gui.Node
+	poweron		*gui.Node
+	poweroff	*gui.Node
+	edit		*gui.Node
 
 	// a box and grid of the IPv4 addresses
 	box4		*gui.Node

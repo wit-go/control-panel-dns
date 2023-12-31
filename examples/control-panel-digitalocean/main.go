@@ -1,7 +1,7 @@
 package main
 
 import (
-	// "go.wit.com/log"
+	"go.wit.com/log"
 	"go.wit.com/gui"
 	"go.wit.com/control-panel-dns/digitalocean"
 )
@@ -16,6 +16,11 @@ func main() {
 
 	// draw the main window
 	cloudApp(myGui)
+
+	log.Sleep(1)
+	myDo = digitalocean.New(myGui)
+	myDo.Update()
+	myDo.Show()
 
 	// This is just a optional goroutine to watch that things are alive
 	gui.Watchdog()

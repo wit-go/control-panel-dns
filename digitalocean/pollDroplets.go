@@ -2,7 +2,6 @@ package digitalocean
 
 import (
 	"context"
-	"fmt"
 
 	"golang.org/x/oauth2"
 
@@ -24,13 +23,14 @@ func (d *DigitalOcean) ListDroplets() bool {
 	ctx := context.TODO()
 
 	// List all droplets.
-	d.droplets, _, d.err = client.Droplets.List(ctx, &godo.ListOptions{})
+	d.dpolled, _, d.err = client.Droplets.List(ctx, &godo.ListOptions{})
 	if d.err != nil {
 		return false
 	}
 
 	// Iterate over droplets and print their details.
-	for _, droplet := range d.droplets {
+	/*
+	for _, droplet := range d.polled {
 		fmt.Printf("Droplet: %s\n", droplet.Name)
 		for _, network := range droplet.Networks.V4 {
 			if network.Type == "public" {
@@ -44,6 +44,7 @@ func (d *DigitalOcean) ListDroplets() bool {
 		}
 		fmt.Println("-------------------------")
 	}
+	*/
 
 	return true
 }

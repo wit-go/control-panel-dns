@@ -13,9 +13,10 @@ var myDo *DigitalOcean
 func New(p *gui.Node) *DigitalOcean {
 	if myDo != nil {return myDo}
 	myDo = new(DigitalOcean)
+	myDo.ready = false
 	myDo.parent = p
 
-	myDo.ready = false
+	myDo.dropMap = make(map[int]*Droplet)
 
 	// Your personal API token from DigitalOcean.
 	myDo.token = os.Getenv("DIGITALOCEAN_TOKEN")
@@ -61,8 +62,14 @@ func (d *DigitalOcean) Update() bool {
 		log.Error(d.err, "Error listing droplets")
 		return false
 	}
-	for _, droplet := range d.droplets {
-		d.NewDroplet(&droplet)
+	for _, droplet := range d.dpolled {
+		// check if the droplet ID already exists
+		if (d.dropMap[droplet.ID] != nil) {
+			log.Info("droplet.Update()", droplet.ID, droplet.Name, "already exists")
+			d.dropMap[droplet.ID].Update(&droplet)
+			continue
+		}
+		d.dropMap[droplet.ID] = d.NewDroplet(&droplet)
 	}
 	return true
 }

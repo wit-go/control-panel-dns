@@ -1,6 +1,7 @@
 package digitalocean
 
 import 	(
+	"errors"
 	"github.com/digitalocean/godo"
 
 	"go.wit.com/log"
@@ -10,12 +11,18 @@ import 	(
 func (d *DigitalOcean) NewDroplet(dd *godo.Droplet) *Droplet {
 	if ! myDo.Ready() {return nil}
 
+	// check if the droplet ID already exists
+	if (d.dropMap[dd.ID] != nil) {
+		log.Error(errors.New("droplet.NewDroplet() already exists"))
+		return d.dropMap[dd.ID]
+	}
+
 	droplet := new(Droplet)
 	droplet.ready = false
 	droplet.poll = dd // the information polled from the digital ocean API
 
 	if (d.dGrid == nil) {
-		d.dGrid = d.group.NewGrid("grid", 5, 1).Pad()
+		d.dGrid = d.group.NewGrid("grid", 9, 1).Pad()
 	}
 
 	droplet.name = d.dGrid.NewLabel(dd.Name)
@@ -35,19 +42,76 @@ func (d *DigitalOcean) NewDroplet(dd *godo.Droplet) *Droplet {
 		}
 	}
 
-	d.dGrid.NewButton("Connect", func () {
+	droplet.status = d.dGrid.NewLabel(dd.Status)
+
+	droplet.connect = d.dGrid.NewButton("Connect", func () {
 		droplet.Connect()
 	})
 
-	d.dGrid.NewButton("Show", func () {
+	droplet.edit = d.dGrid.NewButton("Edit", func () {
 		droplet.Show()
+	})
+
+	droplet.poweroff = d.dGrid.NewButton("Power Off", func () {
+		droplet.PowerOff()
+	})
+
+	droplet.poweron = d.dGrid.NewButton("Power On", func () {
+		droplet.PowerOn()
+	})
+
+	droplet.destroy = d.dGrid.NewButton("Destroy", func () {
+		droplet.Destroy()
 	})
 
 	droplet.ready = true
 	return droplet
 }
 
+func (d *Droplet) Active() bool {
+	if ! d.Exists() {return false}
+	log.Info("droplet.Active() status: ", d.poll.Status)
+	if (d.status.S == "active") {
+		return true
+	}
+	return false
+}
+
 func (d *Droplet) Connect() {
+	if ! d.Exists() {return}
+	log.Info("droplet.Connect() here")
+}
+
+func (d *Droplet) Update(dpoll *godo.Droplet) {
+	if ! d.Exists() {return}
+	d.poll = dpoll
+	log.Info("droplet.Update()", dpoll.Name, "dpoll.Status =", dpoll.Status)
+	log.Spew(dpoll)
+	d.status.SetText(dpoll.Status)
+	if d.Active() {
+		d.poweron.Disable()
+		d.destroy.Disable()
+		d.connect.Enable()
+		d.poweroff.Enable()
+	} else {
+		d.poweron.Enable()
+		d.destroy.Enable()
+		d.poweroff.Disable()
+		d.connect.Disable()
+	}
+}
+
+func (d *Droplet) PowerOn() {
+	if ! d.Exists() {return}
+	log.Info("droplet.PowerOn() should do it here")
+}
+
+func (d *Droplet) PowerOff() {
+	if ! d.Exists() {return}
+	log.Info("droplet.PowerOff() here")
+}
+
+func (d *Droplet) Destroy() {
 	if ! d.Exists() {return}
 	log.Info("droplet.Connect() ssh here")
 }
