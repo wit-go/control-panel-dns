@@ -24,7 +24,7 @@ func (d *DigitalOcean) ListSSHKeyID() error {
 
 	// Find the key by name.
 	for _, key := range keys {
-		log.Info("found ssh", key.Name)
+		log.Info("found ssh wierd", key.Name)
 		log.Verbose("found ssh key:", key)
 	}
 	/*

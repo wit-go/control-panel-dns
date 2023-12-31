@@ -49,7 +49,8 @@ type windowCreate struct {
 
 	tag		*gadgets.OneLiner
 	name		*gadgets.BasicEntry
-	zone		*gadgets.BasicDropdown
+	region		*gadgets.BasicDropdown
+	size		*gadgets.BasicDropdown
 }
 
 type ipButton struct {
@@ -67,6 +68,7 @@ type Droplet struct {
 	poll		*godo.Droplet // store what the digital ocean API returned
 
 	name		*gui.Node
+	sizeSlug	*gui.Node
 	status		*gui.Node
 	destroy		*gui.Node
 	connect		*gui.Node
@@ -74,13 +76,6 @@ type Droplet struct {
 	poweroff	*gui.Node
 	edit		*gui.Node
 
-	// a box and grid of the IPv4 addresses
-	box4		*gui.Node
-	grid4		*gui.Node
-	ipv4		[]ipButton
-
-	// a box and grid of the IPv6 addresses
-	box6		*gui.Node
-	grid6		*gui.Node
-	ipv6		[]ipButton
+	ipv4		*gui.Node
+	ipv6		*gui.Node
 }

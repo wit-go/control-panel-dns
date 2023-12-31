@@ -2,6 +2,8 @@ package digitalocean
 
 import 	(
 	"errors"
+	"sort"
+	"strings"
 	"github.com/digitalocean/godo"
 
 	"go.wit.com/log"
@@ -23,25 +25,30 @@ func (d *DigitalOcean) NewDroplet(dd *godo.Droplet) *Droplet {
 	droplet.ID = dd.ID
 
 	if (d.dGrid == nil) {
-		d.dGrid = d.group.NewGrid("grid", 9, 1).Pad()
+		d.dGrid = d.group.NewGrid("grid", 10, 1).Pad()
 	}
 
 	droplet.name = d.dGrid.NewLabel(dd.Name)
 
-	droplet.box4 = d.dGrid.NewBox("hBox", true)
-	droplet.grid4 = droplet.box4.NewGrid("grid", 2, 1).Pad()
+	var ipv4 []string
+	var ipv6 []string
 	for _, network := range dd.Networks.V4 {
 		if network.Type == "public" {
-			droplet.grid4.NewLabel(network.IPAddress)
+			ipv4 = append(ipv4, network.IPAddress)
 		}
 	}
-	droplet.box6 = d.dGrid.NewBox("hBox", true)
-	droplet.grid6 = droplet.box6.NewGrid("grid", 2, 1).Pad()
+
 	for _, network := range dd.Networks.V6 {
 		if network.Type == "public" {
-			droplet.grid6.NewLabel(network.IPAddress)
+			ipv6 = append(ipv6, network.IPAddress)
 		}
 	}
+	sort.Strings(ipv4)
+	sort.Strings(ipv6)
+	droplet.ipv4 = d.dGrid.NewLabel(strings.Join(ipv4, "\n"))
+	droplet.ipv6 = d.dGrid.NewLabel(strings.Join(ipv6, "\n"))
+
+	droplet.sizeSlug = d.dGrid.NewLabel(dd.SizeSlug)
 
 	droplet.status = d.dGrid.NewLabel(dd.Status)
 
@@ -70,7 +77,7 @@ func (d *DigitalOcean) NewDroplet(dd *godo.Droplet) *Droplet {
 }
 
 func (d *Droplet) Active() bool {
-	if ! d.Exists() {return false}
+	if ! d.Ready() {return false}
 	log.Info("droplet.Active() status: ", d.poll.Status)
 	if (d.status.S == "active") {
 		return true
@@ -78,9 +85,41 @@ func (d *Droplet) Active() bool {
 	return false
 }
 
+// Returns true if the droplet is finished installing
+func (d *Droplet) Ready() bool {
+	if d == nil {return false}
+	return d.ready
+}
+
+// Returns true if the droplet is running
+func (d *Droplet) On() bool {
+	if ! d.Ready() {return false}
+	return true
+}
+
+func (d *Droplet) HasIPv4() bool {
+	if ! d.Ready() {return false}
+	return true
+}
+
+func (d *Droplet) GetIPv4() string {
+	if ! d.Ready() {return ""}
+	return d.ipv4.GetText()
+}
+
+func (d *Droplet) GetIPv6() string {
+	if ! d.Ready() {return ""}
+	log.Info("droplet GetIPv6 has: n.GetText()", d.ipv6.GetText())
+	return d.ipv6.GetText()
+}
+
 func (d *Droplet) Connect() {
-	if ! d.Exists() {return}
-	log.Info("droplet.Connect() here")
+	if ! d.Ready() {return}
+	if d.HasIPv4() {
+		ipv4 := d.GetIPv4()
+		log.Info("droplet has IPv4 =", ipv4)
+	}
+	log.Info("droplet.Connect() here", d.GetIPv4(), d.GetIPv6())
 }
 
 func (d *Droplet) Update(dpoll *godo.Droplet) {

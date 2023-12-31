@@ -45,12 +45,11 @@ func createDroplet(token, name, region, size, image string) (*godo.Droplet, erro
 }
 */
 
-func (d *DigitalOcean) Create(name string, region string) {
+func (d *DigitalOcean) Create(name string, region string, size string) {
 	// region := "nyc1" // New York City region.
-	size := "s-1vcpu-1gb" // Size of the droplet.
+	// size := "s-1vcpu-1gb" // Size of the droplet.
 	image := "ubuntu-20-04-x64" // Image slug for Ubuntu 20.04 (LTS) x64.
 
-	return
 	// Create a new droplet.
 	droplet, err := d.createDropletNew(name, region, size, image)
 	if err != nil {
@@ -115,7 +114,10 @@ var myCreate *windowCreate
 // You can only have one of these
 func InitCreateWindow() *windowCreate {
 	if ! myDo.Ready() {return nil}
-	if myCreate != nil {return myCreate}
+	if myCreate != nil {
+		myCreate.Show()
+		return myCreate
+	}
 	myCreate = new(windowCreate)
 	myCreate.ready = false
 
@@ -127,8 +129,7 @@ func InitCreateWindow() *windowCreate {
 	
 	myCreate.name = gadgets.NewBasicEntry(myCreate.grid, "Name").Set("test.wit.com")
 
-
-	myCreate.zone = gadgets.NewBasicDropdown(myCreate.grid, "Region")
+	myCreate.region = gadgets.NewBasicDropdown(myCreate.grid, "Region")
 
 	regions := myDo.listRegions()
 
@@ -137,26 +138,47 @@ func InitCreateWindow() *windowCreate {
 	for i, region := range regions {
 		log.Infof("i: %d, Slug: %s, Name: %s, Available: %v\n", i, region.Slug, region.Name, region.Available)
 		log.Spew(i, region)
-		myCreate.zone.Add(region.Name)
+		if len(region.Sizes) == 0 {
+			log.Info("Skipping region. No available sizes region =", region.Name)
+		} else {
+			myCreate.region.Add(region.Name)
+		}
 	}
 
 	var zone godo.Region
-	myCreate.zone.Custom = func() {
-		s := myCreate.zone.Get()
+	myCreate.region.Custom = func() {
+		s := myCreate.region.Get()
 		log.Info("create droplet region changed to:", s)
 		for _, region := range regions {
 			if s == region.Name {
 				log.Info("Found region! slug =", region.Slug, region)
 				zone = region
+				log.Info("Found region! Now update all the sizes count =", len(region.Sizes))
+				for _, size := range region.Sizes {
+					log.Info("Size: ", size)
+				}
 			}
 		}
 	}
 
-	myCreate.grid.NewLabel("makes a new droplet")
-	myCreate.grid.NewButton("Create", func () {
+	myCreate.size = gadgets.NewBasicDropdown(myCreate.grid, "Size")
+	myCreate.size.Add("s-1vcpu-1gb")
+	myCreate.size.Add("s-1vcpu-1gb-amd")
+	myCreate.size.Add("s-1vcpu-1gb-intel")
+
+	myCreate.group.NewLabel("Create Droplet")
+
+	// box := myCreate.group.NewBox("vBox", false).Pad()
+	box := myCreate.group.NewBox("hBox", true).Pad()
+	box.NewButton("Cancel", func () {
+		myCreate.Hide()
+	})
+	box.NewButton("Create", func () {
 		name := myCreate.name.Get()
-		log.Info("create droplet name =", name, "zone =", zone.Slug)
-		myDo.Create(name, zone.Slug)
+		size := myCreate.size.Get()
+		log.Info("create droplet name =", name, "region =", zone.Slug, "size =", size)
+		myDo.Create(name, zone.Slug, size)
+		myCreate.Hide()
 	})
 
 	myCreate.ready = true
