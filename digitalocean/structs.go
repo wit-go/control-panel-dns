@@ -47,10 +47,13 @@ type windowCreate struct {
 	group	*gui.Node
 	grid	*gui.Node
 
+	regionSelected	godo.Region
 	tag		*gadgets.OneLiner
 	name		*gadgets.BasicEntry
 	region		*gadgets.BasicDropdown
-	size		*gadgets.BasicDropdown
+	size		*gadgets.BasicCombobox
+	memory		*gadgets.BasicDropdown
+	// nvme		*gadgets.BasicCheckbox
 }
 
 type ipButton struct {

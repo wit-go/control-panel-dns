@@ -2,6 +2,7 @@ package digitalocean
 
 import (
 	"context"
+	"strings"
 	"golang.org/x/oauth2"
 	"github.com/digitalocean/godo"
 
@@ -145,14 +146,13 @@ func InitCreateWindow() *windowCreate {
 		}
 	}
 
-	var zone godo.Region
 	myCreate.region.Custom = func() {
 		s := myCreate.region.Get()
 		log.Info("create droplet region changed to:", s)
 		for _, region := range regions {
 			if s == region.Name {
 				log.Info("Found region! slug =", region.Slug, region)
-				zone = region
+				myCreate.regionSelected = region
 				log.Info("Found region! Now update all the sizes count =", len(region.Sizes))
 				for _, size := range region.Sizes {
 					log.Info("Size: ", size)
@@ -161,10 +161,34 @@ func InitCreateWindow() *windowCreate {
 		}
 	}
 
-	myCreate.size = gadgets.NewBasicDropdown(myCreate.grid, "Size")
+	myCreate.size = gadgets.NewBasicCombobox(myCreate.grid, "Size")
 	myCreate.size.Add("s-1vcpu-1gb")
 	myCreate.size.Add("s-1vcpu-1gb-amd")
 	myCreate.size.Add("s-1vcpu-1gb-intel")
+	myCreate.size.Custom = func() {
+		size := myCreate.size.Get()
+		log.Info("Create() need to verify size exists in region. Digital Ocean size.Slug =", size)
+	}
+
+	myCreate.memory = gadgets.NewBasicDropdown(myCreate.grid, "Memory")
+	myCreate.memory.Add("1 GB")
+	myCreate.memory.Add("2 GB")
+	myCreate.memory.Add("4 GB")
+	myCreate.memory.Add("8 GB")
+	myCreate.memory.Add("16 GB")
+	myCreate.memory.Add("32 GB")
+	myCreate.memory.Add("64 GB")
+	myCreate.memory.Add("96 GB")
+	myCreate.memory.Add("128 GB")
+	myCreate.memory.Add("256 GB")
+	myCreate.memory.Custom = func() {
+		for _, size := range myCreate.regionSelected.Sizes {
+			log.Info("Size: ", size)
+		}
+		myCreate.UpdateSize()
+	}
+
+	// myCreate.nvme = gadgets.NewBasicCheckbox(myCreate.grid, "NVMe")
 
 	myCreate.group.NewLabel("Create Droplet")
 
@@ -176,14 +200,55 @@ func InitCreateWindow() *windowCreate {
 	box.NewButton("Create", func () {
 		name := myCreate.name.Get()
 		size := myCreate.size.Get()
-		log.Info("create droplet name =", name, "region =", zone.Slug, "size =", size)
-		myDo.Create(name, zone.Slug, size)
+		region := myCreate.regionSelected.Slug
+		log.Info("create droplet name =", name, "region =", region, "size =", size)
+		myDo.Create(name, region, size)
 		myCreate.Hide()
 	})
 
 	myCreate.ready = true
 	myDo.create = myCreate
 	return myCreate
+}
+
+// Find the size
+func (d *windowCreate) UpdateSize() {
+	if ! d.Ready() {return}
+	log.Info("Now find the size. sizes count =", len(myCreate.regionSelected.Sizes))
+	var s string
+	m := myCreate.memory.Get()
+	switch m {
+	case "1 GB":
+		s = "cpu-1gb-"
+	case "2 GB":
+		s = "cpu-2gb-"
+	case "4 GB":
+		s = "cpu-4gb-"
+	case "8 GB":
+		s = "cpu-8gb-"
+	case "16 GB":
+		s = "cpu-16gb-"
+	case "32 GB":
+		s = "cpu-32gb-"
+	case "64 GB":
+		s = "cpu-64gb-"
+	case "96 GB":
+		s = "cpu-96gb-"
+	case "128 GB":
+		s = "cpu-128gb-"
+	case "256 GB":
+		s = "cpu-256gb-"
+	default:
+		s = "cpu-4gb-"
+	}
+	for _, size := range myCreate.regionSelected.Sizes {
+		if strings.Contains(size, s) {
+			log.Info("Found Size! size.Slug =", size, "contains", s)
+			myCreate.size.Set(size)
+			return
+		}
+	}
+	log.Info("memory =", myCreate.memory.Get())
 }
 
 // Returns true if the status is valid
