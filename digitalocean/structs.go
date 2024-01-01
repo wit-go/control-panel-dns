@@ -65,6 +65,9 @@ type ipButton struct {
 
 type Droplet struct {
 	ID		int
+	image		string
+	memory		int
+	disk		int
 
 	ready		bool
 	hidden		bool
@@ -72,9 +75,11 @@ type Droplet struct {
 
 	poll		*godo.Droplet // store what the digital ocean API returned
 
-	name		*gui.Node
-	sizeSlug	*gui.Node
-	status		*gui.Node
+	nameN		*gui.Node
+	sizeSlugN	*gui.Node
+	statusN		*gui.Node
+	imageN		*gui.Node
+
 	destroy		*gui.Node
 	connect		*gui.Node
 	poweron		*gui.Node

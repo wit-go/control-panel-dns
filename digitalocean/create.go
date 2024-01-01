@@ -169,11 +169,12 @@ func InitCreateWindow() *windowCreate {
 	myCreate.size.Add("s-1vcpu-1gb")
 	myCreate.size.Add("s-1vcpu-1gb-amd")
 	myCreate.size.Add("s-1vcpu-1gb-intel")
+	myCreate.size.Add("s-2vcpu-4gb-120gb-intel")
+	myCreate.size.Set("s-2vcpu-4gb-120gb-intel")
 	myCreate.size.Custom = func() {
 		size := myCreate.size.Get()
 		log.Info("Create() need to verify size exists in region. Digital Ocean size.Slug =", size)
 	}
-	myCreate.size.Set("s-1vcpu-1gb")
 
 	myCreate.memory = gadgets.NewBasicDropdown(myCreate.grid, "Memory")
 	myCreate.memory.Add("1 GB")

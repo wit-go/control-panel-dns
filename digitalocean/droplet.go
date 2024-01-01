@@ -4,6 +4,7 @@ import 	(
 	"errors"
 	"sort"
 	"strings"
+	"strconv"
 	"github.com/digitalocean/godo"
 
 	"go.wit.com/log"
@@ -23,12 +24,15 @@ func (d *DigitalOcean) NewDroplet(dd *godo.Droplet) *Droplet {
 	droplet.ready = false
 	droplet.poll = dd // the information polled from the digital ocean API
 	droplet.ID = dd.ID
+	droplet.image = dd.Image.Name + " (" + dd.Image.Slug + ")"
 
 	if (d.dGrid == nil) {
-		d.dGrid = d.group.NewGrid("grid", 10, 1).Pad()
+		d.dGrid = d.group.NewGrid("grid", 12, 1).Pad()
 	}
 
-	droplet.name = d.dGrid.NewLabel(dd.Name)
+	droplet.nameN = d.dGrid.NewLabel(dd.Name)
+
+	d.dGrid.NewLabel(dd.Region.Slug)
 
 	var ipv4 []string
 	var ipv6 []string
@@ -48,9 +52,9 @@ func (d *DigitalOcean) NewDroplet(dd *godo.Droplet) *Droplet {
 	droplet.ipv4 = d.dGrid.NewLabel(strings.Join(ipv4, "\n"))
 	droplet.ipv6 = d.dGrid.NewLabel(strings.Join(ipv6, "\n"))
 
-	droplet.sizeSlug = d.dGrid.NewLabel(dd.SizeSlug)
-
-	droplet.status = d.dGrid.NewLabel(dd.Status)
+	droplet.sizeSlugN = d.dGrid.NewLabel(dd.SizeSlug)
+	droplet.imageN = d.dGrid.NewLabel(dd.Image.Slug)
+	droplet.statusN = d.dGrid.NewLabel(dd.Status)
 
 	droplet.connect = d.dGrid.NewButton("Connect", func () {
 		droplet.Connect()
@@ -78,8 +82,8 @@ func (d *DigitalOcean) NewDroplet(dd *godo.Droplet) *Droplet {
 
 func (d *Droplet) Active() bool {
 	if ! d.Ready() {return false}
-	log.Info("droplet.Active() status: ", d.poll.Status)
-	if (d.status.S == "active") {
+	log.Info("droplet.Active() status: ", d.poll.Status, "d.statusN.GetText() =", d.statusN.GetText())
+	if (d.statusN.GetText() == "active") {
 		return true
 	}
 	return false
@@ -145,7 +149,7 @@ func (d *Droplet) Update(dpoll *godo.Droplet) {
 	d.poll = dpoll
 	log.Info("droplet.Update()", dpoll.Name, "dpoll.Status =", dpoll.Status)
 	log.Spew(dpoll)
-	d.status.SetText(dpoll.Status)
+	d.statusN.SetText(dpoll.Status)
 	if d.Active() {
 		d.poweron.Disable()
 		d.destroy.Disable()
@@ -173,7 +177,7 @@ func (d *Droplet) PowerOff() {
 
 func (d *Droplet) Destroy() {
 	if ! d.Exists() {return}
-	log.Info("droplet.Destroy() ID =", d.ID, "Name =", d.name)
+	log.Info("droplet.Destroy() ID =", d.ID, "Name =", d.nameN.GetText())
 	myDo.deleteDroplet(d)
 }
 
@@ -204,8 +208,14 @@ type Droplet struct {
 */
 func (d *Droplet) Show() {
 	if ! d.Exists() {return}
-	log.Info("droplet:", d.name.Name)
-	log.Info("droplet:", d.poll.ID, d.poll.Name, d.poll.Memory, d.poll.Disk, d.poll.Status)
+	log.Info("droplet: ID =", d.ID)
+	log.Info("droplet: Name =", d.GetName())
+	log.Info("droplet: Size =", d.GetSize())
+	log.Info("droplet: Memory =", d.GetMemory())
+	log.Info("droplet: Disk =", d.GetDisk())
+	log.Info("droplet: Image =", d.GetImage())
+	log.Info("droplet: Status =", d.GetStatus())
+	log.Info("droplet: ", d.poll.Name, d.poll.Image.Slug, d.poll.Region.Slug)
 	log.Spew(d.poll)
 }
 
@@ -223,4 +233,34 @@ func (d *Droplet) Exists() bool {
 	if d == nil {return false}
 	if d.poll == nil {return false}
 	return d.ready
+}
+
+func (d *Droplet) GetName() string {
+	if ! d.Ready() {return ""}
+	return d.nameN.GetText()
+}
+
+func (d *Droplet) GetSize() string {
+	if ! d.Ready() {return ""}
+	return d.sizeSlugN.GetText()
+}
+
+func (d *Droplet) GetMemory() string {
+	if ! d.Ready() {return ""}
+	return strconv.Itoa(d.memory)
+}
+
+func (d *Droplet) GetDisk() string {
+	if ! d.Ready() {return ""}
+	return strconv.Itoa(d.disk)
+}
+
+func (d *Droplet) GetImage() string {
+	if ! d.Ready() {return ""}
+	return d.imageN.GetText()
+}
+
+func (d *Droplet) GetStatus() string {
+	if ! d.Ready() {return ""}
+	return d.statusN.GetText()
 }

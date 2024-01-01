@@ -75,7 +75,7 @@ func (d *DigitalOcean) deleteDroplet(drop *Droplet) error {
 	client := godo.NewClient(oauthClient)
 
 	ctx := context.TODO()
-	log.Warn("deleteDroplet() going to delete ID =", drop.ID, "Name =", drop.name.GetText())
+	log.Warn("deleteDroplet() going to delete ID =", drop.ID, "Name =", drop.GetName())
 	response, err := client.Droplets.Delete(ctx, drop.ID)
 	log.Warn(response)
 	return err
