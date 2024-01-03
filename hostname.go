@@ -7,7 +7,7 @@ import (
 
 	"go.wit.com/log"
 	"go.wit.com/shell"
-	"go.wit.com/control-panel-dns/cloudflare"
+	"go.wit.com/gui/cloudflare"
 
 	"github.com/miekg/dns"
 	// will try to get this hosts FQDN

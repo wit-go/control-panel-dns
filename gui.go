@@ -9,11 +9,12 @@ import 	(
 	"net"
 	"strings"
 
-	"go.wit.com/gui"
-	"go.wit.com/gui/gadgets"
 	"go.wit.com/log"
 	"go.wit.com/shell"
-	"go.wit.com/control-panel-dns/cloudflare"
+
+	"go.wit.com/gui/gui"
+	"go.wit.com/gui/gadgets"
+	"go.wit.com/gui/cloudflare"
 )
 
 // This setups up the dns control panel window

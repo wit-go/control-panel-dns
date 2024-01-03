@@ -7,10 +7,10 @@ package main
 */
 
 import 	(
-	"log"
 	"time"
 	arg "github.com/alexflint/go-arg"
-	"go.wit.com/gui"
+	"go.wit.com/log"
+	"go.wit.com/gui/gui"
 )
 
 var args struct {
@@ -18,14 +18,29 @@ var args struct {
 	VerboseDNS bool  `arg:"--verbose-dns" help:"debug your dns settings"`
 }
 
+var NET log.LogFlag
+var SPEW log.LogFlag
+
 func init() {
 	arg.MustParse(&args)
 	// fmt.Println(args.Foo, args.Bar, args.User)
 
+	NET.B = false
+	NET.Name = "NET"
+	NET.Subsystem = "cpdns"
+	NET.Desc = "Network logging"
+	NET.Register()
+
+	SPEW.B = false
+	SPEW.Name = "SPEW"
+	SPEW.Subsystem = "cpdns"
+	SPEW.Desc = "spew logging"
+	SPEW.Register()
+
 	if gui.ArgDebug() {
-		log.Println(true, "INIT() gui debug == true")
+		log.Log(true, "INIT() gui debug == true")
 	} else {
-		log.Println(true, "INIT() gui debug == false")
+		log.Log(true, "INIT() gui debug == false")
 	}
 
 	me.dnsSleep = 500 * time.Millisecond
@@ -33,7 +48,7 @@ func init() {
 
 	me.artificialSleep = 0.4	// seems to need to exist or GTK crashes. TODO: fix andlabs plugin
 	me.artificialS = "blah"
-	log.Println("init() me.artificialSleep =", me.artificialSleep)
-	log.Println("init() me.artificialS =", me.artificialS)
+	log.Log(true, "init() me.artificialSleep =", me.artificialSleep)
+	log.Log(true, "init() me.artificialS =", me.artificialS)
 	sleep(me.artificialSleep)
 }

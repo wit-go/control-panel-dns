@@ -18,9 +18,10 @@ import (
 	"time"
 	"strconv"
 	"reflect"
+	"errors"
 
 	"go.wit.com/log"
-	"go.wit.com/gui"
+	"go.wit.com/gui/gui"
 	"go.wit.com/gui/gadgets"
 	"go.wit.com/shell"
 
@@ -127,7 +128,7 @@ func NewDigStatusWindow(p *gui.Node) *digStatus {
 func (ds *digStatus) Update() {
 	log.Info("digStatus() Update() START")
 	if ds == nil {
-		log.Error("digStatus() Update() ds == nil")
+		log.Error(errors.New("digStatus() Update() ds == nil"))
 		return
 	}
 	duration := timeFunction(func () {
@@ -206,7 +207,7 @@ func (ds *digStatus) set(a any, s string) {
 		ol.Set(s)
 		return
 	}
-	log.Error("unknown type TypeOf(a) =", reflect.TypeOf(a), "a =", a)
+	log.Warn("unknown type TypeOf(a) =", reflect.TypeOf(a), "a =", a)
 	os.Exit(0)
 }
 
@@ -216,12 +217,12 @@ func (ds *digStatus) updateDnsStatus() {
 
 	log.Info("updateDnsStatus() START")
 	if (ds == nil) {
-		log.Error("updateDnsStatus() not initialized yet. ds == nil")
+		log.Error(errors.New("updateDnsStatus() not initialized yet. ds == nil"))
 		return
 	}
 
 	if (! ds.ready) {
-		log.Error("updateDnsStatus() not ready yet")
+		log.Error(errors.New("updateDnsStatus() not ready yet"))
 		return
 	}
 

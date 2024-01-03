@@ -11,11 +11,12 @@ import (
 	"time"
 	"reflect"
 	"strings"
+	"errors"
 
 	"go.wit.com/log"
-	"go.wit.com/gui"
+	"go.wit.com/gui/gui"
 	"go.wit.com/gui/gadgets"
-	"go.wit.com/control-panel-dns/cloudflare"
+	"go.wit.com/gui/cloudflare"
 )
 
 type hostnameStatus struct {
@@ -156,7 +157,7 @@ func (hs *hostnameStatus) createDNSrecord(value string) bool {
 func (hs *hostnameStatus) Update() {
 	log.Info("hostnameStatus() Update() START")
 	if hs == nil {
-		log.Error("hostnameStatus() Update() hs == nil")
+		log.Error(errors.New("hostnameStatus() Update() hs == nil"))
 		return
 	}
 	duration := timeFunction(func () {
@@ -237,7 +238,7 @@ func (hs *hostnameStatus) set(a any, s string) {
 		ol.Set(s)
 		return
 	}
-	log.Error("unknown type TypeOf(a) =", reflect.TypeOf(a), "a =", a)
+	log.Warn("unknown type TypeOf(a) =", reflect.TypeOf(a), "a =", a)
 	os.Exit(0)
 }
 

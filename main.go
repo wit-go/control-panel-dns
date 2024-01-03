@@ -14,7 +14,9 @@ import 	(
 	"embed"
 
 	"go.wit.com/log"
-	"go.wit.com/gui"
+	"go.wit.com/gui/gui"
+	"go.wit.com/gui/debugger"
+
 	"github.com/miekg/dns"
 )
 
@@ -43,6 +45,11 @@ func main() {
 
 	sleep(me.artificialSleep)
 	setupControlPanelWindow()
+
+	sleep(2)
+	if gui.ArgDebug() {
+		debugger.DebugWindow(myGui)
+	}
 
 	// forever monitor for network and dns changes
 	sleep(me.artificialSleep)

@@ -3,7 +3,7 @@ package main
 import 	(
 	"log"
 	"reflect"
-	witlog "go.wit.com/gui/log"
+	witlog "go.wit.com/log"
 )
 
 var LogPrefix = "ipv6cp" // ipv6 control panel debugging line
@@ -19,7 +19,7 @@ var LogNet bool = false // general network debugging
 var LogProc bool = false // turn on /proc debugging output
 var LogExec bool = false // turn on os.Exec() debugging
 
-var SPEW witlog.Spewt
+// var SPEW witlog.Spewt
 
 // var log interface{}
 
