@@ -46,8 +46,8 @@ func main() {
 	sleep(me.artificialSleep)
 	setupControlPanelWindow()
 
-	sleep(2)
-	if gui.ArgDebug() {
+	if debugger.ArgDebug() {
+		sleep(2)
 		debugger.DebugWindow(myGui)
 	}
 

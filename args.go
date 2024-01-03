@@ -10,7 +10,7 @@ import 	(
 	"time"
 	arg "github.com/alexflint/go-arg"
 	"go.wit.com/log"
-	"go.wit.com/gui/gui"
+	"go.wit.com/gui/debugger"
 )
 
 var args struct {
@@ -37,7 +37,7 @@ func init() {
 	SPEW.Desc = "spew logging"
 	SPEW.Register()
 
-	if gui.ArgDebug() {
+	if debugger.ArgDebug() {
 		log.Log(true, "INIT() gui debug == true")
 	} else {
 		log.Log(true, "INIT() gui debug == false")
