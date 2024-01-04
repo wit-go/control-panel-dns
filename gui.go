@@ -22,8 +22,8 @@ func setupControlPanelWindow() {
 	me.window = myGui.NewWindow("DNS and IPv6 Control Panel")
 	// me.window.Dump() // will dump out some info
 
-	debug("artificial sleep of:", me.artificialSleep)
-	sleep(me.artificialSleep)
+	log.Info("artificial sleep of:", me.artificialSleep)
+	log.Sleep(me.artificialSleep)
 
 	// setup the main tab
 	dnsTab("DNS")
@@ -109,10 +109,10 @@ func debugTab(title string) {
 	g2.NewButton("checkDNS:", func () {
 		ipv6s, ipv4s := checkDNS()
 		for s, _ := range ipv6s {
-			debug(LogNow, "check if", s, "is in DNS")
+			log.Log(NOW, "check if", s, "is in DNS")
 		}
 		for s, _ := range ipv4s {
-			debug(LogNow, "check if", s, "is in DNS")
+			log.Log(NOW, "check if", s, "is in DNS")
 		}
 	})
 
@@ -153,19 +153,14 @@ func debugTab(title string) {
 	g2 = tab.NewGroup("debugging options")
 
 	// DEBUG flags
-	me.dbOn = g2.NewCheckbox("turn on debugging (will override all flags below)")
-	me.dbOn.Custom = func() {
-		DEBUGON = me.dbOn.B
-	}
-
 	me.dbNet = g2.NewCheckbox("turn on network debugging)")
 	me.dbNet.Custom = func() {
-		LogNet = me.dbNet.B
+		log.Warn("TODO: re-implement")
 	}
 
 	me.dbProc = g2.NewCheckbox("turn on /proc debugging)")
 	me.dbProc.Custom = func() {
-		LogProc = me.dbProc.B
+		log.Warn("TODO: re-implement")
 	}
 
 	// makes a slider widget
@@ -185,7 +180,7 @@ func deleteAAA() string {
 	var aaaa []string
 	aaaa = dhcpAAAA() // your AAAA IP addresses right now
 	for _, s := range aaaa {
-		debug(LogNow, "DNS AAAA =", s)
+		log.Log(NOW, "DNS AAAA =", s)
 		if ( me.ipmap[s] == nil) {
 			return s
 		}
@@ -198,7 +193,7 @@ func missingAAAA() string {
 	var aaaa []string
 	aaaa = dhcpAAAA() // your AAAA IP addresses right now
 	for _, s := range aaaa {
-		debug(LogNow, "missing AAAA =", s)
+		log.Log(NOW, "missing AAAA =", s)
 		return s
 	}
 	return ""
@@ -213,10 +208,10 @@ func displayDNS() string {
 	var all string
 	var broken string = "unknown"
 	for _, s := range aaaa {
-		debug(LogNow, "host", h, "DNS AAAA =", s, "ipmap[s] =", me.ipmap[s])
+		log.Log(NOW, "host", h, "DNS AAAA =", s, "ipmap[s] =", me.ipmap[s])
 		all += s + "\n"
 		if ( me.ipmap[s] == nil) {
-			debug(LogError, "THIS IS THE WRONG AAAA DNS ENTRY:  host", h, "DNS AAAA =", s)
+			log.Warn("THIS IS THE WRONG AAAA DNS ENTRY:  host", h, "DNS AAAA =", s)
 			broken = "wrong AAAA entry"
 		} else {
 			if (broken == "unknown") {
@@ -226,7 +221,7 @@ func displayDNS() string {
 	}
 	all = sortLines(all)
 	if (me.workingIPv6.S != all) {
-		debug(LogError, "workingIPv6.SetText() to:", all)
+		log.Warn("workingIPv6.SetText() to:", all)
 		me.workingIPv6.SetText(all)
 	}
 
@@ -234,11 +229,11 @@ func displayDNS() string {
 	a = realA()
 	all = sortLines(strings.Join(a, "\n"))
 	if (all == "") {
-		debug(LogInfo, "THERE IS NOT a real A DNS ENTRY")
+		log.Info("THERE IS NOT a real A DNS ENTRY")
 		all = "CNAME ipv6.wit.com"
 	}
 	if (me.DnsA.S != all) {
-		debug(LogError, "DnsA.SetText() to:", all)
+		log.Warn("DnsA.SetText() to:", all)
 		me.DnsA.SetText(all)
 	}
 	return broken
@@ -270,9 +265,9 @@ func dnsTab(title string) {
 
 	me.fix = me.mainStatus.NewButton("Fix", func () {
 		if (goodHostname(me.hostname)) {
-			debug(LogInfo, "hostname is good:", me.hostname)
+			log.Info("hostname is good:", me.hostname)
 		} else {
-			debug(LogError, "FIX: you need to fix your hostname here", me.hostname)
+			log.Warn("FIX: you need to fix your hostname here", me.hostname)
 			return
 		}
 		// check to see if the cloudflare window exists
@@ -396,11 +391,11 @@ func updateDNS() {
 
 	// log.Println("digAAAA()")
 	aaaa = digAAAA(h)
-	debug(LogNow, "digAAAA() =", aaaa)
+	log.Log(NOW, "digAAAA() =", aaaa)
 
 	// log.Println(SPEW, me)
 	if (aaaa == nil) {
-		debug(LogError, "There are no DNS AAAA records for hostname: ", h)
+		log.Warn("There are no DNS AAAA records for hostname: ", h)
 		me.DnsAAAA.SetText("(none)")
 		if (cloudflare.CFdialog.TypeNode != nil) {
 			cloudflare.CFdialog.TypeNode.SetText("AAAA new")
@@ -467,14 +462,12 @@ func suggestProcDebugging() {
 	}
 
 	me.fixProc = me.mainStatus.NewButton("Try debugging Slow DNS lookups", func () {
-		debug("You're DNS lookups are very slow")
+		log.Warn("You're DNS lookups are very slow")
 		me.dbOn.Set(true)
 		me.dbProc.Set(true)
 
-		DEBUGON = true
-		LogProc = true
 		processName := getProcessNameByPort(53)
-		log.Println("Process with port 53:", processName)
+		log.Info("Process with port 53:", processName)
 	})
 	// me.fixProc.Disable()
 }

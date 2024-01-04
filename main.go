@@ -43,16 +43,16 @@ func main() {
 
 	myGui = gui.New().Default()
 
-	sleep(me.artificialSleep)
+	log.Sleep(me.artificialSleep)
 	setupControlPanelWindow()
 
 	if debugger.ArgDebug() {
-		sleep(2)
+		log.Sleep(2)
 		debugger.DebugWindow(myGui)
 	}
 
 	// forever monitor for network and dns changes
-	sleep(me.artificialSleep)
+	log.Sleep(me.artificialSleep)
 	checkNetworkChanges()
 }
 
@@ -99,7 +99,7 @@ func checkNetworkChanges() {
 				me.LocalSpeedActual.SetText(s)
 			} else {
 				// TODO: make windows and macos diagnostics
-				debug(LogError, "Windows and MacOS don't work yet")
+				log.Warn("Windows and MacOS don't work yet")
 			}
 			lastLocal = time.Now()
 		}
@@ -120,7 +120,7 @@ func checkNetworkChanges() {
 // run this on each timeout
 func DNSloop() {
 	duration := timeFunction(dnsTTL)
-	debug(LogInfo, "dnsTTL() execution Time: ", duration)
+	log.Info("dnsTTL() execution Time: ", duration)
 	var s, newSpeed string
 	if (duration > 5000 * time.Millisecond ) {
 		newSpeed = "VERY BAD"
@@ -143,8 +143,8 @@ func DNSloop() {
 		}
 	}
 	if (newSpeed != me.DnsSpeedLast) {
-		debug(LogChange, "dns lookup speed changed =", newSpeed)
-		debug(LogChange, "dnsTTL() execution Time: ", duration)
+		log.Log(CHANGE, "dns lookup speed changed =", newSpeed)
+		log.Log(CHANGE, "dnsTTL() execution Time: ", duration)
 		me.DnsSpeed.SetText(newSpeed)
 		me.DnsSpeedLast = newSpeed
 	}
@@ -160,30 +160,30 @@ func dnsTTL() {
 
 func linuxLoop() {
 	me.changed = false
-	debug(LogNet, "FQDN =", me.fqdn.GetText())
+	log.Log(NET, "FQDN =", me.fqdn.GetText())
 	duration := timeFunction(getHostname)
-	debug(LogInfo, "getHostname() execution Time: ", duration, "me.changed =", me.changed)
+	log.Info("getHostname() execution Time: ", duration, "me.changed =", me.changed)
 
 	duration = timeFunction(scanInterfaces)
-	debug(LogNet, "scanInterfaces() execution Time: ", duration)
+	log.Log(NET, "scanInterfaces() execution Time: ", duration)
 	for i, t := range me.ifmap {
-		debug(LogNet, strconv.Itoa(i) + " iface = " + t.iface.Name)
+		log.Log(NET, strconv.Itoa(i) + " iface = " + t.iface.Name)
 	}
 
 	var aaaa []string
 	aaaa = dhcpAAAA()
 	var all string
 	for _, s := range aaaa {
-		debug(LogNet, "my actual AAAA = ",s)
+		log.Log(NET, "my actual AAAA = ",s)
 		all += s + "\n"
 	}
 	// me.IPv6.SetText(all)
 
 	if (me.changed) {
 		stamp := time.Now().Format("2006/01/02 15:04:05")
-		debug(LogChange, "Network things changed on", stamp)
+		log.Log(CHANGE, "Network things changed on", stamp)
 		duration := timeFunction(updateDNS)
-		debug(LogChange, "updateDNS() execution Time: ", duration)
+		log.Log(CHANGE, "updateDNS() execution Time: ", duration)
 	}
 
 	/*

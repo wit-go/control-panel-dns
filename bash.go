@@ -2,7 +2,6 @@ package main
 
 import (
         "io"
-	"log"
         "os"
         "os/exec"
         "os/signal"
@@ -10,6 +9,8 @@ import (
 
         "github.com/creack/pty"
         "golang.org/x/term"
+
+	"go.wit.com/log"
 )
 
 func test() error {
@@ -54,7 +55,7 @@ func test() error {
 
 func mainBash() {
         if err := test(); err != nil {
-		debug(LogError, "exit in mainBash()")
-                exit(err)
+		log.Error(err, "exit in mainBash()")
+                log.Exit(err)
         }
 }

@@ -19,7 +19,7 @@ func getHostname() {
 	var s string = "gui.Label == nil"
 	s, err = fqdn.FqdnHostname()
 	if (err != nil) {
-		debug(LogError, "FQDN hostname error =", err)
+		log.Error(err, "FQDN hostname error")
 		return
 	}
 	if (me.fqdn != nil) {
@@ -29,18 +29,18 @@ func getHostname() {
 			me.changed = true
 		}
 	}
-	debug(LogNet, "FQDN =", s)
+	log.Log(NET, "FQDN =", s)
 
 	dn := run("domainname")
 	if (me.domainname.S != dn) {
-		debug(LogChange, "domainname has changed from", me.domainname.S, "to", dn)
+		log.Log(CHANGE, "domainname has changed from", me.domainname.S, "to", dn)
 		me.domainname.SetText(dn)
 		me.changed = true
 	}
 
 	hshort := run("hostname -s")
 	if (me.hostshort.S != hshort) {
-		debug(LogChange, "hostname -s has changed from", me.hostshort.S, "to", hshort)
+		log.Log(CHANGE, "hostname -s has changed from", me.hostshort.S, "to", hshort)
 		me.hostshort.SetText(hshort)
 		me.changed = true
 	}
@@ -48,21 +48,21 @@ func getHostname() {
 	var test string
 	test = hshort + "." + dn
 	if (me.hostname != test) {
-		debug(LogInfo, "me.hostname", me.hostname, "does not equal", test)
+		log.Info("me.hostname", me.hostname, "does not equal", test)
 		if (me.hostnameStatusOLD.S != "BROKEN") {
-			debug(LogChange, "me.hostname", me.hostname, "does not equal", test)
+			log.Log(CHANGE, "me.hostname", me.hostname, "does not equal", test)
 			me.changed = true
 			me.hostnameStatusOLD.SetText("BROKEN")
 		}
 	} else {
 		if (me.hostnameStatusOLD.S != "VALID") {
-			debug(LogChange, "me.hostname", me.hostname, "is valid")
+			log.Log(CHANGE, "me.hostname", me.hostname, "is valid")
 			me.hostnameStatusOLD.SetText("VALID")
 			me.changed = true
 		}
 		// enable the cloudflare button if the provider is cloudflare
 		if (me.cloudflareB == nil) {
-			debug(LogChange, "me.cloudflare == nil; me.DnsAPI.S =", me.DnsAPI.S)
+			log.Log(CHANGE, "me.cloudflare == nil; me.DnsAPI.S =", me.DnsAPI.S)
 			if (me.DnsAPI.S == "cloudflare") {
 				me.cloudflareB = me.mainStatus.NewButton("cloudflare wit.com", func () {
 					cloudflare.CreateRR(myGui, "wit.com", "3777302ac4a78cd7fa4f6d3f72086d06")
@@ -78,15 +78,15 @@ func getHostname() {
 //      and domainname and hostname
 func goodHostname(h string) bool {
 	hostname := shell.Chomp(shell.Cat("/etc/hostname"))
-	debug(true, "hostname =", hostname)
+	log.Log(NOW, "hostname =", hostname)
 
 	hs := run("hostname -s")
 	dn := run("domainname")
-	debug(true, "hostname short =", hs, "domainname =", dn)
+	log.Log(NOW, "hostname short =", hs, "domainname =", dn)
 
 	tmp := hs + "." + dn
 	if (hostname == tmp) {
-		debug(true, "hostname seems to be good", hostname)
+		log.Log(NOW, "hostname seems to be good", hostname)
 		return true
 	}
 
@@ -98,18 +98,18 @@ func digAAAA(s string) []string {
 	var aaaa []string
 	// lookup the IP address from DNS
 	rrset := dnssecsocket.Dnstrace(s, "AAAA")
-	// debug(true, args.VerboseDNS, SPEW, rrset)
+	// log.Spew(args.VerboseDNS, SPEW, rrset)
 	for i, rr := range rrset {
 		ipaddr := dns.Field(rr, 1)
 		// how the hell do you detect a RRSIG	AAAA record here?
 		if (ipaddr == "28") {
 			continue
 		}
-		debug(LogNow, "r.Answer =", i, "rr =", rr, "ipaddr =", ipaddr)
+		log.Log(NOW, "r.Answer =", i, "rr =", rr, "ipaddr =", ipaddr)
 		aaaa = append(aaaa, ipaddr)
 		me.ipv6s[ipaddr] = rr
 	}
-	debug(true, args.VerboseDNS, "aaaa =", aaaa)
+	log.Info(args.VerboseDNS, "aaaa =", aaaa)
 	log.Println("digAAAA() returned =", aaaa)
 	log.Println("digAAAA() me.ipv6s =", me.ipv6s)
 	os.Exit(0)

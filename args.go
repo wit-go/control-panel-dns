@@ -19,11 +19,20 @@ var args struct {
 }
 
 var NET log.LogFlag
+var NOW log.LogFlag
+var PROC log.LogFlag
 var SPEW log.LogFlag
+var CHANGE log.LogFlag
 
 func init() {
 	arg.MustParse(&args)
 	// fmt.Println(args.Foo, args.Bar, args.User)
+
+	NOW.B = false
+	NOW.Name = "NOW"
+	NOW.Subsystem = "cpdns"
+	NOW.Desc = "temp debugging stuff"
+	NOW.Register()
 
 	NET.B = false
 	NET.Name = "NET"
@@ -31,11 +40,23 @@ func init() {
 	NET.Desc = "Network logging"
 	NET.Register()
 
+	PROC.B = false
+	PROC.Name = "PROC"
+	PROC.Subsystem = "cpdns"
+	PROC.Desc = "/proc logging"
+	PROC.Register()
+
 	SPEW.B = false
 	SPEW.Name = "SPEW"
 	SPEW.Subsystem = "cpdns"
 	SPEW.Desc = "spew logging"
 	SPEW.Register()
+
+	CHANGE.B = false
+	CHANGE.Name = "CHANGE"
+	CHANGE.Subsystem = "cpdns"
+	CHANGE.Desc = "show droplet state changes"
+	CHANGE.Register()
 
 	if debugger.ArgDebug() {
 		log.Log(true, "INIT() gui debug == true")
@@ -50,5 +71,5 @@ func init() {
 	me.artificialS = "blah"
 	log.Log(true, "init() me.artificialSleep =", me.artificialSleep)
 	log.Log(true, "init() me.artificialS =", me.artificialS)
-	sleep(me.artificialSleep)
+	log.Sleep(me.artificialSleep)
 }

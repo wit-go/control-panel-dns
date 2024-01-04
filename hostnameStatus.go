@@ -247,7 +247,7 @@ func (hs *hostnameStatus) missingAAAA() bool {
 	var aaaa []string
 	aaaa = dhcpAAAA()
 	for _, s := range aaaa {
-		debug(LogNet, "my actual AAAA = ",s)
+		log.Log(NET, "my actual AAAA = ",s)
 		hs.dnsValue.SetText(s)
 		hs.dnsAction.SetText("CREATE")
 		return true

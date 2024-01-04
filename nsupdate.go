@@ -7,6 +7,8 @@ package main
 
 import (
 	"os"
+
+	"go.wit.com/log"
 )
 
 //	./go-nsupdate \
@@ -16,17 +18,17 @@ import (
 
 func nsupdate() {
 	var tsigSecret string
-	debug(true, "nsupdate() START")
+	log.Log(NET, "nsupdate() START")
 	cmd := "go-nsupdate --tsig-algorithm=hmac-sha512"
 	tsigSecret = os.Getenv("TIG_SECRET")
 	cmd += " --tig-secret=\"" + tsigSecret + "\""
 	cmd += " -i wlo1 " + me.hostname
-	debug(true, "nsupdate() RUN:", cmd)
+	log.Log(NET, "nsupdate() RUN:", cmd)
 
 	for s, t := range me.ipmap {
 		if (t.IsReal()) {
 			if (t.ipv6) {
-				debug(true, "nsupdate() found real AAAA =", s, "on iface", t.iface.Name)
+				log.Log(NET, "nsupdate() found real AAAA =", s, "on iface", t.iface.Name)
 			}
 		}
 	}

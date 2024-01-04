@@ -3,7 +3,7 @@ package main
 // Watches for changes to a directory. Works cross-platform
 
 import (
-	"log"
+	"go.wit.com/log"
 	"github.com/fsnotify/fsnotify"
 )
 
@@ -14,7 +14,7 @@ func watchSysClassNet() {
     // Create new watcher.
     watcher, err := fsnotify.NewWatcher()
     if err != nil {
-	    debug(LogError, "watchSysClassNet() failed:", err)
+	    log.Error(err, "watchSysClassNet() failed")
 	    return
     }
     defer watcher.Close()
@@ -43,7 +43,7 @@ func watchSysClassNet() {
     // Add a path.
     err = watcher.Add("/tmp")
     if err != nil {
-	    debug(LogError, "watchSysClassNet() watcher.Add() failed:", err)
+	    log.Error(err, "watchSysClassNet() watcher.Add() failed")
 	    return
     }
 

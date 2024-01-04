@@ -270,7 +270,7 @@ func deleteChanges() bool {
 	var changed bool = false
 	for i, t := range me.ifmap {
 		if (t.gone) {
-			log.Log(LogChange, "DELETE int =", i, "name =", t.name, t.iface)
+			log.Log(CHANGE, "DELETE int =", i, "name =", t.name, t.iface)
 			delete(me.ifmap, i)
 			changed = true
 		}
@@ -278,10 +278,10 @@ func deleteChanges() bool {
 	}
 	for s, t := range me.ipmap {
 		if (t.gone) {
-			log.Log(LogChange, "DELETE name =", s, "IPv4 =", t.ipv4)
-			log.Log(LogChange, "DELETE name =", s, "IPv6 =", t.ipv6)
-			log.Log(LogChange, "DELETE name =", s, "iface =", t.iface)
-			log.Log(LogChange, "DELETE name =", s, "ip =", t.ip)
+			log.Log(CHANGE, "DELETE name =", s, "IPv4 =", t.ipv4)
+			log.Log(CHANGE, "DELETE name =", s, "IPv6 =", t.ipv6)
+			log.Log(CHANGE, "DELETE name =", s, "iface =", t.iface)
+			log.Log(CHANGE, "DELETE name =", s, "ip =", t.ip)
 			delete(me.ipmap, s)
 			changed = true
 		}

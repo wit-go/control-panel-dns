@@ -5,7 +5,6 @@
 package main
 
 import 	(
-	"log"
 	"os"
 	"os/exec"
 	"net"
@@ -13,6 +12,7 @@ import 	(
 	"fmt"
 	"strings"
 
+	"go.wit.com/log"
 	"go.wit.com/shell"
 )
 
@@ -28,8 +28,8 @@ func Escalate() {
 		cmd.Stderr = os.Stderr
 		err := cmd.Run()
 		if err != nil {
-			debug(LogError, "exit in Escalate()")
-			exit(err)
+			log.Error(err, "exit in Escalate()")
+			log.Exit(err)
 		}
 	}
 }
@@ -50,7 +50,7 @@ func DumpPublicDNSZone(zone string) {
 func dumpIPs(host string) {
     ips, err := net.LookupIP(host)
         if err != nil {
-		debug(LogError, "dumpIPs() failed:", err)
+		log.Error(err, "dumpIPs() failed")
         }
         for _, ip := range ips {
                 log.Println(host, ip)
@@ -91,7 +91,7 @@ func run(s string) string {
 
 	tmp := shell.Chomp(out.String())
 	// Output the results
-	debug(LogExec, "Command Output:", tmp)
+	log.Info("Command Output:", tmp)
 
 	return tmp
 }

@@ -5,10 +5,10 @@
 package main
 
 import 	(
-	"log"
 	"net"
 	"strings"
 
+	"go.wit.com/log"
 	"go.wit.com/shell"
 )
 
@@ -27,7 +27,7 @@ func (h *Host) verifyETC() bool {
 func (h *Host) updateIPs(host string) {
     ips, err := net.LookupIP(host)
         if err != nil {
-                debug(LogError, "updateIPs failed", err)
+                log.Error(err, "updateIPs failed")
         }
         for _, ip := range ips {
                 log.Println(host, ip)
@@ -93,7 +93,7 @@ func lookupNS(domain string) {
 	for _, server := range servers {
 		server = strings.TrimRight(server, ".")
 		if (me.nsmap[server] != domain) {
-			debug(LogChange, "lookupNS() domain", domain, "has NS", server)
+			log.Log(CHANGE, "lookupNS() domain", domain, "has NS", server)
 			me.nsmap[server] = domain
 			domains += server + "\n"
 		}
@@ -102,7 +102,7 @@ func lookupNS(domain string) {
 	var tmp string
 	// checks to see if the NS records change
 	for s, d := range me.nsmap {
-		debug(LogChange, "lookupNS() domain =", d, "server =", s)
+		log.Log(CHANGE, "lookupNS() domain =", d, "server =", s)
 		if (domain == d) {
 			tmp += s + "\n"
 			// figure out the provider (google, cloudflare, etc)
@@ -113,7 +113,7 @@ func lookupNS(domain string) {
 
 	if (tmp != me.NSrr.S) {
 		me.changed = true
-		debug(LogChange, "lookupNS() setting me.NSrr =", tmp)
+		log.Log(CHANGE, "lookupNS() setting me.NSrr =", tmp)
 		me.NSrr.SetText(tmp)
 	}
 }
@@ -127,7 +127,7 @@ func setProvider(hostname string) {
 	}
 	if (me.DnsAPI.S != provider) {
 		me.changed = true
-		debug(LogChange, "setProvider() changed to =", provider)
+		log.Log(CHANGE, "setProvider() changed to =", provider)
 		me.DnsAPI.SetText(provider)
 	}
 }
