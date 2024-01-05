@@ -80,6 +80,8 @@ type Host struct {
 
 	hostnameStatus		*hostnameStatus
 	hostnameStatusButton	*gui.Node
+
+	myDebug		*gui.Node
 }
 
 type IPtype struct {

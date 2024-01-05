@@ -6,7 +6,7 @@ import 	(
 	"os"
 	"os/user"
 	"strconv"
-	"net"
+//	"net"
 	"strings"
 
 	"go.wit.com/log"
@@ -15,6 +15,7 @@ import 	(
 	"go.wit.com/gui/gui"
 	"go.wit.com/gui/gadgets"
 	"go.wit.com/gui/cloudflare"
+	"go.wit.com/gui/debugger"
 )
 
 // This setups up the dns control panel window
@@ -36,7 +37,7 @@ func setupControlPanelWindow() {
 func detailsTab(title string) {
 	var g2 *gui.Node
 
-	tab := me.window.NewTab(title)
+	tab := me.window.NewWindow(title)
 
 	g2 = tab.NewGroup("Real Stuff")
 
@@ -81,24 +82,28 @@ func detailsTab(title string) {
 func debugTab(title string) {
 	var g2 *gui.Node
 
-	tab := me.window.NewTab(title)
+	tab := me.window.NewWindow(title)
 
 	g2 = tab.NewGroup("Real Stuff")
 
-	g2.NewButton("Network Interfaces", func () {
-		for i, t := range me.ifmap {
-			log.Println("name =", t.iface.Name)
-			log.Println("int =", i, "name =", t.name, t.iface)
-			log.Println("iface = " + t.iface.Name)
+	var hidden bool = true
+	g2.NewButton("GO GUI Debug Window", func () {
+		if (me.myDebug == nil) {
+			me.myDebug = debugger.DebugWindow(me.window)
+			hidden = false
+			return
+		}
+		if hidden {
+			me.myDebug.Show()
+			hidden = false
+		} else {
+			me.myDebug.Hide()
+			hidden = true
 		}
 	})
 
-	g2.NewButton("Hostname", func () {
+	g2.NewButton("getHostname() looks at the OS settings", func () {
 		getHostname()
-	})
-
-	g2.NewButton("Actual AAAA & A", func () {
-		displayDNS() // doesn't re-query anything
 	})
 
 	g2.NewButton("dig A & AAAA DNS records", func () {
@@ -106,62 +111,12 @@ func debugTab(title string) {
 		updateDNS()
 	})
 
-	g2.NewButton("checkDNS:", func () {
-		ipv6s, ipv4s := checkDNS()
-		for s, _ := range ipv6s {
-			log.Log(NOW, "check if", s, "is in DNS")
-		}
-		for s, _ := range ipv4s {
-			log.Log(NOW, "check if", s, "is in DNS")
-		}
-	})
-
-	g2.NewButton("os.User()", func () {
-		user, _ := user.Current()
-		log.Println("os.Getuid =", user.Username, os.Getuid())
-		if (me.uid != nil) {
-			me.uid.SetText(user.Username + " (" + strconv.Itoa(os.Getuid()) + ")")
-		}
-	})
-
 	g2.NewButton("dig +trace", func () {
 		o := shell.Run("dig +trace +noadditional DS " + me.hostname + " @8.8.8.8")
 		log.Println(o)
 	})
 
-	g2.NewButton("Example_listLink()", func () {
-		Example_listLink()
-	})
-
-	g2.NewButton("Escalate()", func () {
-		Escalate()
-	})
-
-	g2.NewButton("LookupAddr(<raw ipv6>) == fire from /etc/hosts", func () {
-		host, err := net.LookupAddr("2600:1700:afd5:6000:b26e:bfff:fe80:3c52")
-		if err != nil {
-			return
-		}
-		log.Println("host =", host)
-	})
-
-	g2.NewButton("DumpPublicDNSZone(apple.com)", func () {
-		DumpPublicDNSZone("apple.com")
-		dumpIPs("www.apple.com")
-	})
-
 	g2 = tab.NewGroup("debugging options")
-
-	// DEBUG flags
-	me.dbNet = g2.NewCheckbox("turn on network debugging)")
-	me.dbNet.Custom = func() {
-		log.Warn("TODO: re-implement")
-	}
-
-	me.dbProc = g2.NewCheckbox("turn on /proc debugging)")
-	me.dbProc.Custom = func() {
-		log.Warn("TODO: re-implement")
-	}
 
 	// makes a slider widget
 	me.ttl = gadgets.NewDurationSlider(g2, "Loop Timeout", 10 * time.Millisecond, 5 * time.Second)
@@ -245,7 +200,8 @@ func myDefaultExit(n *gui.Node) {
 }
 
 func dnsTab(title string) {
-	tab := me.window.NewTab(title)
+	win := me.window.NewWindow(title)
+	tab := win.NewBox("hBox", true)
 
 	me.mainStatus = tab.NewGroup("dns update")
 
