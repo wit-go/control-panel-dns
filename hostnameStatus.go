@@ -202,13 +202,13 @@ func (hs *hostnameStatus) IPv6() bool {
 }
 
 func (hs *hostnameStatus) setIPv4(s string) {
-	hs.statusIPv4.Set(s)
 	if ! hs.Ready() {return}
+	hs.statusIPv4.Set(s)
 }
 
 func (hs *hostnameStatus) setIPv6(s string) {
-	hs.statusIPv6.Set(s)
 	if ! hs.Ready() {return}
+	hs.statusIPv6.Set(s)
 }
 
 func (hs *hostnameStatus) set(a any, s string) {
