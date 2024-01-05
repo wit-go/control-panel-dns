@@ -20,8 +20,6 @@ import 	(
 	"github.com/miekg/dns"
 )
 
-var myGui *gui.Node
-
 //go:embed plugins/*.so
 var resToolkit embed.FS
 
@@ -41,14 +39,14 @@ func main() {
 	// send all log() output to a file in /tmp
 	log.SetTmp()
 
-	myGui = gui.New().Default()
+	me.myGui = gui.New().Default()
 
 	log.Sleep(me.artificialSleep)
 	setupControlPanelWindow()
 
 	if debugger.ArgDebug() {
 		log.Sleep(2)
-		debugger.DebugWindow(myGui)
+		debugger.DebugWindow(me.myGui)
 	}
 
 	// forever monitor for network and dns changes

@@ -41,7 +41,9 @@ type Host struct {
 	ipv4s		map[string]dns.RR
 	ipv6s		map[string]dns.RR
 
-	window		*gui.Node		// the main window
+	window		*gadgets.BasicWindow	// the main window
+	details		*gadgets.BasicWindow	// more details of the DNS state
+
 	tab		*gui.Node		// the main dns tab
 	notes		*gui.Node		// using this to put notes here
 
@@ -81,7 +83,8 @@ type Host struct {
 	hostnameStatus		*hostnameStatus
 	hostnameStatusButton	*gui.Node
 
-	myDebug		*gui.Node
+	myDebug			*gui.Node
+	myGui			*gui.Node
 }
 
 type IPtype struct {

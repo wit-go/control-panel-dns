@@ -65,7 +65,7 @@ func getHostname() {
 			log.Log(CHANGE, "me.cloudflare == nil; me.DnsAPI.S =", me.DnsAPI.S)
 			if (me.DnsAPI.S == "cloudflare") {
 				me.cloudflareB = me.mainStatus.NewButton("cloudflare wit.com", func () {
-					cloudflare.CreateRR(myGui, "wit.com", "3777302ac4a78cd7fa4f6d3f72086d06")
+					cloudflare.CreateRR(me.myGui, "wit.com", "3777302ac4a78cd7fa4f6d3f72086d06")
 				})
 			}
 		}

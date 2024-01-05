@@ -20,14 +20,11 @@ import 	(
 
 // This setups up the dns control panel window
 func setupControlPanelWindow() {
-	me.window = myGui.NewWindow("DNS and IPv6 Control Panel")
-	// me.window.Dump() // will dump out some info
-
 	log.Info("artificial sleep of:", me.artificialSleep)
 	log.Sleep(me.artificialSleep)
 
 	// setup the main tab
-	dnsTab("DNS")
+	mainWindow("DNS and IPv6 Control Panel")
 	detailsTab("Details")
 	debugTab("Debug")
 
@@ -37,9 +34,8 @@ func setupControlPanelWindow() {
 func detailsTab(title string) {
 	var g2 *gui.Node
 
-	tab := me.window.NewWindow(title)
-
-	g2 = tab.NewGroup("Real Stuff")
+	me.details = gadgets.NewBasicWindow(me.myGui, title)
+	g2 = me.details.Box().NewGroup("Real Stuff")
 
 	grid := g2.NewGrid("gridnuts", 2, 2)
 
@@ -72,9 +68,6 @@ func detailsTab(title string) {
 	grid.NewLabel("refresh speed")
 	me.LocalSpeedActual = grid.NewLabel("unknown")
 
-	tab.Margin()
-	tab.Pad()
-
 	grid.Margin()
 	grid.Pad()
 }
@@ -82,24 +75,12 @@ func detailsTab(title string) {
 func debugTab(title string) {
 	var g2 *gui.Node
 
-	tab := me.window.NewWindow(title)
+	win := gadgets.NewBasicWindow(me.myGui, title)
 
-	g2 = tab.NewGroup("Real Stuff")
+	g2 = win.Box().NewGroup("Real Stuff")
 
-	var hidden bool = true
 	g2.NewButton("GO GUI Debug Window", func () {
-		if (me.myDebug == nil) {
-			me.myDebug = debugger.DebugWindow(me.window)
-			hidden = false
-			return
-		}
-		if hidden {
-			me.myDebug.Show()
-			hidden = false
-		} else {
-			me.myDebug.Hide()
-			hidden = true
-		}
+		debugger.DebugWindow(me.myGui)
 	})
 
 	g2.NewButton("getHostname() looks at the OS settings", func () {
@@ -116,7 +97,7 @@ func debugTab(title string) {
 		log.Println(o)
 	})
 
-	g2 = tab.NewGroup("debugging options")
+	g2 = win.Box().NewGroup("debugging options")
 
 	// makes a slider widget
 	me.ttl = gadgets.NewDurationSlider(g2, "Loop Timeout", 10 * time.Millisecond, 5 * time.Second)
@@ -199,12 +180,10 @@ func myDefaultExit(n *gui.Node) {
 	os.Exit(0)
 }
 
-func dnsTab(title string) {
-	win := me.window.NewWindow(title)
-	tab := win.NewBox("hBox", true)
+func mainWindow(title string) {
+	me.window = gadgets.NewBasicWindow(me.myGui, title)
 
-	me.mainStatus = tab.NewGroup("dns update")
-
+	me.mainStatus = me.window.Box().NewGroup("dns update")
 	grid := me.mainStatus.NewGrid("gridnuts", 2, 2)
 
 	grid.SetNext(1,1)
@@ -253,7 +232,7 @@ func dnsTab(title string) {
 	me.digStatusButton = me.mainStatus.NewButton("Resolver Status", func () {
 		if (me.digStatus == nil) {
 			log.Info("drawing the digStatus window START")
-			me.digStatus = NewDigStatusWindow(myGui)
+			me.digStatus = NewDigStatusWindow(me.myGui)
 			log.Info("drawing the digStatus window END")
 			me.digStatusButton.SetText("Hide DNS Lookup Status")
 			me.digStatus.Update()
@@ -270,7 +249,7 @@ func dnsTab(title string) {
 	})
 	me.hostnameStatusButton = me.mainStatus.NewButton("Show hostname DNS Status", func () {
 		if (me.hostnameStatus == nil) {
-			me.hostnameStatus = NewHostnameStatusWindow(myGui)
+			me.hostnameStatus = NewHostnameStatusWindow(me.myGui)
 			me.hostnameStatusButton.SetText("Hide " + me.hostname + " DNS Status")
 			me.hostnameStatus.Update()
 			return
@@ -288,8 +267,15 @@ func dnsTab(title string) {
 	grid.Margin()
 	grid.Pad()
 
-	statusGrid(tab)
+	statusGrid(me.window.Box())
 
+	gr := me.window.Box().NewGroup("debugging")
+	gr.NewButton("GO GUI Debugger", func () {
+		debugger.DebugWindow(me.myGui)
+	})
+	gr.NewButton("Details", func () {
+		me.details.Toggle()
+	})
 }
 
 func statusGrid(n *gui.Node) {
