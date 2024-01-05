@@ -63,6 +63,7 @@ func NewHostnameStatusWindow(p *gui.Node) *hostnameStatus {
 	hs.hostname = me.hostname
 
 	hs.window = gadgets.NewBasicWindow(p, hs.hostname + " Status")
+	hs.window.Draw()
 	hs.window.Hide()
 
 	group := hs.window.Box().NewGroup("Summary")

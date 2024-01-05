@@ -35,6 +35,9 @@ func detailsTab(title string) {
 	var g2 *gui.Node
 
 	me.details = gadgets.NewBasicWindow(me.myGui, title)
+	me.details.Draw()
+	me.details.Hide()
+
 	g2 = me.details.Box().NewGroup("Real Stuff")
 
 	grid := g2.NewGrid("gridnuts", 2, 2)
@@ -78,6 +81,8 @@ func debugTab(title string) {
 	var g2 *gui.Node
 
 	me.debug = gadgets.NewBasicWindow(me.myGui, title)
+	me.debug.Draw()
+	me.debug.Hide()
 
 	g2 = me.debug.Box().NewGroup("Real Stuff")
 
