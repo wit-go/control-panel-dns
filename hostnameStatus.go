@@ -25,7 +25,7 @@ type hostnameStatus struct {
 
 	hostname	string // my hostname. Example: "test.wit.com"
 
-	window	*gui.Node
+	window		*gadgets.BasicWindow
 
 	// Primary Directives
 	status		*gadgets.OneLiner
@@ -62,13 +62,10 @@ func NewHostnameStatusWindow(p *gui.Node) *hostnameStatus {
 	hs.hidden = true
 	hs.hostname = me.hostname
 
-	hs.window = p.NewWindow( hs.hostname + " Status")
-	hs.window.Custom = func () {
-		hs.hidden = true
-		hs.window.Hide()
-	}
-	box := hs.window.NewBox("hBox", true)
-	group := box.NewGroup("Summary")
+	hs.window = gadgets.NewBasicWindow(p, hs.hostname + " Status")
+	hs.window.Hide()
+
+	group := hs.window.Box().NewGroup("Summary")
 	grid := group.NewGrid("LookupStatus", 2, 2)
 
 	hs.status	= gadgets.NewOneLiner(grid, "status").Set("unknown")
@@ -78,7 +75,7 @@ func NewHostnameStatusWindow(p *gui.Node) *hostnameStatus {
 	group.Pad()
 	grid.Pad()
 
-	group = box.NewGroup("Details")
+	group = hs.window.Box().NewGroup("Details")
 	grid = group.NewGrid("LookupDetails", 2, 2)
 
 	hs.hostShort	= gadgets.NewOneLiner(grid, "hostname -s")
@@ -96,7 +93,7 @@ func NewHostnameStatusWindow(p *gui.Node) *hostnameStatus {
 	group.Pad()
 	grid.Pad()
 
-	group = box.NewGroup("Actions")
+	group = hs.window.Box().NewGroup("Actions")
 	grid = group.NewGrid("LookupDetails", 2, 2)
 
 	hs.dnsValue	= grid.NewLabel("3.4.5.6")

@@ -93,7 +93,6 @@ func NewDigStatusWindow(p *gui.Node) *digStatus {
 	ds.hidden = true
 
 	ds.window = gadgets.NewBasicWindow(p, "DNS Resolver Status")
-
 	ds.window.Hide()
 
 	// summary of the current state of things

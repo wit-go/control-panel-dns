@@ -202,74 +202,11 @@ func mainWindow(title string) {
 	grid.NewLabel("DNS A =")
 	me.DnsA = grid.NewLabel("?")
 
-	me.fix = me.mainStatus.NewButton("Fix", func () {
-		if (goodHostname(me.hostname)) {
-			log.Info("hostname is good:", me.hostname)
-		} else {
-			log.Warn("FIX: you need to fix your hostname here", me.hostname)
-			return
-		}
-		// check to see if the cloudflare window exists
-		/*
-		if (me.cloudflareW != nil) {
-			newRR.NameNode.SetText(me.hostname)
-			newRR.TypeNode.SetText("AAAA")
-			for s, t := range me.ipmap {
-				if (t.IsReal()) {
-					if (t.ipv6) {
-						newRR.ValueNode.SetText(s)
-						cloudflare.CreateCurlRR()
-						return
-					}
-				}
-			}
-			cloudflare.CreateCurlRR()
-			return
-		} else {
-		// nsupdate()
-		// me.fixProc.Disable()
-		}
-		*/
-	})
-	me.fix.Disable()
-
 	me.digStatus = NewDigStatusWindow(me.myGui)
+	me.hostnameStatus = NewHostnameStatusWindow(me.myGui)
 
-	/*
-	me.digStatusButton = me.mainStatus.NewButton("Resolver Status", func () {
-		if (me.digStatus == nil) {
-			log.Info("drawing the digStatus window START")
-			me.digStatus = NewDigStatusWindow(me.myGui)
-			log.Info("drawing the digStatus window END")
-			me.digStatusButton.SetText("Hide DNS Lookup Status")
-			me.digStatus.Update()
-			return
-		}
-		if me.digStatus.hidden {
-			me.digStatusButton.SetText("Hide Resolver Status")
-			me.digStatus.Show()
-			me.digStatus.Update()
-		} else {
-			me.digStatusButton.SetText("Resolver Status")
-			me.digStatus.Hide()
-		}
-	})
-	*/
-	me.hostnameStatusButton = me.mainStatus.NewButton("Show hostname DNS Status", func () {
-		if (me.hostnameStatus == nil) {
-			me.hostnameStatus = NewHostnameStatusWindow(me.myGui)
-			me.hostnameStatusButton.SetText("Hide " + me.hostname + " DNS Status")
-			me.hostnameStatus.Update()
-			return
-		}
-		if me.hostnameStatus.hidden {
-			me.hostnameStatusButton.SetText("Hide " + me.hostname + " DNS Status")
-			me.hostnameStatus.Show()
-			me.hostnameStatus.Update()
-		} else {
-			me.hostnameStatusButton.SetText("Show " + me.hostname + " DNS Status")
-			me.hostnameStatus.Hide()
-		}
+	me.hostnameStatusButton = me.mainStatus.NewButton("Fix hostname DNS", func () {
+		me.hostnameStatus.window.Toggle()
 	})
 
 	grid.Margin()
