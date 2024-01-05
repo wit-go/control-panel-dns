@@ -43,6 +43,7 @@ type Host struct {
 
 	window		*gadgets.BasicWindow	// the main window
 	details		*gadgets.BasicWindow	// more details of the DNS state
+	debug		*gadgets.BasicWindow	// more attempts to debug the DNS state
 
 	tab		*gui.Node		// the main dns tab
 	notes		*gui.Node		// using this to put notes here

@@ -25,7 +25,7 @@ func setupControlPanelWindow() {
 
 	// setup the main tab
 	mainWindow("DNS and IPv6 Control Panel")
-	detailsTab("Details")
+	detailsTab("DNS Details")
 	debugTab("Debug")
 
 	// me.digStatus = NewDigStatusWindow(me.window)
@@ -70,14 +70,16 @@ func detailsTab(title string) {
 
 	grid.Margin()
 	grid.Pad()
+
+	me.details.Hide()
 }
 
 func debugTab(title string) {
 	var g2 *gui.Node
 
-	win := gadgets.NewBasicWindow(me.myGui, title)
+	me.debug = gadgets.NewBasicWindow(me.myGui, title)
 
-	g2 = win.Box().NewGroup("Real Stuff")
+	g2 = me.debug.Box().NewGroup("Real Stuff")
 
 	g2.NewButton("GO GUI Debug Window", func () {
 		debugger.DebugWindow(me.myGui)
@@ -97,7 +99,7 @@ func debugTab(title string) {
 		log.Println(o)
 	})
 
-	g2 = win.Box().NewGroup("debugging options")
+	g2 = me.debug.Box().NewGroup("debugging options")
 
 	// makes a slider widget
 	me.ttl = gadgets.NewDurationSlider(g2, "Loop Timeout", 10 * time.Millisecond, 5 * time.Second)
@@ -109,6 +111,8 @@ func debugTab(title string) {
 
 	g2.Margin()
 	g2.Pad()
+
+	me.debug.Hide()
 }
 
 // will return a AAAA value that needs to be deleted
@@ -273,8 +277,11 @@ func mainWindow(title string) {
 	gr.NewButton("GO GUI Debugger", func () {
 		debugger.DebugWindow(me.myGui)
 	})
-	gr.NewButton("Details", func () {
+	gr.NewButton("DNS Details", func () {
 		me.details.Toggle()
+	})
+	gr.NewButton("DNS Debug", func () {
+		me.debug.Toggle()
 	})
 }
 
