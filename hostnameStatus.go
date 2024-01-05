@@ -98,7 +98,7 @@ func NewHostnameStatusWindow(p *gui.Node) *hostnameStatus {
 
 	hs.dnsValue	= grid.NewLabel("3.4.5.6")
 	hs.dnsAction	= grid.NewButton("CHECK",  func () {
-		log.Info("should", hs.dnsAction.S, "here for", hs.dnsValue.S)
+		log.Warn("should", hs.dnsAction.S, "here for", hs.dnsValue.S)
 		if (hs.dnsAction.S == "DELETE") {
 			hs.deleteDNSrecord(hs.dnsValue.S)
 		}
@@ -145,7 +145,7 @@ func (hs *hostnameStatus) createDNSrecord(value string) bool {
 	log.Info("createDNSrecord() DNS API Provider =", hs.API())
 
 	if (hs.API() == "cloudflare") {
-		log.Info("createDNSrecord() Try to delete via cloudflare")
+		log.Warn("createDNSrecord() Try to delete via cloudflare:", me.hostname, value)
 		return cloudflare.Create(hs.Domain(), me.hostname, value)
 	}
 	return false

@@ -25,7 +25,7 @@ func setupControlPanelWindow() {
 
 	// setup the main tab
 	mainWindow("DNS and IPv6 Control Panel")
-	detailsTab("DNS Details")
+	detailsTab("OS Details")
 	debugTab("Debug")
 
 	// me.digStatus = NewDigStatusWindow(me.window)
@@ -218,7 +218,7 @@ func mainWindow(title string) {
 	gr.NewButton("GO GUI Debugger", func () {
 		debugger.DebugWindow(me.myGui)
 	})
-	gr.NewButton("DNS Details", func () {
+	gr.NewButton("OS Details", func () {
 		me.details.Toggle()
 	})
 	gr.NewButton("DNS Debug", func () {
