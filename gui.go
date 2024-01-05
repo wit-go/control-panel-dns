@@ -233,6 +233,9 @@ func mainWindow(title string) {
 	})
 	me.fix.Disable()
 
+	me.digStatus = NewDigStatusWindow(me.myGui)
+
+	/*
 	me.digStatusButton = me.mainStatus.NewButton("Resolver Status", func () {
 		if (me.digStatus == nil) {
 			log.Info("drawing the digStatus window START")
@@ -251,6 +254,7 @@ func mainWindow(title string) {
 			me.digStatus.Hide()
 		}
 	})
+	*/
 	me.hostnameStatusButton = me.mainStatus.NewButton("Show hostname DNS Status", func () {
 		if (me.hostnameStatus == nil) {
 			me.hostnameStatus = NewHostnameStatusWindow(me.myGui)
@@ -282,6 +286,10 @@ func mainWindow(title string) {
 	})
 	gr.NewButton("DNS Debug", func () {
 		me.debug.Toggle()
+	})
+	gr.NewButton("Resolver Status", func () {
+		if ! me.digStatus.Ready() {return}
+		me.digStatus.window.Toggle()
 	})
 }
 

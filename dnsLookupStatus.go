@@ -35,10 +35,9 @@ type digStatus struct {
 	statusIPv6	string
 
 	parent	*gui.Node
-	window	*gui.Node
+	window	*gadgets.BasicWindow
 	group	*gui.Node
 	grid	*gui.Node
-	box	*gui.Node
 
 	summary		*gui.Node
 	status		*gadgets.OneLiner
@@ -93,15 +92,12 @@ func NewDigStatusWindow(p *gui.Node) *digStatus {
 	ds.ready = false
 	ds.hidden = true
 
-	ds.window = p.NewWindow("DNS Resolver Status")
-	ds.window.Custom = func () {
-		ds.hidden = true
-		ds.window.Hide()
-	}
-	ds.box = ds.window.NewBox("hBox", true)
+	ds.window = gadgets.NewBasicWindow(p, "DNS Resolver Status")
+
+	ds.window.Hide()
 
 	// summary of the current state of things
-	ds.summary = ds.box.NewGroup("Summary")
+	ds.summary = ds.window.Box().NewGroup("Summary")
 	g := ds.summary.NewGrid("LookupStatus", 2, 2)
 	g.Pad()
 
@@ -112,7 +108,7 @@ func NewDigStatusWindow(p *gui.Node) *digStatus {
 	ds.speedActual	= gadgets.NewOneLiner(g, "actual").Set("unknown")
 
 	// make the area to store the raw details
-	ds.details = ds.box.NewGroup("Details")
+	ds.details = ds.window.Box().NewGroup("Details")
 	ds.dsLocalhost		= NewDnsStatus(ds.details, "(localhost)", "127.0.0.1:53", "go.wit.com")
 	ds.dsLocalNetwork	= NewDnsStatus(ds.details, "(Local Network)", "172.22.0.1:53", "go.wit.com")
 	ds.dsCloudflare		= NewDnsStatus(ds.details, "(cloudflare)", "1.1.1.1:53", "go.wit.com")
