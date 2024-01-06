@@ -100,7 +100,7 @@ func checkNetworkChanges() {
 			if (runtime.GOOS == "linux") {
 				duration := timeFunction(linuxLoop)
 				s := fmt.Sprint(duration)
-				me.LocalSpeedActual.SetText(s)
+				me.statusOS.SetSpeedActual(s)
 			} else {
 				// TODO: make windows and macos diagnostics
 				log.Warn("Windows and MacOS don't work yet")

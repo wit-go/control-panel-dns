@@ -44,7 +44,6 @@ type Host struct {
 	ipv6s		map[string]dns.RR
 
 	window		*gadgets.BasicWindow	// the main window
-	details		*gadgets.BasicWindow	// more details of the DNS state
 	debug		*gadgets.BasicWindow	// more attempts to debug the DNS state
 
 	tab		*gui.Node		// the main dns tab

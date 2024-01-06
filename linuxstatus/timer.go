@@ -29,3 +29,8 @@ func sortLines(input string) string {
 	tmp = strings.TrimRight(tmp, "\n")
 	return tmp
 }
+
+func (ls *LinuxStatus) SetSpeedActual(s string) {
+	if ! ls.Ready() {return}
+	ls.speedActual.Set(s)
+}

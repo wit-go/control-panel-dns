@@ -22,55 +22,7 @@ func setupControlPanelWindow() {
 
 	// setup the main tab
 	mainWindow("DNS and IPv6 Control Panel")
-	detailsTab("OS Details")
 	debugTab("Debug")
-}
-
-func detailsTab(title string) {
-	var g2 *gui.Node
-
-	me.details = gadgets.NewBasicWindow(me.myGui, title)
-	me.details.Draw()
-	me.details.Hide()
-
-	g2 = me.details.Box().NewGroup("Real Stuff")
-
-	grid := g2.NewGrid("gridnuts", 2, 2)
-
-	grid.SetNext(1,1)
-
-	grid.NewLabel("domainname =")
-	grid.NewLabel("DEPRECATED")
-//	me.domainname = grid.NewLabel("domainname")
-
-	grid.NewLabel("hostname -s =")
-	grid.NewLabel("DEPRECATED")
-
-	grid.NewLabel("NS records =")
-	grid.NewLabel("DEPRECATED")
-
-	grid.NewLabel("UID =")
-	grid.NewLabel("DEPRECATED")
-
-	grid.NewLabel("Current IPv4 =")
-	grid.NewLabel("DEPRECATED")
-
-	grid.NewLabel("Current IPv6 =")
-	grid.NewLabel("DEPRECATED")
-
-	grid.NewLabel("Working Real IPv6 =")
-	grid.NewLabel("?")
-
-	grid.NewLabel("interfaces =")
-	me.Interfaces = grid.NewCombobox("Interfaces")
-
-	grid.NewLabel("refresh speed")
-	me.LocalSpeedActual = grid.NewLabel("unknown")
-
-	grid.Margin()
-	grid.Pad()
-
-	me.details.Hide()
 }
 
 func debugTab(title string) {
@@ -218,9 +170,6 @@ func mainWindow(title string) {
 		me.status.window.Toggle()
 	})
 
-	gr.NewButton("OS details", func () {
-		me.details.Toggle()
-	})
 	gr.NewButton("linuxstatus.New()", func () {
 		if (me.statusOS == nil) {
 			me.statusOS = linuxstatus.New()
