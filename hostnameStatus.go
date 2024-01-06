@@ -296,7 +296,7 @@ func (hs *hostnameStatus) updateStatus() {
 	var vals []string
 	log.Log(STATUS, "updateStatus() START")
 
-	hs.hostShort.Set(me.hostshort.S)
+	hs.hostShort.Set(me.statusOS.GetHostShort())
 	hs.domainname.Set(me.statusOS.GetDomainName())
 
 	if hs.ValidHostname() {

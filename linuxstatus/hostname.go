@@ -22,9 +22,41 @@ func (ls *LinuxStatus) GetDomainName() string {
 	return me.domainname.Get()
 }
 
-func (ls *LinuxStatus) setDomainName(dn string) {
+func (ls *LinuxStatus) setDomainName() {
 	if ! me.Ready() {return}
-	me.domainname.Set(dn)
+
+	dn := run("domainname")
+	if me.window == nil {
+		log.Log(NOW, "me.window == nil")
+	} else {
+		log.Log(NOW, "me.window exists, but has not been drawn")
+		log.Log(NOW, "me.window.Draw() =")
+	}
+	if (me.domainname.Get() != dn) {
+		log.Log(CHANGE, "domainname has changed from", me.GetDomainName(), "to", dn)
+		me.domainname.Set(dn)
+		me.changed = true
+	}
+}
+
+func (ls *LinuxStatus) GetHostShort() string {
+	if ! me.Ready() {return ""}
+	if me.window == nil {
+		log.Log(NOW, "me.window == nil")
+	} else {
+		log.Log(NOW, "me.window exists, but has not been drawn")
+	}
+	return me.hostshort.Get()
+}
+
+func (ls *LinuxStatus) setHostShort() {
+	if ! me.Ready() {return ""}
+	hshort := run("hostname -s")
+	if (me.hostshort.Get() != hshort) {
+		log.Log(CHANGE, "hostname -s has changed from", me.hostshort.Get(), "to", hshort)
+		me.hostshort.Set(hshort)
+		me.changed = true
+	}
 }
 
 func lookupHostname() {
@@ -38,25 +70,8 @@ func lookupHostname() {
 	}
 	log.Error(errors.New("full hostname should be: " + s))
 
-	dn := run("domainname")
-	if me.window == nil {
-		log.Log(NOW, "me.window == nil")
-	} else {
-		log.Log(NOW, "me.window exists, but has not been drawn")
-		log.Log(NOW, "me.window.Draw() =")
-	}
-	if (me.domainname.Get() != dn) {
-		log.Log(CHANGE, "domainname has changed from", me.GetDomainName(), "to", dn)
-		me.setDomainName(dn)
-		me.changed = true
-	}
+	me.setDomainName()
 
-	hshort := run("hostname -s")
-	if (me.hostshort.Get() != hshort) {
-		log.Log(CHANGE, "hostname -s has changed from", me.hostshort.Get(), "to", hshort)
-		me.hostshort.Set(hshort)
-		me.changed = true
-	}
 
 	/*
 	var test string

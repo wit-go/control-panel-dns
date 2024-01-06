@@ -44,7 +44,7 @@ func detailsTab(title string) {
 //	me.domainname = grid.NewLabel("domainname")
 
 	grid.NewLabel("hostname -s =")
-	me.hostshort = grid.NewLabel("hostname -s")
+	grid.NewLabel("DEPRECATED")
 
 	grid.NewLabel("NS records =")
 	me.NSrr = grid.NewLabel("NS RR's")
@@ -227,16 +227,16 @@ func mainWindow(title string) {
 		me.details.Toggle()
 	})
 	gr.NewButton("linuxstatus.New()", func () {
-		me.statusOS = linuxstatus.New()
+		if (me.statusOS == nil) {
+			me.statusOS = linuxstatus.New()
+		}
 		me.statusOS.SetParent(me.myGui)
 		me.statusOS.InitWindow()
+		me.statusOS.Make()
+		me.statusOS.Draw2()
 	})
 	gr.NewButton("statusOS.Ready()", func () {
 		me.statusOS.Ready()
-	})
-	gr.NewButton("statusOS.Make()", func () {
-		me.statusOS.Make()
-		me.statusOS.Draw2()
 	})
 	gr.NewButton("statusOS.Draw()", func () {
 		me.statusOS.Draw()
