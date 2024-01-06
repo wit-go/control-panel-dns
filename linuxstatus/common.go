@@ -6,29 +6,36 @@ import 	(
 	"go.wit.com/gui/gui"
 )
 
+// reports externally if something has changed
+// since the last time it was asked about it
+func (ls *LinuxStatus) Changed() bool {
+	if ! ls.Ready() {return false}
+	if ls.changed {
+		ls.changed = false
+		return true
+	}
+	return false
+}
+
 func (ls *LinuxStatus) Make() {
-	log.Log(CHANGE, "Draw() window")
 	if ! ls.Ready() {return}
-	log.Log(CHANGE, "Draw() window ready =", ls.ready)
+	log.Log(CHANGE, "Make() window ready =", ls.ready)
 	ls.window.Make()
 	ls.ready = true
 }
 func (ls *LinuxStatus) Draw() {
-	log.Log(CHANGE, "Draw() window")
 	if ! ls.Ready() {return}
 	log.Log(CHANGE, "Draw() window ready =", ls.ready)
 	ls.window.Draw()
 	ls.ready = true
 }
 func (ls *LinuxStatus) Draw2() {
-	log.Log(CHANGE, "draw(ls)")
 	if ! ls.Ready() {return}
 	log.Log(CHANGE, "draw(ls) ready =", ls.ready)
 	draw(ls)
 }
 
 func (ls *LinuxStatus) Show() {
-	log.Log(CHANGE, "Show() window")
 	if ! ls.Ready() {return}
 	log.Log(CHANGE, "Show() window ready =", ls.ready)
 	ls.window.Show()
@@ -36,7 +43,6 @@ func (ls *LinuxStatus) Show() {
 }
 
 func (ls *LinuxStatus) Hide() {
-	log.Log(CHANGE, "Hide() window")
 	if ! ls.Ready() {return}
 	log.Log(CHANGE, "Hide() window ready =", ls.ready)
 	ls.window.Hide()
@@ -44,7 +50,6 @@ func (ls *LinuxStatus) Hide() {
 }
 
 func (ls *LinuxStatus) Toggle() {
-	log.Log(CHANGE, "Toggle() window")
 	if ! ls.Ready() {return}
 	log.Log(CHANGE, "Toggle() window ready =", ls.ready)
 	if ls.hidden {
@@ -55,7 +60,7 @@ func (ls *LinuxStatus) Toggle() {
 }
 
 func (ls *LinuxStatus) Ready() bool {
-	log.Log(CHANGE, "Ready()")
+	log.Log(SPEW, "Ready() maybe not ready? ls =", ls)
 	if me == nil {return false}
 	if ls == nil {return false}
 	if ls.window == nil {return false}

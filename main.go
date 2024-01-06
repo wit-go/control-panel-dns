@@ -154,38 +154,14 @@ func dnsTTL() {
 }
 
 func linuxLoop() {
-	me.changed = false
-	log.Log(NET, "FQDN =", me.fqdn.GetText())
-	duration := timeFunction(getHostname)
-	log.Info("getHostname() execution Time: ", duration, "me.changed =", me.changed)
-
-	var aaaa []string
-	aaaa = dhcpAAAA()
-	var all string
-	for _, s := range aaaa {
-		log.Log(NET, "my actual AAAA = ",s)
-		all += s + "\n"
-	}
 	// me.IPv6.SetText(all)
 
-	if (me.changed) {
+	if (me.statusOS.Changed()) {
 		stamp := time.Now().Format("2006/01/02 15:04:05")
 		log.Log(CHANGE, "Network things changed on", stamp)
 		duration := timeFunction(updateDNS)
 		log.Log(CHANGE, "updateDNS() execution Time: ", duration)
 	}
-
-	/*
-	processName := getProcessNameByPort(53)
-	fmt.Println("Process with port 53:", processName)
-
-	commPath := filepath.Join("/proc", proc.Name(), "comm")
-	comm, err := ioutil.ReadFile(commPath)
-	if err != nil {
-		return "", err // Error reading the process name
-	}
-	return strings.TrimSpace(string(comm)), nil
-	*/
 }
 
 /*

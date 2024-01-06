@@ -4,39 +4,11 @@ package linuxstatus
 import 	(
 	// "log"
 	"net"
+	"sort"
 	"strings"
 
 	"go.wit.com/log"
 )
-
-// this doesn't work
-/*
-func watchNetworkInterfaces() {
-	// Get list of network interfaces
-	interfaces, _ := net.Interfaces()
-
-	// Set up a notification channel
-	notification := make(chan net.Interface)
-
-	log.Log(NET, "watchNet()")
-	// Start goroutine to watch for changes
-	go func() {
-		log.Log(NET, "watchNet() func")
-		for {
-			log.Log(NET, "forever loop start")
-			// Check for changes in each interface
-			for _, i := range interfaces {
-				log.Log(NET, "something on i =", i)
-				if status := i.Flags & net.FlagUp; status != 0 {
-					notification <- i
-					log.Log(NET, "something on i =", i)
-				}
-			}
-			log.Log(NET, "forever loop end")
-		}
-	}()
-}
-*/
 
 func IsIPv6(address string) bool {
 	return strings.Count(address, ":") >= 2
@@ -240,28 +212,35 @@ func scanInterfaces() {
 
 // displays the IP address found on your network interfaces
 func updateRealAAAA() {
-	var all4 string
-	var all6 string
+	var all4 []string
+	var all6 []string
 	for s, t := range me.ipmap {
 		if (t.ipv4) {
-			all4 += s + "\n"
+			all4 = append(all4, s)
 			log.Log(NET, "IPv4 =", s)
 		} else if (t.ipv6) {
-			all6 += s + "\n"
+			all6 = append(all6, s)
 			log.Log(NET, "IPv6 =", s)
 		} else {
 			log.Log(NET, "???? =", s)
 		}
 	}
-	all4 = sortLines(all4)
-	all6 = sortLines(all6)
-	if (me.IPv4.Get() != all4) {
-		log.Log(NET, "IPv4 addresses have changed", all4)
-		me.IPv4.Set(all4)
+
+	// sort and create text
+	sort.Strings(all4)
+	sort.Strings(all6)
+	s4 := strings.Join(all4, "\n")
+	s6 := strings.Join(all6, "\n")
+
+	if (me.IPv4.Get() != s4) {
+		log.Log(CHANGE, "IPv4 addresses have changed", s4)
+		me.IPv4.Set(s4)
+		me.changed = true
 	}
-	if (me.IPv6.Get() != all6) {
-		log.Log(NET, "IPv6 addresses have changed", all6)
-		me.IPv6.Set(all6)
+	if (me.IPv6.Get() != s6) {
+		log.Log(CHANGE, "IPv6 addresses have changed", s6)
+		me.IPv6.Set(s6)
+		me.changed = true
 	}
 }
 
