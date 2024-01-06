@@ -41,7 +41,8 @@ func detailsTab(title string) {
 	grid.SetNext(1,1)
 
 	grid.NewLabel("domainname =")
-	me.domainname = grid.NewLabel("domainname")
+	grid.NewLabel("DEPRECATED")
+//	me.domainname = grid.NewLabel("domainname")
 
 	grid.NewLabel("hostname -s =")
 	me.hostshort = grid.NewLabel("hostname -s")
@@ -209,24 +210,7 @@ func mainWindow(title string) {
 
 	// This is where you figure out what to do next to fix the problems
 	gr.NewButton("fix", func () {
-		if ! me.status.Ready() {
-			log.Warn("The IPv6 Control Panel is not Ready() yet")
-			return
-		}
-		if me.status.ValidHostname() {
-			log.Warn("Your hostname is VALID:", me.status.GetHostname())
-		} else {
-			log.Warn("You must first fix your hostname:", me.status.GetHostname())
-			return
-		}
-		if ! me.status.IPv4() {
-			log.Warn("You do not have real IPv4 addresses. Nothing to fix here") 
-		}
-		if ! me.status.IPv6() {
-			log.Warn("IPv6 DNS is broken. Check what is broken here")
-			return
-		}
-		log.Warn("FIGURE OUT WHAT TO DO HERE")
+		fix()
 	})
 
 	grid.Margin()
@@ -242,6 +226,9 @@ func mainWindow(title string) {
 
 	gr.NewButton("OS details", func () {
 		me.details.Toggle()
+	})
+	gr.NewButton("Linux details", func () {
+		me.statusOS.Update()
 	})
 	gr.NewButton("resolver status", func () {
 		if ! me.digStatus.Ready() {return}
@@ -368,7 +355,7 @@ func updateDNS() {
 
 	// lookup the NS records for your domain
 	// if your host is test.wit.com, find the NS resource records for wit.com
-	lookupNS(me.domainname.S)
+	lookupNS(me.statusOS.GetDomainName())
 
 	log.Println("updateDNS() END")
 }

@@ -17,6 +17,8 @@ import 	(
 	"go.wit.com/gui/gui"
 	"go.wit.com/gui/debugger"
 
+	"go.wit.com/control-panels/dns/linuxstatus"
+
 	"github.com/miekg/dns"
 )
 
@@ -46,6 +48,8 @@ func main() {
 
 	me.digStatus = NewDigStatusWindow(me.myGui)
 	me.status = NewHostnameStatusWindow(me.myGui)
+
+	linuxstatus.New()
 
 	if debugger.ArgDebug() {
 		log.Sleep(2)

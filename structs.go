@@ -6,6 +6,7 @@ import 	(
 	"time"
 	"go.wit.com/gui/gui"
 	"go.wit.com/gui/gadgets"
+	"go.wit.com/control-panels/dns/linuxstatus"
 
 	"github.com/miekg/dns"
 )
@@ -15,10 +16,11 @@ var me Host
 
 type Host struct {
 	status		*hostnameStatus		// keeps track of the hostname and it's status
+	statusOS	*linuxstatus.LinuxStatus		// what the Linux OS sees
 
 	hostnameStatus	*gui.Node		// a summary for the user of where things are
 
-	domainname	*gui.Node		// kernel.org
+	// domainname	*gui.Node		// kernel.org
 	hostshort	*gui.Node		// hostname -s
 
 	artificialSleep float64	`default:"0.7"`	// artificial sleep on startup

@@ -1,18 +1,24 @@
 // figures out if your hostname is valid
 // then checks if your DNS is setup correctly
-package main
+package linuxstatus
 
 import (
-	"strings"
-
 	"go.wit.com/log"
 	"go.wit.com/shell"
-//	"go.wit.com/gui/cloudflare"
 
-	"github.com/miekg/dns"
 	// will try to get this hosts FQDN
 	"github.com/Showmax/go-fqdn"
 )
+
+func (ls *LinuxStatus) GetDomainName() string {
+	if ! me.Ready() {return ""}
+	return me.domainname.Get()
+}
+
+func (ls *LinuxStatus) setDomainName(dn string) {
+	if ! me.Ready() {return}
+	me.domainname.Set(dn)
+}
 
 func getHostname() {
 	var err error
@@ -22,11 +28,23 @@ func getHostname() {
 		log.Error(err, "FQDN hostname error")
 		return
 	}
-	me.status.SetHostname(s)
+	log.Warn("full hostname should be:", s)
 
 	dn := run("domainname")
-	hshort := run("hostname -s")
+	if (me.domainname.Get() != dn) {
+		log.Log(CHANGE, "domainname has changed from", me.GetDomainName(), "to", dn)
+		me.setDomainName(dn)
+		me.changed = true
+	}
 
+	hshort := run("hostname -s")
+	if (me.hostshort.Get() != hshort) {
+		log.Log(CHANGE, "hostname -s has changed from", me.hostshort.Get(), "to", hshort)
+		me.hostshort.Set(hshort)
+		me.changed = true
+	}
+
+	/*
 	var test string
 	test = hshort + "." + dn
 	if (me.status.GetHostname() != test) {
@@ -43,6 +61,7 @@ func getHostname() {
 			me.changed = true
 		}
 	}
+	*/
 }
 
 // returns true if the hostname is good
@@ -64,29 +83,4 @@ func goodHostname() bool {
 	}
 
 	return false
-}
-
-func digAAAA(hostname string) []string {
-	var blah, ipv6Addresses []string
-	// domain := hostname
-	recordType := dns.TypeAAAA // dns.TypeTXT
-
-	// Cloudflare's DNS server
-	blah, _ = dnsUdpLookup("1.1.1.1:53", hostname, recordType)
-	log.Println("digAAAA() has BLAH =", blah)
-
-	if (len(blah) == 0) {
-		log.Println("digAAAA() RUNNING dnsAAAAlookupDoH(domain)")
-		ipv6Addresses = lookupDoH(hostname, "AAAA")
-		log.Println("digAAAA() has ipv6Addresses =", strings.Join(ipv6Addresses, " "))
-		for _, addr := range ipv6Addresses {
-			log.Println(addr)
-		}
-		return ipv6Addresses
-	}
-
-	// TODO: check digDoH vs blah, if so, then port 53 TCP and/or UDP is broken or blocked
-	log.Println("digAAAA() has BLAH =", blah)
-
-	return blah
 }
