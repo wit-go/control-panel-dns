@@ -18,13 +18,9 @@ type Host struct {
 
 	hostnameStatus	*gui.Node		// a summary for the user of where things are
 
-	// hostname	string			// mirrors
 	domainname	*gui.Node		// kernel.org
 	hostshort	*gui.Node		// hostname -s
-	// fqdn		string			// mirrors.kernel.org
 
-//	dnsTTL		int	`default:"3"`	// Recheck DNS is working every TTL (in seconds)
-//	dnsTTLsleep	float64			// sleep between loops
 	artificialSleep float64	`default:"0.7"`	// artificial sleep on startup
 	artificialS     string 	`default:"abc"`	// artificial sleep on startup
 
@@ -71,21 +67,15 @@ type Host struct {
 	DnsSpeedActual	*gui.Node		// the last actual duration
 	DnsSpeedLast	string			// the last state 'FAST', 'OK', etc
 
-	fix		*gui.Node		// button for the user to click
-	fixProc		*gui.Node		// button for the user to click
+	// fix		*gui.Node		// button for the user to click
+	// fixProc		*gui.Node		// button for the user to click
 
-	mainStatus	*gui.Node		// group for the main display of stuff
-	cloudflareB	*gui.Node		// cloudflare button
-
-	dbOn		*gui.Node		// button for setting debugging on
-	dbNet		*gui.Node		// button for setting network debugging on
-	dbProc		*gui.Node		// button for setting proc debugging on
+	// mainStatus	*gui.Node		// group for the main display of stuff
+	// cloudflareB	*gui.Node		// cloudflare button
 
 	digStatus	*digStatus
 	statusIPv6	*gadgets.OneLiner
 	digStatusButton *gui.Node
-
-	hostnameStatusButton	*gui.Node
 
 	myDebug			*gui.Node
 	myGui			*gui.Node

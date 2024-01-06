@@ -44,6 +44,9 @@ func main() {
 	log.Sleep(me.artificialSleep)
 	setupControlPanelWindow()
 
+	me.digStatus = NewDigStatusWindow(me.myGui)
+	me.status = NewHostnameStatusWindow(me.myGui)
+
 	if debugger.ArgDebug() {
 		log.Sleep(2)
 		debugger.DebugWindow(me.myGui)
@@ -121,24 +124,15 @@ func DNSloop() {
 	log.Info("dnsTTL() execution Time: ", duration)
 	var s, newSpeed string
 	if (duration > 5000 * time.Millisecond ) {
-		newSpeed = "VERY BAD"
-		suggestProcDebugging()
+		newSpeed = "VERY SLOW"
 	} else if (duration > 2000 * time.Millisecond ) {
-		newSpeed = "BAD"
-		suggestProcDebugging()
+		newSpeed = "SLOWER"
 	} else if (duration > 500 * time.Millisecond ) {
-		suggestProcDebugging()
 		newSpeed = "SLOW"
 	} else if (duration > 100 * time.Millisecond ) {
 		newSpeed = "OK"
-		if (me.fixProc != nil) {
-			// me.fixProc.Disable()
-		}
 	} else {
 		newSpeed = "FAST"
-		if (me.fixProc != nil) {
-			// me.fixProc.Disable()
-		}
 	}
 	if (newSpeed != me.DnsSpeedLast) {
 		log.Log(CHANGE, "dns lookup speed changed =", newSpeed)

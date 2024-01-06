@@ -7,7 +7,7 @@ import (
 
 	"go.wit.com/log"
 	"go.wit.com/shell"
-	"go.wit.com/gui/cloudflare"
+//	"go.wit.com/gui/cloudflare"
 
 	"github.com/miekg/dns"
 	// will try to get this hosts FQDN
@@ -52,15 +52,6 @@ func getHostname() {
 			log.Log(CHANGE, "me.hostname", me.status.GetHostname(), "is valid")
 			me.hostnameStatus.SetText("VALID")
 			me.changed = true
-		}
-		// enable the cloudflare button if the provider is cloudflare
-		if (me.cloudflareB == nil) {
-			log.Log(CHANGE, "me.cloudflare == nil; me.DnsAPI.S =", me.DnsAPI.S)
-			if (me.DnsAPI.S == "cloudflare") {
-				me.cloudflareB = me.mainStatus.NewButton("cloudflare wit.com", func () {
-					cloudflare.CreateRR(me.myGui, "wit.com", "3777302ac4a78cd7fa4f6d3f72086d06")
-				})
-			}
 		}
 	}
 }

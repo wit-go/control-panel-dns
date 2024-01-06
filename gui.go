@@ -101,6 +101,11 @@ func debugTab(title string) {
 		// log.Println(o)
 	})
 
+	g2.NewButton("getProcessNameByPort()", func () {
+		processName := getProcessNameByPort(53)
+		log.Info("Process with port 53:", processName)
+	})
+
 	g2 = me.debug.Box().NewGroup("debugging options")
 
 	// makes a slider widget
@@ -189,25 +194,22 @@ func myDefaultExit(n *gui.Node) {
 func mainWindow(title string) {
 	me.window = gadgets.NewBasicWindow(me.myGui, title)
 
-	me.mainStatus = me.window.Box().NewGroup("dns update")
-	grid := me.mainStatus.NewGrid("gridnuts", 2, 2)
+	gr := me.window.Box().NewGroup("dns update")
+	grid := gr.NewGrid("gridnuts", 2, 2)
 
 	grid.SetNext(1,1)
 
 	grid.NewLabel("hostname =")
 	me.fqdn = grid.NewLabel("?")
 
-	// grid.NewLabel("DNS AAAA =")
 	me.DnsAAAA = gadgets.NewOneLiner(grid, "DNS AAAA =").Set("unknown")
 
 	grid.NewLabel("DNS A =")
 	me.DnsA = grid.NewLabel("?")
 
-	me.digStatus = NewDigStatusWindow(me.myGui)
-	me.status = NewHostnameStatusWindow(me.myGui)
-
-	me.hostnameStatusButton = me.mainStatus.NewButton("Fix hostname DNS", func () {
-		me.status.window.Toggle()
+	// This is where you figure out what to do next to fix the problems
+	gr.NewButton("fix", func () {
+		log.Warn("FIGURE OUT WHAT TO DO HERE")
 	})
 
 	grid.Margin()
@@ -215,15 +217,23 @@ func mainWindow(title string) {
 
 	statusGrid(me.window.Box())
 
-	gr := me.window.Box().NewGroup("debugging")
-	gr.NewButton("OS Details", func () {
+	gr = me.window.Box().NewGroup("debugging")
+	gr.NewButton("hostname status", func () {
+		if ! me.status.Ready() {return}
+		me.status.window.Toggle()
+	})
+
+	gr.NewButton("OS details", func () {
 		me.details.Toggle()
 	})
-	gr.NewButton("Resolver Status", func () {
+	gr.NewButton("resolver status", func () {
 		if ! me.digStatus.Ready() {return}
 		me.digStatus.window.Toggle()
 	})
-	gr.NewButton("Control Panel Debug", func () {
+	gr.NewButton("cloudflare wit.com", func () {
+		cloudflare.CreateRR(me.myGui, "wit.com", "3777302ac4a78cd7fa4f6d3f72086d06")
+	})
+	gr.NewButton("Debug", func () {
 		me.debug.Toggle()
 	})
 }
@@ -344,21 +354,4 @@ func updateDNS() {
 	lookupNS(me.domainname.S)
 
 	log.Println("updateDNS() END")
-}
-
-func suggestProcDebugging() {
-	if (me.fixProc != nil) {
-		// me.fixProc.Disable()
-		return
-	}
-
-	me.fixProc = me.mainStatus.NewButton("Try debugging Slow DNS lookups", func () {
-		log.Warn("You're DNS lookups are very slow")
-		me.dbOn.Set(true)
-		me.dbProc.Set(true)
-
-		processName := getProcessNameByPort(53)
-		log.Info("Process with port 53:", processName)
-	})
-	// me.fixProc.Disable()
 }
