@@ -36,6 +36,7 @@ type LinuxStatus struct {
 	IPv6		*gadgets.OneLiner
 	workingIPv6	*gadgets.OneLiner
 	Interfaces	*gui.Node
+	speed		*gadgets.OneLiner
 	speedActual	*gadgets.OneLiner
 
 }

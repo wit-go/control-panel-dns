@@ -27,6 +27,7 @@ func draw(ls *LinuxStatus) {
 	ls.grid.NewLabel("interfaces =")
 	ls.Interfaces = ls.grid.NewCombobox("Interfaces")
 
+	ls.speed	= gadgets.NewOneLiner(ls.grid, "refresh speed =")
 	ls.speedActual	= gadgets.NewOneLiner(ls.grid, "refresh speed =")
 
 	ls.grid.Margin()

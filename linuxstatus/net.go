@@ -74,7 +74,7 @@ func renameInterface(i *net.Interface) {
 func checkInterface(i net.Interface) {
 	val, ok := me.ifmap[i.Index]
 	if ! ok {
-		log.Info(i.Name, "is a new network interface. The linux kernel index =", i.Index)
+		log.Log(INFO, i.Name, "is a new network interface. The linux kernel index =", i.Index)
 		me.ifmap[i.Index] = new(IFtype)
 		me.ifmap[i.Index].gone = false
 		me.ifmap[i.Index].iface = &i
@@ -88,7 +88,7 @@ func checkInterface(i net.Interface) {
 	me.ifmap[i.Index].gone = false
 	log.Log(NET, "me.ifmap[i] does exist. Need to compare everything.", i.Index, i.Name, val.iface.Index, val.iface.Name)
 	if (val.iface.Name != i.Name) {
-		log.Info(val.iface.Name, "has changed to it's name to", i.Name)
+		log.Log(INFO, val.iface.Name, "has changed to it's name to", i.Name)
 		me.ifmap[i.Index].iface = &i
 		me.changed = true
 		if (me.Interfaces != nil) {
@@ -143,14 +143,14 @@ func checkDNS() (map[string]*IPtype, map[string]*IPtype) {
 			ipt = "IPv6"
 		}
 		if (t.IsReal()) {
-			log.Info("\tIP is Real    ", ipt, i.Index, i.Name, s)
+			log.Log(INFO, "\tIP is Real    ", ipt, i.Index, i.Name, s)
 			if (t.ipv6) {
 				ipv6s[s] = t
 			} else {
 				ipv4s[s] = t
 			}
 		} else {
-			log.Info("\tIP is not Real", ipt, i.Index, i.Name, s)
+			log.Log(INFO, "\tIP is not Real", ipt, i.Index, i.Name, s)
 		}
 	}
 	return ipv6s, ipv4s
@@ -192,14 +192,14 @@ func checkIP(ip *net.IPNet, i net.Interface) bool {
 		}
 	}
 	if (IsReal(&ip.IP)) {
-		log.Info("\tIP is Real    ", t, i.Index, i.Name, realip)
+		log.Log(INFO, "\tIP is Real    ", t, i.Index, i.Name, realip)
 	} else {
-		log.Info("\tIP is not Real", t, i.Index, i.Name, realip)
+		log.Log(INFO, "\tIP is not Real", t, i.Index, i.Name, realip)
 	}
 	log.Log(NET, "\t\tIP is IsPrivate() =", ip.IP.IsPrivate())
 	log.Log(NET, "\t\tIP is IsLoopback() =", ip.IP.IsLoopback())
 	log.Log(NET, "\t\tIP is IsLinkLocalUnicast() =", ip.IP.IsLinkLocalUnicast())
-	// log.Info("HERE HERE", "realip =", realip, "me.ip[realip]=", me.ipmap[realip])
+	// log.Log(INFO, "HERE HERE", "realip =", realip, "me.ip[realip]=", me.ipmap[realip])
 	return true
 }
 
@@ -210,7 +210,7 @@ func scanInterfaces() {
 	log.Log(NET, SPEW, ifaces)
 	for _, i := range ifaces {
 		addrs, _ := i.Addrs()
-		// log.Info("range ifaces = ", i)
+		// log.Log(INFO, "range ifaces = ", i)
 		checkInterface(i)
 		log.Log(NET, "*net.Interface.Name = ", i.Name, i.Index)
 		log.Log(NET, SPEW, i)

@@ -3,6 +3,8 @@
 package linuxstatus
 
 import (
+	"errors"
+
 	"go.wit.com/log"
 	"go.wit.com/shell"
 
@@ -28,7 +30,7 @@ func getHostname() {
 		log.Error(err, "FQDN hostname error")
 		return
 	}
-	log.Warn("full hostname should be:", s)
+	log.Error(errors.New("full hostname should be: " + s))
 
 	dn := run("domainname")
 	if (me.domainname.Get() != dn) {

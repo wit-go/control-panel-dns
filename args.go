@@ -19,6 +19,7 @@ var args struct {
 }
 
 var NOW log.LogFlag
+var INFO log.LogFlag
 var NET log.LogFlag
 var DNS log.LogFlag
 var PROC log.LogFlag
@@ -35,6 +36,12 @@ func init() {
 	NOW.Subsystem = "cpdns"
 	NOW.Desc = "temp debugging stuff"
 	NOW.Register()
+
+	INFO.B = false
+	INFO.Name = "INFO"
+	INFO.Subsystem = "cpdns"
+	INFO.Desc = "normal debugging stuff"
+	INFO.Register()
 
 	NET.B = false
 	NET.Name = "NET"
@@ -60,7 +67,7 @@ func init() {
 	SPEW.Desc = "spew logging"
 	SPEW.Register()
 
-	CHANGE.B = false
+	CHANGE.B = true
 	CHANGE.Name = "CHANGE"
 	CHANGE.Subsystem = "cpdns"
 	CHANGE.Desc = "show droplet state changes"

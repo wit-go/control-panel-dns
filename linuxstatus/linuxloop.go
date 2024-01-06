@@ -15,7 +15,7 @@ import 	(
 func linuxLoop() {
 	me.changed = false
 	duration := timeFunction(getHostname)
-	log.Info("getHostname() execution Time: ", duration, "me.changed =", me.changed)
+	log.Log(INFO, "getHostname() execution Time: ", duration, "me.changed =", me.changed)
 
 	duration = timeFunction(scanInterfaces)
 	log.Log(NET, "scanInterfaces() execution Time: ", duration)
@@ -33,7 +33,7 @@ func linuxLoop() {
 	// me.IPv6.SetText(all)
 
 	user, _ := user.Current()
-	log.Println("os.Getuid =", user.Username, os.Getuid())
+	log.Log(INFO, "os.Getuid =", user.Username, os.Getuid())
 	if (me.uid != nil) {
 		me.uid.Set(user.Username + " (" + strconv.Itoa(os.Getuid()) + ")")
 	}

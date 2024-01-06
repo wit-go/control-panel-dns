@@ -9,53 +9,31 @@ import 	(
 )
 
 var NOW log.LogFlag
+var INFO log.LogFlag
 var NET log.LogFlag
 var DNS log.LogFlag
 var PROC log.LogFlag
 var SPEW log.LogFlag
+var WARN log.LogFlag
 var CHANGE log.LogFlag
 var STATUS log.LogFlag
 
+func myreg(f *log.LogFlag, b bool, name string, desc string) {
+	f.B = b
+	f.Subsystem = "go.wit.com/control-panels/dns/linuxstatus"
+	f.Short = "linux"
+	f.Desc = desc
+	f.Name = name
+	f.Register()
+}
+
 func init() {
-	NOW.B = false
-	NOW.Name = "NOW"
-	NOW.Subsystem = "cpdns"
-	NOW.Desc = "temp debugging stuff"
-	NOW.Register()
-
-	NET.B = false
-	NET.Name = "NET"
-	NET.Subsystem = "cpdns"
-	NET.Desc = "Network logging"
-	NET.Register()
-
-	DNS.B = false
-	DNS.Name = "DNS"
-	DNS.Subsystem = "cpdns"
-	DNS.Desc = "dnsStatus.update()"
-	DNS.Register()
-
-	PROC.B = false
-	PROC.Name = "PROC"
-	PROC.Subsystem = "cpdns"
-	PROC.Desc = "/proc logging"
-	PROC.Register()
-
-	SPEW.B = false
-	SPEW.Name = "SPEW"
-	SPEW.Subsystem = "cpdns"
-	SPEW.Desc = "spew logging"
-	SPEW.Register()
-
-	CHANGE.B = false
-	CHANGE.Name = "CHANGE"
-	CHANGE.Subsystem = "cpdns"
-	CHANGE.Desc = "show droplet state changes"
-	CHANGE.Register()
-
-	STATUS.B = false
-	STATUS.Name = "STATUS"
-	STATUS.Subsystem = "cpdns"
-	STATUS.Desc = "updateStatus()"
-	STATUS.Register()
+	myreg(&NOW,    true,  "NOW",    "temp debugging stuff")
+	myreg(&NET,    false, "NET",    "Network Logging")
+	myreg(&DNS,    false, "DNS",    "dnsStatus.update()")
+	myreg(&PROC,   false, "PROC",   "/proc logging")
+	myreg(&SPEW,   false, "SPEW",   "spew stuff")
+	myreg(&WARN,   true,  "WARN",   "bad things")
+	myreg(&CHANGE, true,  "CHANGE", "show droplet state changes")
+	myreg(&STATUS, false, "STATUS", "Update() details")
 }

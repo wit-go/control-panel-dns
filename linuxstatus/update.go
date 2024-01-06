@@ -1,31 +1,40 @@
 package linuxstatus
 
 import (
-	"errors"
 	"fmt"
 	"time"
+	"errors"
 
 	"go.wit.com/log"
 )
 
 func (ls *LinuxStatus) Update() {
-	log.Info("linuxStatus() Update() START")
-	if ls == nil {
-		log.Error(errors.New("linuxStatus() Update() ls == nil"))
+	if ! ls.Ready() {
+		log.Warn("can't update yet. ready is false")
+		log.Error(errors.New("Update() is not ready yet"))
 		return
 	}
+	log.Log(INFO, "Update() START")
 	duration := timeFunction(func () {
 		linuxLoop()
 	})
+	ls.SetSpeed(duration)
+	log.Info("linuxStatus() Update() END")
+}
+
+func (ls *LinuxStatus) SetSpeed(duration time.Duration) {
 	s := fmt.Sprint(duration)
+	if ls.speedActual == nil {
+		log.Warn("can't actually warn")
+		return
+	}
 	ls.speedActual.Set(s)
 
 	if (duration > 500 * time.Millisecond ) {
-		// ls.speed, "SLOW")
+		ls.speed.Set("SLOW")
 	} else if (duration > 100 * time.Millisecond ) {
-		// ls.speed, "OK")
+		ls.speed.Set("OK")
 	} else {
-		// ls.speed, "FAST")
+		ls.speed.Set("FAST")
 	}
-	log.Info("linuxStatus() Update() END")
 }
