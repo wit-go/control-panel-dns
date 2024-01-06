@@ -1,4 +1,4 @@
-package main
+package linuxstatus
 
 import (
 	"io/ioutil"
@@ -10,7 +10,7 @@ import (
 	"go.wit.com/log"
 )
 
-func getProcessNameByPort(port int) string {
+func GetProcessNameByPort(port int) string {
 	// Convert port to hex string
 	portHex := strconv.FormatInt(int64(port), 16)
 

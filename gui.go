@@ -50,7 +50,7 @@ func debugTab(title string) {
 	})
 
 	g2.NewButton("getProcessNameByPort()", func () {
-		processName := getProcessNameByPort(53)
+		processName := linuxstatus.GetProcessNameByPort(53)
 		log.Info("Process with port 53:", processName)
 	})
 
@@ -70,6 +70,7 @@ func debugTab(title string) {
 	me.debug.Hide()
 }
 
+/*
 // will return a AAAA value that needs to be deleted
 func deleteAAA() string {
 	var aaaa []string
@@ -93,6 +94,7 @@ func missingAAAA() string {
 	}
 	return ""
 }
+*/
 
 // doesn't actually do any network traffic
 // it just updates the GUI
@@ -116,7 +118,7 @@ func displayDNS() string {
 	}
 
 	var a []string
-	a = realA()
+	a = append(a, "fixme")
 	all = sortLines(strings.Join(a, "\n"))
 	if (all == "") {
 		log.Log(NOW, "THERE IS NOT a real A DNS ENTRY")
@@ -265,28 +267,30 @@ func updateDNS() {
 				cloudflare.CFdialog.NameNode.SetText(h)
 			}
 	
+			/*
 			d := deleteAAA()
 			if (d != "") {
 				if (cloudflare.CFdialog.ValueNode != nil) {
 					cloudflare.CFdialog.ValueNode.SetText(d)
 				}
 			}
-			m := missingAAAA()
-			if (m != "") {
-				if (cloudflare.CFdialog.ValueNode != nil) {
-					cloudflare.CFdialog.ValueNode.SetText(m)
-				}
-				/*
-				 rr := &cloudflare.RRT{
-					Type:	"AAAA",
-					Name:	me.hostname,
-					Ttl:	"Auto",
-					Proxied:	false,
-					Content:	m,
-				}
-				cloudflare.Update(rr)
-				*/
-			}
+			*/
+//			m := missingAAAA()
+//			if (m != "") {
+//				if (cloudflare.CFdialog.ValueNode != nil) {
+//					cloudflare.CFdialog.ValueNode.SetText(m)
+//				}
+//				/*
+//				 rr := &cloudflare.RRT{
+//					Type:	"AAAA",
+//					Name:	me.hostname,
+//					Ttl:	"Auto",
+//					Proxied:	false,
+//					Content:	m,
+//				}
+//				cloudflare.Update(rr)
+//				*/
+//			}
 		}
 	}
 	status := displayDNS() // update the GUI based on dig results

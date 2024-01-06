@@ -2,6 +2,7 @@ package main
 
 // Watches for changes to a directory. Works cross-platform
 
+/*
 import (
 	"go.wit.com/log"
 	"github.com/fsnotify/fsnotify"
@@ -77,3 +78,4 @@ func fsnotifyNetworkInterfaceChanges() error {
 	}
 }
 
+*/

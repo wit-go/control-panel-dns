@@ -15,8 +15,14 @@ import 	(
 var me Host
 
 type Host struct {
+	myGui		*gui.Node	// the 'gui' binary tree root node
+
+	window		*gadgets.BasicWindow	// the main window
+	debug		*gadgets.BasicWindow	// the debug window
+
 	status		*hostnameStatus		// keeps track of the hostname and it's status
 	statusOS	*linuxstatus.LinuxStatus		// what the Linux OS sees
+	digStatus	*digStatus		// window of the results of DNS lookups
 
 	hostnameStatus	*gui.Node		// a summary for the user of where things are
 	hostname	*gadgets.OneLiner	// the hostname grabbed from gadget.linuxStatus
@@ -30,7 +36,6 @@ type Host struct {
 	localSleep	time.Duration
 
 	changed		bool			// set to true if things changed
-	user		string			// name of the user
 
 	ipmap		map[string]*IPtype	// the current ip addresses
 	dnsmap		map[string]*IPtype	// the current dns addresses
@@ -41,16 +46,6 @@ type Host struct {
 	ipv4s		map[string]dns.RR
 	ipv6s		map[string]dns.RR
 
-	window		*gadgets.BasicWindow	// the main window
-	debug		*gadgets.BasicWindow	// more attempts to debug the DNS state
-
-	tab		*gui.Node		// the main dns tab
-	notes		*gui.Node		// using this to put notes here
-
-	// local OS settings, network interfaces, etc
-//	fqdn		*gui.Node		// display the full hostname
-//	Interfaces	*gui.Node		// Interfaces
-//	LocalSpeedActual *gui.Node		// the time it takes to check each network interface
 
 	// DNS stuff
 	DnsAPI		*gui.Node		// what DNS API to use?
@@ -61,18 +56,8 @@ type Host struct {
 	DnsSpeedActual	*gui.Node		// the last actual duration
 	DnsSpeedLast	string			// the last state 'FAST', 'OK', etc
 
-	// fix		*gui.Node		// button for the user to click
-	// fixProc		*gui.Node		// button for the user to click
-
-	// mainStatus	*gui.Node		// group for the main display of stuff
-	// cloudflareB	*gui.Node		// cloudflare button
-
-	digStatus	*digStatus
 	statusIPv6	*gadgets.OneLiner
 	digStatusButton *gui.Node
-
-	myDebug			*gui.Node
-	myGui			*gui.Node
 }
 
 type IPtype struct {

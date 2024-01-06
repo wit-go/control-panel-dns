@@ -40,6 +40,7 @@ func (h *Host) setIPv4(ipv4s map[string]*IPtype) {
         }
 }
 
+/*
 func (h *Host) checkDNS() {
 	var ip4 bool = false
 	var ip6 bool = false
@@ -74,6 +75,7 @@ func (h *Host) checkDNS() {
 		log.Println(args.VerboseDNS, "IPv6 is broken. Need to fix it here.")
 	}
 }
+*/
 
 // nsLookup performs an NS lookup on the given domain name.
 func lookupNS(domain string) {
@@ -113,7 +115,7 @@ func lookupNS(domain string) {
 
 	if (tmp != me.status.NSrr.Get()) {
 		me.changed = true
-		log.Log(CHANGE, "lookupNS() setting me.NSrr =", tmp)
+		log.Log(CHANGE, "lookupNS() setting changed to me.NSrr =", tmp)
 		me.status.NSrr.Set(tmp)
 	}
 }
