@@ -8,6 +8,7 @@ import 	(
 	"os"
 	"os/user"
 	"strconv"
+	"strings"
 
 	"go.wit.com/log"
 )
@@ -23,14 +24,10 @@ func linuxLoop() {
 		log.Log(NET, strconv.Itoa(i) + " iface = " + t.iface.Name)
 	}
 
-	var aaaa []string
-	aaaa = dhcpAAAA()
-	var all string
-	for _, s := range aaaa {
-		log.Log(NET, "my actual AAAA = ",s)
-		all += s + "\n"
-	}
-	// me.IPv6.SetText(all)
+	// get all the real AAAA records from all the network interfaces linux can see
+	tmp := strings.Join(realAAAA(), "\n")
+	tmp = sortLines(tmp)
+	me.workingIPv6.Set(tmp)
 
 	user, _ := user.Current()
 	log.Log(INFO, "os.Getuid =", user.Username, os.Getuid())

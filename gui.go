@@ -47,19 +47,19 @@ func detailsTab(title string) {
 	grid.NewLabel("DEPRECATED")
 
 	grid.NewLabel("NS records =")
-	me.NSrr = grid.NewLabel("NS RR's")
+	grid.NewLabel("DEPRECATED")
 
 	grid.NewLabel("UID =")
 	grid.NewLabel("DEPRECATED")
 
 	grid.NewLabel("Current IPv4 =")
-	me.IPv4 = grid.NewLabel("?")
+	grid.NewLabel("DEPRECATED")
 
 	grid.NewLabel("Current IPv6 =")
-	me.IPv6 = grid.NewLabel("?")
+	grid.NewLabel("DEPRECATED")
 
 	grid.NewLabel("Working Real IPv6 =")
-	me.workingIPv6 = grid.NewLabel("?")
+	grid.NewLabel("?")
 
 	grid.NewLabel("interfaces =")
 	me.Interfaces = grid.NewCombobox("Interfaces")
@@ -150,7 +150,7 @@ func missingAAAA() string {
 // it just updates the GUI
 func displayDNS() string {
 	var aaaa []string
-	aaaa = dhcpAAAA() // your AAAA records right now
+	aaaa = append(aaaa, "blah", "more")
 	// h := me.hostname
 	var all string
 	var broken string = "unknown"
@@ -165,11 +165,6 @@ func displayDNS() string {
 				broken = "needs update"
 			}
 		}
-	}
-	all = sortLines(all)
-	if (me.workingIPv6.S != all) {
-		log.Log(NOW, "workingIPv6.SetText() to:", all)
-		me.workingIPv6.SetText(all)
 	}
 
 	var a []string

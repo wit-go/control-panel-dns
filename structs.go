@@ -53,16 +53,16 @@ type Host struct {
 	// local OS settings, network interfaces, etc
 //	uid		*gui.Node		// user
 	fqdn		*gui.Node		// display the full hostname
-	IPv4		*gui.Node		// show valid IPv4 addresses
-	IPv6		*gui.Node		// show valid IPv6 addresses
+	// IPv4		*gui.Node		// show valid IPv4 addresses
+	// IPv6		*gui.Node		// show valid IPv6 addresses
 	Interfaces	*gui.Node		// Interfaces
 	LocalSpeedActual *gui.Node		// the time it takes to check each network interface
 
 	// DNS stuff
-	NSrr		*gui.Node		// NS resource records for the domain name
+	// NSrr		*gui.Node		// NS resource records for the domain name
 	DnsAPI		*gui.Node		// what DNS API to use?
 	DnsAAAA		*gadgets.OneLiner	// the actual DNS AAAA results
-	workingIPv6	*gui.Node		// currently working AAAA
+	// workingIPv6	*gui.Node		// currently working AAAA
 	DnsA		*gui.Node		// the actual DNS A results (ignore for status since mostly never happens?)
 	DnsStatus	*gui.Node		// the current state of DNS
 	DnsSpeed	*gui.Node		// 'FAST', 'OK', 'SLOW', etc

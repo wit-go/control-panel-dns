@@ -9,15 +9,17 @@ import 	(
 // it's assumed you are always passing in a box
 func draw(ls *LinuxStatus) {
 	if ! ls.Ready() {return}
-	ls.group = ls.window.Box().NewGroup("Real Stuff")
+	ls.group = ls.window.Box().NewGroup("What Linux Says It Is")
 
 	ls.grid = ls.group.NewGrid("gridnuts", 2, 2)
 
 	ls.grid.SetNext(1,1)
 
+	ls.fqdn		= gadgets.NewOneLiner(ls.grid, "hostname -f")
 	ls.hostshort	= gadgets.NewOneLiner(ls.grid, "hostname -s")
 	ls.domainname	= gadgets.NewOneLiner(ls.grid, "domain name")
-	ls.NSrr		= gadgets.NewOneLiner(ls.grid, "NS records =")
+	ls.resolver	= gadgets.NewOneLiner(ls.grid, "nameservers =")
+	ls.resolver.Set("TODO")
 	ls.uid		= gadgets.NewOneLiner(ls.grid, "UID =")
 	ls.IPv4		= gadgets.NewOneLiner(ls.grid, "Current IPv4 =")
 	ls.IPv6		= gadgets.NewOneLiner(ls.grid, "Current IPv6 =")

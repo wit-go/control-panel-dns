@@ -42,6 +42,7 @@ type hostnameStatus struct {
 	currentIPv6	*gadgets.OneLiner
 
 	// what the DNS servers have
+	NSrr		*gadgets.OneLiner
 	dnsA		*gadgets.OneLiner
 	dnsAAAA		*gadgets.OneLiner
 	dnsAPI		*gadgets.OneLiner
@@ -84,6 +85,7 @@ func NewHostnameStatusWindow(p *gui.Node) *hostnameStatus {
 	hs.currentIPv4	= gadgets.NewOneLiner(grid, "Current IPv4")
 	hs.currentIPv6	= gadgets.NewOneLiner(grid, "Current IPv6")
 
+	hs.NSrr		= gadgets.NewOneLiner(grid, "dns NS records").Set("unknown")
 	hs.dnsAPI	= gadgets.NewOneLiner(grid, "dns API provider").Set("unknown")
 	hs.dnsA		= gadgets.NewOneLiner(grid, "dns IPv4 resource records").Set("unknown")
 	hs.dnsAAAA	= gadgets.NewOneLiner(grid, "dns IPv6 resource records").Set("unknown")
@@ -339,8 +341,10 @@ func (hs *hostnameStatus) updateStatus() {
 		}
 	}
 
-	hs.currentIPv4.Set(me.IPv4.S)
-	hs.currentIPv6.Set(me.IPv6.S)
+	// hs.currentIPv4.Set(me.IPv4.S)
+	// hs.currentIPv6.Set(me.IPv6.S)
+	hs.currentIPv4.Set("get this from linuxStatus")
+	hs.currentIPv6.Set("get this from linuxStatus")
 
 	if hs.IPv4() && hs.IPv6() {
 		hs.status.Set("GOOD")

@@ -30,7 +30,7 @@ type LinuxStatus struct {
 	hostshort	*gadgets.OneLiner
 	domainname	*gadgets.OneLiner
 	fqdn		*gadgets.OneLiner
-	NSrr		*gadgets.OneLiner
+	resolver	*gadgets.OneLiner
 	uid		*gadgets.OneLiner
 	IPv4		*gadgets.OneLiner
 	IPv6		*gadgets.OneLiner

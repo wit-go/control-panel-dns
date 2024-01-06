@@ -8,7 +8,6 @@ import 	(
 	"fmt"
 	"strings"
 	"sort"
-	"strconv"
 	"runtime"
 	"time"
 	"embed"
@@ -159,12 +158,6 @@ func linuxLoop() {
 	log.Log(NET, "FQDN =", me.fqdn.GetText())
 	duration := timeFunction(getHostname)
 	log.Info("getHostname() execution Time: ", duration, "me.changed =", me.changed)
-
-	duration = timeFunction(scanInterfaces)
-	log.Log(NET, "scanInterfaces() execution Time: ", duration)
-	for i, t := range me.ifmap {
-		log.Log(NET, strconv.Itoa(i) + " iface = " + t.iface.Name)
-	}
 
 	var aaaa []string
 	aaaa = dhcpAAAA()

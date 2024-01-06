@@ -50,7 +50,7 @@ func (ls *LinuxStatus) GetHostShort() string {
 }
 
 func (ls *LinuxStatus) setHostShort() {
-	if ! me.Ready() {return ""}
+	if ! me.Ready() {return}
 	hshort := run("hostname -s")
 	if (me.hostshort.Get() != hshort) {
 		log.Log(CHANGE, "hostname -s has changed from", me.hostshort.Get(), "to", hshort)
@@ -71,7 +71,7 @@ func lookupHostname() {
 	log.Error(errors.New("full hostname should be: " + s))
 
 	me.setDomainName()
-
+	me.setHostShort()
 
 	/*
 	var test string
