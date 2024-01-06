@@ -16,7 +16,6 @@ import (
 	"go.wit.com/log"
 	"go.wit.com/gui/gui"
 	"go.wit.com/gui/gadgets"
-	"go.wit.com/gui/cloudflare"
 )
 
 type hostnameStatus struct {
@@ -51,8 +50,8 @@ type hostnameStatus struct {
 	speedActual	*gadgets.OneLiner
 
 	// Actions
-	dnsValue	*gui.Node
-	dnsAction	*gui.Node
+//	dnsValue	*gui.Node
+//	dnsAction	*gui.Node
 }
 
 func NewHostnameStatusWindow(p *gui.Node) *hostnameStatus {
@@ -95,6 +94,7 @@ func NewHostnameStatusWindow(p *gui.Node) *hostnameStatus {
 	group.Pad()
 	grid.Pad()
 
+	/*
 	group = hs.window.Box().NewGroup("Actions")
 	grid = group.NewGrid("LookupDetails", 2, 2)
 
@@ -108,6 +108,7 @@ func NewHostnameStatusWindow(p *gui.Node) *hostnameStatus {
 			hs.createDNSrecord(hs.dnsValue.S)
 		}
 	})
+	*/
 
 	group.Pad()
 	grid.Pad()
@@ -146,6 +147,7 @@ func (hs *hostnameStatus) API() string {
 	return hs.dnsAPI.Get()
 }
 
+/*
 func (hs *hostnameStatus) deleteDNSrecord(value string) bool {
 	log.Info("deleteDNSrecord() START for", value)
 	log.Info("deleteDNSrecord() hostname =", me.status.GetHostname())
@@ -171,6 +173,7 @@ func (hs *hostnameStatus) createDNSrecord(value string) bool {
 	}
 	return false
 }
+*/
 
 func (hs *hostnameStatus) Update() {
 	log.Info("hostnameStatus() Update() START")
@@ -266,6 +269,7 @@ func (hs *hostnameStatus) existsAAAA(s string) bool {
 	return false
 }
 
+/*
 // figure out if I'm missing any IPv6 address in DNS
 func (hs *hostnameStatus) missingAAAA() bool {
 	var aaaa []string
@@ -284,6 +288,7 @@ func (hs *hostnameStatus) missingAAAA() bool {
 
 	return false
 }
+*/
 
 func (hs *hostnameStatus) updateStatus() {
 	if ! hs.Ready() { return }
@@ -302,15 +307,17 @@ func (hs *hostnameStatus) updateStatus() {
 			s = "(none)"
 		} else {
 			hs.setIPv6("Check for real IPv6 addresses here")
+			/*
 			if hs.missingAAAA() {
 				hs.setIPv6("Add the missing IPv6 address")
 			}
+			*/
 			for _, addr := range vals {
 				log.Log(STATUS, addr)
 				s += addr + " (DELETE)" + "\n"
 				hs.setIPv6("NEEDS DELETE")
-				hs.dnsValue.SetText(addr)
-				hs.dnsAction.SetText("DELETE")
+				// hs.dnsValue.SetText(addr)
+				// hs.dnsAction.SetText("DELETE")
 			}
 		}
 		hs.set(hs.dnsAAAA, s)
