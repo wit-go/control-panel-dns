@@ -38,10 +38,6 @@ func debugTab(title string) {
 		debugger.DebugWindow(me.myGui)
 	})
 
-	g2.NewButton("getHostname() looks at the OS settings", func () {
-		getHostname()
-	})
-
 	g2.NewButton("dig A & AAAA DNS records", func () {
 		log.Println("updateDNS()")
 		updateDNS()
@@ -146,9 +142,7 @@ func mainWindow(title string) {
 
 	grid.SetNext(1,1)
 
-	grid.NewLabel("hostname =")
-	me.fqdn = grid.NewLabel("?")
-
+	me.hostname = gadgets.NewOneLiner(grid, "hostname =").Set("unknown")
 	me.DnsAAAA = gadgets.NewOneLiner(grid, "DNS AAAA =").Set("unknown")
 
 	grid.NewLabel("DNS A =")
@@ -253,9 +247,9 @@ func updateDNS() {
 
 	// log.Println("digAAAA()")
 
-	if me.status.ValidHostname() {
+	if me.statusOS.ValidHostname() {
 		var aaaa []string
-		h := me.status.GetHostname()
+		h := me.statusOS.GetHostname()
 		aaaa = digAAAA(h)
 		log.Log(NOW, "digAAAA() for", h, "=", aaaa)
 

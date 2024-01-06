@@ -2,10 +2,13 @@ package main
 
 import (
 	"fmt"
-	"go.wit.com/log"
+	"strings"
 	"io/ioutil"
 	"encoding/json"
 	"net/http"
+
+	"go.wit.com/log"
+	"github.com/miekg/dns"
 )
 
 // dnsLookupDoH performs a DNS lookup for AAAA records over HTTPS.
@@ -53,4 +56,29 @@ func lookupDoH(hostname string, rrType string) []string {
 	}
 
 	return values
+}
+
+func digAAAA(hostname string) []string {
+	var blah, ipv6Addresses []string
+	// domain := hostname
+	recordType := dns.TypeAAAA // dns.TypeTXT
+
+	// Cloudflare's DNS server
+	blah, _ = dnsUdpLookup("1.1.1.1:53", hostname, recordType)
+	log.Println("digAAAA() has BLAH =", blah)
+
+	if (len(blah) == 0) {
+		log.Println("digAAAA() RUNNING dnsAAAAlookupDoH(domain)")
+		ipv6Addresses = lookupDoH(hostname, "AAAA")
+		log.Println("digAAAA() has ipv6Addresses =", strings.Join(ipv6Addresses, " "))
+		for _, addr := range ipv6Addresses {
+			log.Println(addr)
+		}
+		return ipv6Addresses
+	}
+
+	// TODO: check digDoH vs blah, if so, then port 53 TCP and/or UDP is broken or blocked
+	log.Println("digAAAA() has BLAH =", blah)
+
+	return blah
 }

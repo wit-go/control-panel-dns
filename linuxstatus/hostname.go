@@ -31,6 +31,14 @@ func (ls *LinuxStatus) GetHostname() string {
 	return me.hostname.Get()
 }
 
+func (ls *LinuxStatus) ValidHostname() bool {
+	if ! me.Ready() {return false}
+	if me.hostnameStatus.Get() == "VALID" {
+		return true
+	}
+	return false
+}
+
 func (ls *LinuxStatus) setHostname(newname string) {
 	if ! me.Ready() {return}
 	if newname ==  me.hostname.Get() {

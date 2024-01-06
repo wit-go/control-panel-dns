@@ -120,24 +120,11 @@ func NewHostnameStatusWindow(p *gui.Node) *hostnameStatus {
 	return hs
 }
 
+/*
 func (hs *hostnameStatus) ValidHostname() bool {
 	return goodHostname()
 }
-
-func (hs *hostnameStatus) GetHostname() string {
-	return hs.lastname
-}
-
-func (hs *hostnameStatus) SetHostname(hostname string) {
-	if hostname == hs.lastname {return}
-	log.Log(CHANGE, "the hostname is changing from", hs.lastname, "to", hostname)
-	hs.lastname = hostname
-	me.changed = true
-
-	if (me.fqdn != nil) {
-		me.fqdn.SetText(hostname)
-	}
-}
+*/
 
 func (hs *hostnameStatus) Domain() string {
 	if ! hs.Ready() {return ""}
@@ -301,10 +288,10 @@ func (hs *hostnameStatus) updateStatus() {
 	hs.hostShort.Set(me.statusOS.GetHostShort())
 	hs.domainname.Set(me.statusOS.GetDomainName())
 
-	if hs.ValidHostname() {
-		vals = lookupDoH(hs.GetHostname(), "AAAA")
+	if me.statusOS.ValidHostname() {
+		vals = lookupDoH(me.statusOS.GetHostname(), "AAAA")
 
-		log.Log(STATUS, "DNS IPv6 Addresses for ", hs.GetHostname(), "=", vals)
+		log.Log(STATUS, "DNS IPv6 Addresses for ", me.statusOS.GetHostname(), "=", vals)
 		if len(vals) == 0 {
 			s = "(none)"
 		} else {
@@ -324,8 +311,8 @@ func (hs *hostnameStatus) updateStatus() {
 		}
 		hs.set(hs.dnsAAAA, s)
 
-		vals = lookupDoH(hs.GetHostname(), "A")
-		log.Log(STATUS, "IPv4 Addresses for ", hs.GetHostname(), "=", vals)
+		vals = lookupDoH(me.statusOS.GetHostname(), "A")
+		log.Log(STATUS, "IPv4 Addresses for ", me.statusOS.GetHostname(), "=", vals)
 		s = strings.Join(vals, "\n")
 		if (s == "") {
 			s = "(none)"
@@ -333,7 +320,7 @@ func (hs *hostnameStatus) updateStatus() {
 		}
 		hs.set(hs.dnsA, s)
 
-		vals = lookupDoH(hs.GetHostname(), "CNAME")
+		vals = lookupDoH(me.statusOS.GetHostname(), "CNAME")
 		s = strings.Join(vals, "\n")
 		if (s != "") {
 			hs.set(hs.dnsA, "CNAME " + s)

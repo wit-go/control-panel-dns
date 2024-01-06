@@ -9,35 +9,6 @@ import 	(
 	"go.wit.com/log"
 )
 
-// this doesn't work
-/*
-func watchNetworkInterfaces() {
-	// Get list of network interfaces
-	interfaces, _ := net.Interfaces()
-
-	// Set up a notification channel
-	notification := make(chan net.Interface)
-
-	log.Log(NET, "watchNet()")
-	// Start goroutine to watch for changes
-	go func() {
-		log.Log(NET, "watchNet() func")
-		for {
-			log.Log(NET, "forever loop start")
-			// Check for changes in each interface
-			for _, i := range interfaces {
-				log.Log(NET, "something on i =", i)
-				if status := i.Flags & net.FlagUp; status != 0 {
-					notification <- i
-					log.Log(NET, "something on i =", i)
-				}
-			}
-			log.Log(NET, "forever loop end")
-		}
-	}()
-}
-*/
-
 func IsIPv6(address string) bool {
 	return strings.Count(address, ":") >= 2
 }
@@ -59,43 +30,6 @@ func IsReal(ip *net.IP) bool {
 	} else {
 		log.Log(NET, "\t\tIP is Real = true")
 		return true
-	}
-}
-
-func renameInterface(i *net.Interface) {
-	/*
-	/sbin/ip link set eth1 down
-	/sbin/ip link set eth1 name eth123
-	/sbin/ip link set eth123 up
-	*/
-}
-
-// Will figure out if an interface was just added
-func checkInterface(i net.Interface) {
-	val, ok := me.ifmap[i.Index]
-	if ! ok {
-		log.Info(i.Name, "is a new network interface. The linux kernel index =", i.Index)
-		me.ifmap[i.Index] = new(IFtype)
-		me.ifmap[i.Index].gone = false
-		me.ifmap[i.Index].iface = &i
-		me.changed = true
-		if (me.Interfaces != nil) {
-			me.Interfaces.AddText(i.Name)
-			me.Interfaces.SetText(i.Name)
-		}
-		return
-	}
-	me.ifmap[i.Index].gone = false
-	log.Log(NET, "me.ifmap[i] does exist. Need to compare everything.", i.Index, i.Name, val.iface.Index, val.iface.Name)
-	if (val.iface.Name != i.Name) {
-		log.Info(val.iface.Name, "has changed to it's name to", i.Name)
-		me.ifmap[i.Index].iface = &i
-		me.changed = true
-		if (me.Interfaces != nil) {
-			me.Interfaces.AddText(i.Name)
-			me.Interfaces.SetText(i.Name)
-		}
-		return
 	}
 }
 
@@ -154,30 +88,4 @@ func checkDNS() (map[string]*IPtype, map[string]*IPtype) {
 		}
 	}
 	return ipv6s, ipv4s
-}
-
-// delete network interfaces and ip addresses from the gui
-func deleteChanges2() bool {
-	var changed bool = false
-	for i, t := range me.ifmap {
-		if (t.gone) {
-			log.Log(CHANGE, "DELETE int =", i, "name =", t.name, t.iface)
-			delete(me.ifmap, i)
-			changed = true
-		}
-		t.gone = true
-	}
-	for s, t := range me.ipmap {
-		if (t.gone) {
-			log.Log(CHANGE, "DELETE name =", s, "IPv4 =", t.ipv4)
-			log.Log(CHANGE, "DELETE name =", s, "IPv6 =", t.ipv6)
-			log.Log(CHANGE, "DELETE name =", s, "iface =", t.iface)
-			log.Log(CHANGE, "DELETE name =", s, "ip =", t.ip)
-			delete(me.ipmap, s)
-			changed = true
-		}
-		t.gone = true
-	}
-
-	return changed
 }

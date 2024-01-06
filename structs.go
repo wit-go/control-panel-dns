@@ -19,9 +19,7 @@ type Host struct {
 	statusOS	*linuxstatus.LinuxStatus		// what the Linux OS sees
 
 	hostnameStatus	*gui.Node		// a summary for the user of where things are
-
-	// domainname	*gui.Node		// kernel.org
-	hostshort	*gui.Node		// hostname -s
+	hostname	*gadgets.OneLiner	// the hostname grabbed from gadget.linuxStatus
 
 	artificialSleep float64	`default:"0.7"`	// artificial sleep on startup
 	artificialS     string 	`default:"abc"`	// artificial sleep on startup
@@ -50,18 +48,13 @@ type Host struct {
 	notes		*gui.Node		// using this to put notes here
 
 	// local OS settings, network interfaces, etc
-//	uid		*gui.Node		// user
-	fqdn		*gui.Node		// display the full hostname
-	// IPv4		*gui.Node		// show valid IPv4 addresses
-	// IPv6		*gui.Node		// show valid IPv6 addresses
-	Interfaces	*gui.Node		// Interfaces
-	LocalSpeedActual *gui.Node		// the time it takes to check each network interface
+//	fqdn		*gui.Node		// display the full hostname
+//	Interfaces	*gui.Node		// Interfaces
+//	LocalSpeedActual *gui.Node		// the time it takes to check each network interface
 
 	// DNS stuff
-	// NSrr		*gui.Node		// NS resource records for the domain name
 	DnsAPI		*gui.Node		// what DNS API to use?
 	DnsAAAA		*gadgets.OneLiner	// the actual DNS AAAA results
-	// workingIPv6	*gui.Node		// currently working AAAA
 	DnsA		*gui.Node		// the actual DNS A results (ignore for status since mostly never happens?)
 	DnsStatus	*gui.Node		// the current state of DNS
 	DnsSpeed	*gui.Node		// 'FAST', 'OK', 'SLOW', etc

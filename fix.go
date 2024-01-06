@@ -11,10 +11,10 @@ func fix() bool {
 		log.Warn("The IPv6 Control Panel is not Ready() yet")
 		return false
 	}
-	if me.status.ValidHostname() {
-		log.Warn("Your hostname is VALID:", me.status.GetHostname())
+	if me.statusOS.ValidHostname() {
+		log.Warn("Your hostname is VALID:", me.statusOS.GetHostname())
 	} else {
-		log.Warn("You must first fix your hostname:", me.status.GetHostname())
+		log.Warn("You must first fix your hostname:", me.statusOS.GetHostname())
 		return false
 	}
 	if me.digStatus.IPv4() {

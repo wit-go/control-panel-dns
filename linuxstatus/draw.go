@@ -9,7 +9,7 @@ import 	(
 // it's assumed you are always passing in a box
 func draw(ls *LinuxStatus) {
 	if ! ls.Ready() {return}
-	ls.group = ls.window.Box().NewGroup("What Linux Says It Is")
+	ls.group = ls.window.Box().NewGroup("What Linux Knows It Is")
 
 	ls.grid = ls.group.NewGrid("gridnuts", 2, 2)
 

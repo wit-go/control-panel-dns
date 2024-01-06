@@ -207,8 +207,8 @@ func (ds *digStatus) updateDnsStatus() {
 	ipv4, ipv6 = ds.dsCloudflare.update()
 	ipv4, ipv6 = ds.dsGoogle.update()
 
-	if me.status.ValidHostname() {
-		if ds.checkLookupDoH(me.status.GetHostname()) {
+	if me.statusOS.ValidHostname() {
+		if ds.checkLookupDoH(me.statusOS.GetHostname()) {
 			log.Log(DNS, "updateDnsStatus() HTTP DNS lookups working")
 			me.digStatus.set(ds.statusHTTP, "WORKING")
 		} else {

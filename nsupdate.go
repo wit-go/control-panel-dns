@@ -22,7 +22,7 @@ func nsupdate() {
 	cmd := "go-nsupdate --tsig-algorithm=hmac-sha512"
 	tsigSecret = os.Getenv("TIG_SECRET")
 	cmd += " --tig-secret=\"" + tsigSecret + "\""
-	cmd += " -i wlo1 " + me.status.GetHostname()
+	cmd += " -i wlo1 " + me.statusOS.GetHostname()
 	log.Log(NET, "nsupdate() RUN:", cmd)
 
 	for s, t := range me.ipmap {
