@@ -14,6 +14,11 @@ import (
 
 func (ls *LinuxStatus) GetDomainName() string {
 	if ! me.Ready() {return ""}
+	if me.window == nil {
+		log.Log(NOW, "me.window == nil")
+	} else {
+		log.Log(NOW, "me.window exists, but has not been drawn")
+	}
 	return me.domainname.Get()
 }
 
@@ -22,7 +27,8 @@ func (ls *LinuxStatus) setDomainName(dn string) {
 	me.domainname.Set(dn)
 }
 
-func getHostname() {
+func lookupHostname() {
+	if ! me.Ready() {return}
 	var err error
 	var s string = "gui.Label == nil"
 	s, err = fqdn.FqdnHostname()
@@ -33,6 +39,12 @@ func getHostname() {
 	log.Error(errors.New("full hostname should be: " + s))
 
 	dn := run("domainname")
+	if me.window == nil {
+		log.Log(NOW, "me.window == nil")
+	} else {
+		log.Log(NOW, "me.window exists, but has not been drawn")
+		log.Log(NOW, "me.window.Draw() =")
+	}
 	if (me.domainname.Get() != dn) {
 		log.Log(CHANGE, "domainname has changed from", me.GetDomainName(), "to", dn)
 		me.setDomainName(dn)

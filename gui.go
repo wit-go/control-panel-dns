@@ -228,21 +228,19 @@ func mainWindow(title string) {
 	})
 	gr.NewButton("linuxstatus.New()", func () {
 		me.statusOS = linuxstatus.New()
-	})
-	gr.NewButton("SetParent()", func () {
 		me.statusOS.SetParent(me.myGui)
-	})
-	gr.NewButton("InitWindow()", func () {
 		me.statusOS.InitWindow()
-	})
-	gr.NewButton("statusOS.Draw()", func () {
-		me.statusOS.Draw()
-	})
-	gr.NewButton("statusOS.Draw2()", func () {
-		me.statusOS.Draw2()
 	})
 	gr.NewButton("statusOS.Ready()", func () {
 		me.statusOS.Ready()
+	})
+	gr.NewButton("statusOS.Make()", func () {
+		me.statusOS.Make()
+		me.statusOS.Draw2()
+	})
+	gr.NewButton("statusOS.Draw()", func () {
+		me.statusOS.Draw()
+		me.statusOS.Draw2()
 	})
 	gr.NewButton("statusOS.Update()", func () {
 		me.statusOS.Update()

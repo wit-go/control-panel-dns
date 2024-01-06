@@ -14,7 +14,7 @@ import 	(
 
 func linuxLoop() {
 	me.changed = false
-	duration := timeFunction(getHostname)
+	duration := timeFunction(lookupHostname)
 	log.Log(INFO, "getHostname() execution Time: ", duration, "me.changed =", me.changed)
 
 	duration = timeFunction(scanInterfaces)

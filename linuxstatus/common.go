@@ -6,10 +6,17 @@ import 	(
 	"go.wit.com/gui/gui"
 )
 
-func (ls *LinuxStatus) Draw() {
-	log.Log(CHANGE, "linuxStatus.Draw() window")
+func (ls *LinuxStatus) Make() {
+	log.Log(CHANGE, "Draw() window")
 	if ! ls.Ready() {return}
-	log.Log(CHANGE, "linuxStatus.Draw() window ready =", ls.ready)
+	log.Log(CHANGE, "Draw() window ready =", ls.ready)
+	ls.window.Make()
+	ls.ready = true
+}
+func (ls *LinuxStatus) Draw() {
+	log.Log(CHANGE, "Draw() window")
+	if ! ls.Ready() {return}
+	log.Log(CHANGE, "Draw() window ready =", ls.ready)
 	ls.window.Draw()
 	ls.ready = true
 }
@@ -21,25 +28,25 @@ func (ls *LinuxStatus) Draw2() {
 }
 
 func (ls *LinuxStatus) Show() {
-	log.Log(CHANGE, "linuxStatus.Show() window")
+	log.Log(CHANGE, "Show() window")
 	if ! ls.Ready() {return}
-	log.Log(CHANGE, "linuxStatus.Show() window ready =", ls.ready)
+	log.Log(CHANGE, "Show() window ready =", ls.ready)
 	ls.window.Show()
 	ls.hidden = false
 }
 
 func (ls *LinuxStatus) Hide() {
-	log.Log(CHANGE, "linuxStatus.Hide() window")
+	log.Log(CHANGE, "Hide() window")
 	if ! ls.Ready() {return}
-	log.Log(CHANGE, "linuxStatus.Hide() window ready =", ls.ready)
+	log.Log(CHANGE, "Hide() window ready =", ls.ready)
 	ls.window.Hide()
 	ls.hidden = true
 }
 
 func (ls *LinuxStatus) Toggle() {
-	log.Log(CHANGE, "linuxStatus.Toggle() window")
+	log.Log(CHANGE, "Toggle() window")
 	if ! ls.Ready() {return}
-	log.Log(CHANGE, "linuxStatus.Toggle() window ready =", ls.ready)
+	log.Log(CHANGE, "Toggle() window ready =", ls.ready)
 	if ls.hidden {
 		ls.Show()
 	} else {
@@ -48,7 +55,7 @@ func (ls *LinuxStatus) Toggle() {
 }
 
 func (ls *LinuxStatus) Ready() bool {
-	log.Log(CHANGE, "Ready() ls =", ls)
+	log.Log(CHANGE, "Ready()")
 	if me == nil {return false}
 	if ls == nil {return false}
 	if ls.window == nil {return false}
@@ -56,7 +63,7 @@ func (ls *LinuxStatus) Ready() bool {
 }
 
 func (ls *LinuxStatus) Initialized() bool {
-	log.Log(CHANGE, "checking Initialized() ls =", ls)
+	log.Log(CHANGE, "checking Initialized()")
 	if me == nil {return false}
 	if ls == nil {return false}
 	if ls.parent == nil {return false}
@@ -64,7 +71,7 @@ func (ls *LinuxStatus) Initialized() bool {
 }
 
 func (ls *LinuxStatus) SetParent(p *gui.Node) {
-	log.Log(CHANGE, "Attempting SetParent =", p)
+	log.Log(CHANGE, "Attempting SetParent")
 	if me == nil {return}
 	if ls == nil {return}
 	if ls.parent == nil {
