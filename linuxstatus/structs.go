@@ -27,9 +27,10 @@ type LinuxStatus struct {
 	group	*gui.Node
 	grid	*gui.Node
 
+	hostnameStatus	*gadgets.OneLiner
+	hostname	*gadgets.OneLiner
 	hostshort	*gadgets.OneLiner
 	domainname	*gadgets.OneLiner
-	fqdn		*gadgets.OneLiner
 	resolver	*gadgets.OneLiner
 	uid		*gadgets.OneLiner
 	IPv4		*gadgets.OneLiner

@@ -153,8 +153,9 @@ func dnsTTL() {
 	updateDNS()
 }
 
+// run update on the LinuxStatus() window
 func linuxLoop() {
-	// me.IPv6.SetText(all)
+	me.statusOS.Update()
 
 	if (me.statusOS.Changed()) {
 		stamp := time.Now().Format("2006/01/02 15:04:05")

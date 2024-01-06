@@ -3,8 +3,6 @@
 package linuxstatus
 
 import (
-	"errors"
-
 	"go.wit.com/log"
 	"go.wit.com/shell"
 
@@ -14,11 +12,6 @@ import (
 
 func (ls *LinuxStatus) GetDomainName() string {
 	if ! me.Ready() {return ""}
-	if me.window == nil {
-		log.Log(NOW, "me.window == nil")
-	} else {
-		log.Log(NOW, "me.window exists, but has not been drawn")
-	}
 	return me.domainname.Get()
 }
 
@@ -26,12 +19,6 @@ func (ls *LinuxStatus) setDomainName() {
 	if ! me.Ready() {return}
 
 	dn := run("domainname")
-	if me.window == nil {
-		log.Log(NOW, "me.window == nil")
-	} else {
-		log.Log(NOW, "me.window exists, but has not been drawn")
-		log.Log(NOW, "me.window.Draw() =")
-	}
 	if (me.domainname.Get() != dn) {
 		log.Log(CHANGE, "domainname has changed from", me.GetDomainName(), "to", dn)
 		me.domainname.Set(dn)
@@ -39,13 +26,23 @@ func (ls *LinuxStatus) setDomainName() {
 	}
 }
 
+func (ls *LinuxStatus) GetHostname() string {
+	if ! me.Ready() {return ""}
+	return me.hostname.Get()
+}
+
+func (ls *LinuxStatus) setHostname(newname string) {
+	if ! me.Ready() {return}
+	if newname ==  me.hostname.Get() {
+		return
+	}
+	log.Log(CHANGE, "hostname has changed from", me.GetHostname(), "to", newname)
+	me.hostname.Set(newname)
+	me.changed = true
+}
+
 func (ls *LinuxStatus) GetHostShort() string {
 	if ! me.Ready() {return ""}
-	if me.window == nil {
-		log.Log(NOW, "me.window == nil")
-	} else {
-		log.Log(NOW, "me.window exists, but has not been drawn")
-	}
 	return me.hostshort.Get()
 }
 
@@ -62,35 +59,49 @@ func (ls *LinuxStatus) setHostShort() {
 func lookupHostname() {
 	if ! me.Ready() {return}
 	var err error
-	var s string = "gui.Label == nil"
-	s, err = fqdn.FqdnHostname()
+	var hostfqdn string = "broken"
+	hostfqdn, err = fqdn.FqdnHostname()
 	if (err != nil) {
 		log.Error(err, "FQDN hostname error")
 		return
 	}
-	log.Error(errors.New("full hostname should be: " + s))
+	log.Log(NET, "full hostname should be: ", hostfqdn)
 
 	me.setDomainName()
 	me.setHostShort()
 
-	/*
+	// these are authoritative
+	// if they work wrong, your linux configuration is wrong.
+	// Do not complain.
+	// Fix your distro if your box is otherwise not working this way
+	hshort := me.GetHostShort() // from `hostname -s`
+	dn := me.GetDomainName() // from `domanname`
+	hostname := me.GetHostname() // from `hostname -f`
+
+	if hostfqdn != hostname {
+		log.Log(WARN, "hostname", hostname, "does not equal fqdn.FqdnHostname()", hostfqdn)
+		// TODO: figure out what is wrong
+	}
+
 	var test string
 	test = hshort + "." + dn
-	if (me.status.GetHostname() != test) {
-		log.Log(CHANGE, "me.hostname", me.status.GetHostname(), "does not equal", test)
-		if (me.hostnameStatus.S != "BROKEN") {
-			log.Log(CHANGE, "me.hostname", me.status.GetHostname(), "does not equal", test)
+
+	me.setHostname(test)
+
+	if (hostname != test) {
+		log.Log(CHANGE, "hostname", hostname, "does not equal", test)
+		if (me.hostnameStatus.Get() != "BROKEN") {
+			log.Log(CHANGE, "hostname", hostname, "does not equal", test)
 			me.changed = true
-			me.hostnameStatus.SetText("BROKEN")
+			me.hostnameStatus.Set("BROKEN")
 		}
 	} else {
-		if (me.hostnameStatus.S != "VALID") {
-			log.Log(CHANGE, "me.hostname", me.status.GetHostname(), "is valid")
-			me.hostnameStatus.SetText("VALID")
+		if (me.hostnameStatus.Get() != "VALID") {
+			log.Log(CHANGE, "hostname", hostname, "is valid")
+			me.hostnameStatus.Set("VALID")
 			me.changed = true
 		}
 	}
-	*/
 }
 
 // returns true if the hostname is good

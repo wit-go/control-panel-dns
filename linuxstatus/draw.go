@@ -15,7 +15,8 @@ func draw(ls *LinuxStatus) {
 
 	ls.grid.SetNext(1,1)
 
-	ls.fqdn		= gadgets.NewOneLiner(ls.grid, "hostname -f")
+	ls.hostnameStatus	= gadgets.NewOneLiner(ls.grid, "status")
+	ls.hostname	= gadgets.NewOneLiner(ls.grid, "hostname -f")
 	ls.hostshort	= gadgets.NewOneLiner(ls.grid, "hostname -s")
 	ls.domainname	= gadgets.NewOneLiner(ls.grid, "domain name")
 	ls.resolver	= gadgets.NewOneLiner(ls.grid, "nameservers =")
