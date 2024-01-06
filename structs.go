@@ -6,6 +6,7 @@ import 	(
 	"time"
 	"go.wit.com/gui/gui"
 	"go.wit.com/gui/gadgets"
+
 	"github.com/miekg/dns"
 )
 
@@ -13,10 +14,13 @@ import 	(
 var me Host
 
 type Host struct {
-	hostname	string			// mirrors
+	status		*hostnameStatus		// keeps track of the hostname and it's status
+
+	hostnameStatus	*gui.Node		// a summary for the user of where things are
+
+	// hostname	string			// mirrors
 	domainname	*gui.Node		// kernel.org
 	hostshort	*gui.Node		// hostname -s
-	hostnameStatusOLD	*gui.Node		// is the hostname configured correctly in the OS?
 	// fqdn		string			// mirrors.kernel.org
 
 //	dnsTTL		int	`default:"3"`	// Recheck DNS is working every TTL (in seconds)
@@ -59,7 +63,7 @@ type Host struct {
 	// DNS stuff
 	NSrr		*gui.Node		// NS resource records for the domain name
 	DnsAPI		*gui.Node		// what DNS API to use?
-	DnsAAAA		*gui.Node		// the actual DNS AAAA results
+	DnsAAAA		*gadgets.OneLiner	// the actual DNS AAAA results
 	workingIPv6	*gui.Node		// currently working AAAA
 	DnsA		*gui.Node		// the actual DNS A results (ignore for status since mostly never happens?)
 	DnsStatus	*gui.Node		// the current state of DNS
@@ -81,7 +85,6 @@ type Host struct {
 	statusIPv6	*gadgets.OneLiner
 	digStatusButton *gui.Node
 
-	hostnameStatus		*hostnameStatus
 	hostnameStatusButton	*gui.Node
 
 	myDebug			*gui.Node

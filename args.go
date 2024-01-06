@@ -18,11 +18,13 @@ var args struct {
 	VerboseDNS bool  `arg:"--verbose-dns" help:"debug your dns settings"`
 }
 
-var NET log.LogFlag
 var NOW log.LogFlag
+var NET log.LogFlag
+var DNS log.LogFlag
 var PROC log.LogFlag
 var SPEW log.LogFlag
 var CHANGE log.LogFlag
+var STATUS log.LogFlag
 
 func init() {
 	arg.MustParse(&args)
@@ -39,6 +41,12 @@ func init() {
 	NET.Subsystem = "cpdns"
 	NET.Desc = "Network logging"
 	NET.Register()
+
+	DNS.B = false
+	DNS.Name = "DNS"
+	DNS.Subsystem = "cpdns"
+	DNS.Desc = "dnsStatus.update()"
+	DNS.Register()
 
 	PROC.B = false
 	PROC.Name = "PROC"
@@ -57,6 +65,12 @@ func init() {
 	CHANGE.Subsystem = "cpdns"
 	CHANGE.Desc = "show droplet state changes"
 	CHANGE.Register()
+
+	STATUS.B = false
+	STATUS.Name = "STATUS"
+	STATUS.Subsystem = "cpdns"
+	STATUS.Desc = "updateStatus()"
+	STATUS.Register()
 
 	if debugger.ArgDebug() {
 		log.Log(true, "INIT() gui debug == true")

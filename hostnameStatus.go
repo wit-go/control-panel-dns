@@ -23,7 +23,8 @@ type hostnameStatus struct {
 	ready		bool
 	hidden		bool
 
-	hostname	string // my hostname. Example: "test.wit.com"
+	// hostname	string // my hostname. Example: "test.wit.com"
+	lastname	string // used to watch for changes in the hostname
 
 	window		*gadgets.BasicWindow
 
@@ -60,9 +61,9 @@ func NewHostnameStatusWindow(p *gui.Node) *hostnameStatus {
 
 	hs.ready = false
 	hs.hidden = true
-	hs.hostname = me.hostname
+	// hs.hostname = me.hostname
 
-	hs.window = gadgets.NewBasicWindow(p, hs.hostname + " Status")
+	hs.window = gadgets.NewBasicWindow(p, "fix hostname here" + " Status")
 	hs.window.Draw()
 	hs.window.Hide()
 
@@ -116,6 +117,25 @@ func NewHostnameStatusWindow(p *gui.Node) *hostnameStatus {
 	return hs
 }
 
+func (hs *hostnameStatus) ValidHostname() bool {
+	return goodHostname()
+}
+
+func (hs *hostnameStatus) GetHostname() string {
+	return hs.lastname
+}
+
+func (hs *hostnameStatus) SetHostname(hostname string) {
+	if hostname == hs.lastname {return}
+	log.Log(CHANGE, "the hostname is changing from", hs.lastname, "to", hostname)
+	hs.lastname = hostname
+	me.changed = true
+
+	if (me.fqdn != nil) {
+		me.fqdn.SetText(hostname)
+	}
+}
+
 func (hs *hostnameStatus) Domain() string {
 	if ! hs.Ready() {return ""}
 	return hs.domainname.Get()
@@ -128,26 +148,26 @@ func (hs *hostnameStatus) API() string {
 
 func (hs *hostnameStatus) deleteDNSrecord(value string) bool {
 	log.Info("deleteDNSrecord() START for", value)
-	log.Info("deleteDNSrecord() hostname =", me.hostname)
+	log.Info("deleteDNSrecord() hostname =", me.status.GetHostname())
 	log.Info("deleteDNSrecord() domain =", hs.Domain())
 	log.Info("deleteDNSrecord() DNS API Provider =", hs.API())
 
 	if (hs.API() == "cloudflare") {
 		log.Info("deleteDNSrecord() Try to delete via cloudflare")
-		return cloudflare.Delete(hs.Domain(), me.hostname, value)
+		return cloudflare.Delete(hs.Domain(), me.status.GetHostname(), value)
 	}
 	return false
 }
 
 func (hs *hostnameStatus) createDNSrecord(value string) bool {
 	log.Info("createDNSrecord() START for", value)
-	log.Info("createDNSrecord() hostname =", me.hostname)
+	log.Info("createDNSrecord() hostname =", me.status.GetHostname())
 	log.Info("createDNSrecord() domain =", hs.Domain())
 	log.Info("createDNSrecord() DNS API Provider =", hs.API())
 
 	if (hs.API() == "cloudflare") {
-		log.Warn("createDNSrecord() Try to delete via cloudflare:", me.hostname, value)
-		return cloudflare.Create(hs.Domain(), me.hostname, value)
+		log.Warn("createDNSrecord() Try to create via cloudflare:", me.status.GetHostname(), value)
+		return cloudflare.Create(hs.Domain(), me.status.GetHostname(), value)
 	}
 	return false
 }
@@ -229,15 +249,21 @@ func (hs *hostnameStatus) set(a any, s string) {
 	if reflect.TypeOf(a) == reflect.TypeOf(ol) {
 		ol = a.(*gadgets.OneLiner)
 		if ol == nil {
-			log.Println("ol = nil", reflect.TypeOf(a), "a =", a)
+			// log.Println("ol = nil", reflect.TypeOf(a), "a =", a)
 			return
 		}
-		log.Println("SETTING ol:", ol)
+		// log.Println("SETTING ol:", ol)
 		ol.Set(s)
 		return
 	}
 	log.Warn("unknown type TypeOf(a) =", reflect.TypeOf(a), "a =", a)
 	os.Exit(0)
+}
+
+// returns true if AAAA record already exists in DNS
+func (hs *hostnameStatus) existsAAAA(s string) bool {
+	log.Log(NOW, "existsAAAA() try to see if AAAA is already set", s)
+	return false
 }
 
 // figure out if I'm missing any IPv6 address in DNS
@@ -246,63 +272,70 @@ func (hs *hostnameStatus) missingAAAA() bool {
 	aaaa = dhcpAAAA()
 	for _, s := range aaaa {
 		log.Log(NET, "my actual AAAA = ",s)
-		hs.dnsValue.SetText(s)
-		hs.dnsAction.SetText("CREATE")
-		return true
+		if hs.existsAAAA(s) {
+			log.Log(NOW, "my actual AAAA already exists in DNS =",s)
+		} else {
+			log.Log(NOW, "my actual AAAA is missing from DNS",s)
+			hs.dnsValue.SetText(s)
+			hs.dnsAction.SetText("CREATE")
+			return true
+		}
 	}
 
 	return false
 }
 
 func (hs *hostnameStatus) updateStatus() {
+	if ! hs.Ready() { return }
 	var s string
 	var vals []string
-	log.Info("updateStatus() START")
-	if ! hs.Ready() { return }
+	log.Log(STATUS, "updateStatus() START")
 
 	hs.hostShort.Set(me.hostshort.S)
 	hs.domainname.Set(me.domainname.S)
 
-	vals = lookupDoH(hs.hostname, "AAAA")
+	if hs.ValidHostname() {
+		vals = lookupDoH(hs.GetHostname(), "AAAA")
 
-	log.Println("DNS IPv6 Addresses for ", hs.hostname, "=", vals)
-	if len(vals) == 0 {
-		s = "(none)"
-		hs.setIPv6("Check for real IPv6 addresses here")
-		if hs.missingAAAA() {
-			hs.setIPv6("Add the missing IPv6 address")
+		log.Log(STATUS, "DNS IPv6 Addresses for ", hs.GetHostname(), "=", vals)
+		if len(vals) == 0 {
+			s = "(none)"
+		} else {
+			hs.setIPv6("Check for real IPv6 addresses here")
+			if hs.missingAAAA() {
+				hs.setIPv6("Add the missing IPv6 address")
+			}
+			for _, addr := range vals {
+				log.Log(STATUS, addr)
+				s += addr + " (DELETE)" + "\n"
+				hs.setIPv6("NEEDS DELETE")
+				hs.dnsValue.SetText(addr)
+				hs.dnsAction.SetText("DELETE")
+			}
 		}
-	} else {
-		for _, addr := range vals {
-			log.Println(addr)
-			s += addr + " (DELETE)"
-			hs.setIPv6("NEEDS DELETE")
-			hs.dnsValue.SetText(addr)
-			hs.dnsAction.SetText("DELETE")
+		hs.set(hs.dnsAAAA, s)
+
+		vals = lookupDoH(hs.GetHostname(), "A")
+		log.Log(STATUS, "IPv4 Addresses for ", hs.GetHostname(), "=", vals)
+		s = strings.Join(vals, "\n")
+		if (s == "") {
+			s = "(none)"
+			hs.setIPv4("NEEDS CNAME")
 		}
-	}
-	hs.set(hs.dnsAAAA, s)
+		hs.set(hs.dnsA, s)
 
-	vals = lookupDoH(hs.hostname, "A")
-	log.Println("IPv4 Addresses for ", hs.hostname, "=", vals)
-	s = strings.Join(vals, "\n")
-	if (s == "") {
-		s = "(none)"
-		hs.setIPv4("NEEDS CNAME")
-	}
-	hs.set(hs.dnsA, s)
-
-	vals = lookupDoH(hs.hostname, "CNAME")
-	s = strings.Join(vals, "\n")
-	if (s != "") {
-		hs.set(hs.dnsA, "CNAME " + s)
-		hs.setIPv4("GOOD")
+		vals = lookupDoH(hs.GetHostname(), "CNAME")
+		s = strings.Join(vals, "\n")
+		if (s != "") {
+			hs.set(hs.dnsA, "CNAME " + s)
+			hs.setIPv4("GOOD")
+		}
 	}
 
 	hs.currentIPv4.Set(me.IPv4.S)
 	hs.currentIPv6.Set(me.IPv6.S)
 
-	if hs.IPv4() && hs.IPv4() {
+	if hs.IPv4() && hs.IPv6() {
 		hs.status.Set("GOOD")
 	} else {
 		hs.status.Set("BROKEN")
@@ -312,7 +345,7 @@ func (hs *hostnameStatus) updateStatus() {
 }
 
 func (hs *hostnameStatus) Show() {
-	log.Info("hostnameStatus.Show() window")
+	log.Log(STATUS, "hostnameStatus.Show() window")
 	if hs.hidden {
 		hs.window.Show()
 	}
@@ -320,7 +353,7 @@ func (hs *hostnameStatus) Show() {
 }
 
 func (hs *hostnameStatus) Hide() {
-	log.Info("hostnameStatus.Hide() window")
+	log.Log(STATUS, "hostnameStatus.Hide() window")
 	if ! hs.hidden {
 		hs.window.Hide()
 	}
