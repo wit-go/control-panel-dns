@@ -4,8 +4,6 @@ package main
 import 	(
 	"time"
 	"os"
-	"os/user"
-	"strconv"
 	"strings"
 
 	"go.wit.com/log"
@@ -14,6 +12,7 @@ import 	(
 	"go.wit.com/gui/gadgets"
 	"go.wit.com/gui/cloudflare"
 	"go.wit.com/gui/debugger"
+	"go.wit.com/control-panels/dns/linuxstatus"
 )
 
 // This setups up the dns control panel window
@@ -51,7 +50,7 @@ func detailsTab(title string) {
 	me.NSrr = grid.NewLabel("NS RR's")
 
 	grid.NewLabel("UID =")
-	me.uid = grid.NewLabel("my uid")
+	grid.NewLabel("DEPRECATED")
 
 	grid.NewLabel("Current IPv4 =")
 	me.IPv4 = grid.NewLabel("?")
@@ -227,8 +226,20 @@ func mainWindow(title string) {
 	gr.NewButton("OS details", func () {
 		me.details.Toggle()
 	})
-	gr.NewButton("Linux details", func () {
+	gr.NewButton("linuxstatus.New()", func () {
+		me.statusOS = linuxstatus.New()
+	})
+	gr.NewButton("statusOS.Ready()", func () {
+		me.statusOS.Ready()
+	})
+	gr.NewButton("statusOS.Draw()", func () {
+		me.statusOS.Ready()
+	})
+	gr.NewButton("statusOS.Update()", func () {
 		me.statusOS.Update()
+	})
+	gr.NewButton("Linux details", func () {
+		me.statusOS.Toggle()
 	})
 	gr.NewButton("resolver status", func () {
 		if ! me.digStatus.Ready() {return}
@@ -347,11 +358,6 @@ func updateDNS() {
 
 	// me.fix.Enable()
 
-	user, _ := user.Current()
-	log.Println("os.Getuid =", user.Username, os.Getuid())
-	if (me.uid != nil) {
-		me.uid.SetText(user.Username + " (" + strconv.Itoa(os.Getuid()) + ")")
-	}
 
 	// lookup the NS records for your domain
 	// if your host is test.wit.com, find the NS resource records for wit.com

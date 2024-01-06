@@ -5,6 +5,8 @@
 package linuxstatus
 
 import 	(
+	"os"
+	"os/user"
 	"strconv"
 
 	"go.wit.com/log"
@@ -29,6 +31,12 @@ func linuxLoop() {
 		all += s + "\n"
 	}
 	// me.IPv6.SetText(all)
+
+	user, _ := user.Current()
+	log.Println("os.Getuid =", user.Username, os.Getuid())
+	if (me.uid != nil) {
+		me.uid.Set(user.Username + " (" + strconv.Itoa(os.Getuid()) + ")")
+	}
 
 	/*
 	processName := getProcessNameByPort(53)
