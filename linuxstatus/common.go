@@ -5,30 +5,37 @@ import 	(
 	"go.wit.com/log"
 )
 
-func (hs *LinuxStatus) Show() {
+func (ls *LinuxStatus) Show() {
 	log.Log(CHANGE, "linuxStatus.Show() window")
-	hs.window.Show()
-	hs.hidden = false
+	ls.window.Show()
+	ls.hidden = false
 }
 
-func (hs *LinuxStatus) Hide() {
+func (ls *LinuxStatus) Hide() {
 	log.Log(CHANGE, "linuxStatus.Hide() window")
-	hs.window.Hide()
-	hs.hidden = true
+	ls.window.Hide()
+	ls.hidden = true
 }
 
-func (hs *LinuxStatus) Toggle() {
+func (ls *LinuxStatus) Toggle() {
 	log.Log(CHANGE, "linuxStatus.Toggle() window")
-	if hs.hidden {
-		hs.window.Show()
+	if ls.hidden {
+		ls.window.Show()
 	} else {
-		hs.window.Hide()
+		ls.window.Hide()
 	}
 }
 
-func (hs *LinuxStatus) Ready() bool {
+func (ls *LinuxStatus) Ready() bool {
 	if me == nil {return false}
-	if hs == nil {return false}
-	if hs.window == nil {return false}
+	if ls == nil {return false}
+	if ls.window == nil {return false}
 	return me.ready
+}
+
+func (ls *LinuxStatus) Initialized() bool {
+	if me == nil {return false}
+	if ls == nil {return false}
+	if ls.parent == nil {return false}
+	return true
 }

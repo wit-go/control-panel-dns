@@ -14,13 +14,14 @@ import (
 var me *LinuxStatus
 
 type LinuxStatus struct {
-	init		bool
-	ready		bool
-	hidden		bool
-	changed		bool
+	ready	bool
+	hidden	bool
+	changed	bool
 
-	ifmap		map[int]*IFtype		// the current interfaces
-	ipmap		map[string]*IPtype	// the current ip addresses
+	parent	*gui.Node
+
+	ifmap	map[int]*IFtype		// the current interfaces
+	ipmap	map[string]*IPtype	// the current ip addresses
 
 	window	*gadgets.BasicWindow
 	group	*gui.Node
