@@ -6,95 +6,103 @@ import 	(
 )
 
 func fix() bool {
-	log.Warn("")
+	log.Log(CHANGE, "")
 	if ! me.statusDNS.Ready() {
-		log.Warn("The IPv6 Control Panel is not Ready() yet")
+		log.Log(CHANGE, "The IPv6 Control Panel is not Ready() yet")
 		return false
 	}
 	if me.statusOS.ValidHostname() {
-		log.Warn("Your hostname is VALID:", me.statusOS.GetHostname())
+		log.Log(CHANGE, "Your hostname is VALID:", me.statusOS.GetHostname())
 	} else {
-		log.Warn("You must first fix your hostname:", me.statusOS.GetHostname())
+		log.Log(CHANGE, "You must first fix your hostname:", me.statusOS.GetHostname())
 		return false
 	}
 	if me.digStatus.IPv4() {
-		log.Warn("IPv4 addresses are resolving")
+		log.Log(CHANGE, "IPv4 addresses are resolving")
 	} else {
-		log.Warn("You must first figure out why you can't look up IPv4 addresses")
-		log.Warn("Are you on the internet at all?")
+		log.Log(CHANGE, "You must first figure out why you can't look up IPv4 addresses")
+		log.Log(CHANGE, "Are you on the internet at all?")
 		return false
 	}
 	if me.digStatus.IPv6() {
-		log.Warn("IPv6 addresses are resolving")
+		log.Log(CHANGE, "IPv6 addresses are resolving")
 	} else {
-		log.Warn("You must first figure out why you can't look up IPv6 addresses")
+		log.Log(CHANGE, "You must first figure out why you can't look up IPv6 addresses")
 		return false
 	}
 	if ! me.statusDNS.IPv4() {
-		log.Warn("You do not have real IPv4 addresses. Nothing to fix here") 
+		log.Log(CHANGE, "You do not have real IPv4 addresses. Nothing to fix here") 
 	}
 	if ! me.statusDNS.IPv6() {
-		log.Warn("IPv6 DNS is broken. Check what is broken here")
-		fixIPv6dns()
-		return false
+		log.Log(CHANGE, "IPv6 DNS is broken. Check what is broken here")
+		if fixIPv6dns() {
+			log.Log(CHANGE, "IPv6 DNS Repair is underway")
+			return false
+		}
 	}
-	log.Warn("YOU SHOULD BE IN IPv6 BLISS")
+	log.Log(CHANGE, "YOU SHOULD BE IN IPv6 BLISS")
 	return true
 }
 
-func fixIPv6dns() {
-	log.Warn("What are my IPv6 addresses?")
+func fixIPv6dns() bool {
+	log.Log(INFO, "What are my IPv6 addresses?")
+	var broken bool = false
 	osAAAA := make(map[string]string)
 	dnsAAAA := make(map[string]string)
 
 	for _, aaaa := range me.statusOS.GetIPv6() {
-		log.Warn("FOUND OS  AAAA ip", aaaa)
+		log.Log(INFO, "FOUND OS  AAAA ip", aaaa)
 		osAAAA[aaaa] = "os"
 	}
 
-	log.Warn("What are the AAAA resource records in DNS?")
+	log.Log(INFO, "What are the AAAA resource records in DNS?")
 	for _, aaaa := range me.statusDNS.GetIPv6() {
-		log.Warn("FOUND DNS AAAA ip", aaaa)
+		log.Log(INFO, "FOUND DNS AAAA ip", aaaa)
 		dnsAAAA[aaaa] = "dns"
 	}
 
 	// remove old DNS entries first
 	for aaaa, _ := range dnsAAAA {
 		if osAAAA[aaaa] == "dns" {
-			log.Warn("DNS AAAA is not in OS", aaaa)
+			log.Log(INFO, "DNS AAAA is not in OS", aaaa)
+			broken = true
 			if deleteFromDNS(aaaa) {
-				log.Warn("Delete AAAA", aaaa, "Worked")
+				log.Log(INFO, "Delete AAAA", aaaa, "Worked")
 			} else {
-				log.Warn("Delete AAAA", aaaa, "Failed")
+				log.Log(INFO, "Delete AAAA", aaaa, "Failed")
 			}
 		} else {
-			log.Warn("DNS AAAA is in     OS", aaaa)
+			log.Log(INFO, "DNS AAAA is in     OS", aaaa)
 		}
 	}
 
 	// now add new DNS entries
 	for aaaa, _ := range osAAAA {
 		if dnsAAAA[aaaa] == "dns" {
-			log.Warn("OS  AAAA is in     DNS", aaaa)
+			log.Log(INFO, "OS  AAAA is in     DNS", aaaa)
 		} else {
-			log.Warn("OS  AAAA is not in DNS", aaaa)
+			broken = true
+			log.Log(INFO, "OS  AAAA is not in DNS", aaaa)
 			if addToDNS(aaaa) {
-				log.Warn("Add AAAA", aaaa, "Worked")
+				log.Log(INFO, "Add AAAA", aaaa, "Worked")
 			} else {
-				log.Warn("Add AAAA", aaaa, "Failed")
+				log.Log(INFO, "Add AAAA", aaaa, "Failed")
 			}
 		}
 	}
+
+	// if anything doesn't match, return false
+	return broken
 }
 
 func deleteFromDNS(aaaa string) bool {
-	log.Warn("deleteFromDNS", aaaa)
+	log.Log(CHANGE, "deleteFromDNS", aaaa)
 	return false
 }
 
 func addToDNS(aaaa string) bool {
-	log.Warn("TODO: Add this to DNS !!!!", aaaa)
-	log.Warn("what is your API provider?")
+	log.Log(CHANGE, "TODO: Add this to DNS !!!!", aaaa)
+	log.Log(CHANGE, "what is your API provider?")
 	return false
 }
 
