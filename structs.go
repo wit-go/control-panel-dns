@@ -7,8 +7,8 @@ import 	(
 	"go.wit.com/gui/gui"
 	"go.wit.com/gui/gadgets"
 	// "go.wit.com/gui/cloudflare"
-	"go.wit.com/control-panels/dns/linuxstatus"
-	"go.wit.com/control-panels/dns/smartwindow"
+	"go.wit.com/wit/control-panel-dns/linuxstatus"
+	"go.wit.com/wit/control-panel-dns/smartwindow"
 
 	"github.com/miekg/dns"
 )

@@ -17,7 +17,7 @@ build:
 	-mkdir -p plugins/
 	-cp ~/go/src/go.wit.com/gui/toolkits/*.so plugins/
 	# GO111MODULE="off" go get -v -x .
-	GO111MODULE="off" go build -v -o control-panel-dns
+	GO111MODULE="off" go build -v
 
 # ./control-panel-dns.v1: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.34' not found (required by ./control-panel-dns.v1)
 # ./control-panel-dns.v1: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.32' not found (required by ./control-panel-dns.v1)

@@ -4,7 +4,7 @@ package main
 import 	(
 	"go.wit.com/log"
 	"go.wit.com/gui/cloudflare"
-	"go.wit.com/control-panels/dns/smartwindow"
+	"go.wit.com/wit/control-panel-dns/smartwindow"
 )
 
 func fix() bool {
