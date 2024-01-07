@@ -30,6 +30,7 @@ type Host struct {
 	hostnameStatus	*gui.Node		// a summary for the user of where things are
 	DnsAPIstatus	*gui.Node		// does your DNS API work?
 	APIprovider	string
+	apiButton	*gui.Node		// the button you click for the API config page
 
 	artificialSleep float64	`default:"0.7"`	// artificial sleep on startup
 	artificialS     string 	`default:"abc"`	// artificial sleep on startup

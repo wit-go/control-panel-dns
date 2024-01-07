@@ -177,19 +177,15 @@ func statusGrid(n *gui.Node) {
 
 	gridP.NewLabel("DNS API")
 	me.DnsAPIstatus = gridP.NewLabel("unknown")
-	var apiButton *gui.Node
-	apiButton = gridP.NewButton("unknown wit.com", func () {
+	me.apiButton = gridP.NewButton("unknown wit.com", func () {
 		log.Log(CHANGE, "WHAT API ARE YOU USING?")
 		provider := me.statusDNS.GetDNSapi()
-		apiButton.SetText(provider + " wit.com")
 		if provider == "cloudflare" {
-			me.DnsAPIstatus.Set("WORKING")
-			return
-
 			if me.witcom != nil {
 				me.witcom.Toggle()
+			} else {
+				me.witcom = cloudflare.CreateRR(me.myGui, "wit.com", "3777302ac4a78cd7fa4f6d3f72086d06")
 			}
-			me.witcom = cloudflare.CreateRR(me.myGui, "wit.com", "3777302ac4a78cd7fa4f6d3f72086d06")
 		}
 	})
 

@@ -95,6 +95,7 @@ func main() {
 		if provider != lastProvider {
 			log.Log(CHANGE, "Your DNS API provider appears to have changed to", provider)
 			lastProvider = provider
+			me.apiButton.SetText(provider + " wit.com")
 		}
 		if provider == "cloudflare" {
 			me.DnsAPIstatus.Set("WORKING")
@@ -102,7 +103,7 @@ func main() {
 	})
 
 	// probes the OS network settings
-	myTicker(500 * time.Millisecond, "me.statusOS,Update()", func() {
+	go myTicker(500 * time.Millisecond, "me.statusOS,Update()", func() {
 		duration := timeFunction( func() {
 			me.statusOS.Update()
 
@@ -123,6 +124,27 @@ func main() {
 		})
 		s := fmt.Sprint(duration)
 		me.statusOS.SetSpeedActual(s)
+	})
+
+	// check the four known things to see if they are all WORKING
+	myTicker(3 * time.Second, "MAIN LOOP", func() {
+		if me.hostnameStatus.GetText() != "WORKING" {
+			log.Log(CHANGE, "The hostname is not WORKING yet", me.hostnameStatus.GetText())
+			return
+		}
+		if me.statusIPv6.Get() != "WORKING" {
+			log.Log(CHANGE, "IPv6 DNS lookup has not been confirmed yet", me.statusIPv6.Get())
+			return
+		}
+		if me.DnsStatus.GetText() != "WORKING" {
+			log.Log(CHANGE, "Your IPv6 DNS settings have not been confirmed yet", me.DnsStatus.GetText()) 
+			return
+		}
+		if me.DnsAPIstatus.GetText() != "WORKING" {
+			log.Log(CHANGE, "The DNS API provider is not yet working", me.DnsAPIstatus.GetText())
+			return
+		}
+		log.Log(CHANGE, "EVERYTHING IS WORKING. YOU HAVE IPv6 BLISS")
 	})
 }
 
