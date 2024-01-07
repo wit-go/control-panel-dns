@@ -70,32 +70,6 @@ func debugTab(title string) {
 	me.debug.Hide()
 }
 
-/*
-// will return a AAAA value that needs to be deleted
-func deleteAAA() string {
-	var aaaa []string
-	aaaa = dhcpAAAA() // your AAAA IP addresses right now
-	for _, s := range aaaa {
-		log.Log(NOW, "DNS AAAA =", s)
-		if ( me.ipmap[s] == nil) {
-			return s
-		}
-	}
-	return ""
-}
-
-// will return a AAAA value that needs to be added
-func missingAAAA() string {
-	var aaaa []string
-	aaaa = dhcpAAAA() // your AAAA IP addresses right now
-	for _, s := range aaaa {
-		log.Log(NOW, "missing AAAA =", s)
-		return s
-	}
-	return ""
-}
-*/
-
 // doesn't actually do any network traffic
 // it just updates the GUI
 func displayDNS() string {
@@ -266,7 +240,7 @@ func updateDNS() {
 		var aaaa []string
 		h := me.statusOS.GetHostname()
 		aaaa = digAAAA(h)
-		log.Log(NOW, "digAAAA() for", h, "=", aaaa)
+		log.Log(INFO, "digAAAA() for", h, "=", aaaa)
 
 		// log.Println(SPEW, me)
 		if (aaaa == nil) {
