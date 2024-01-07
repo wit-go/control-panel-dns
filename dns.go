@@ -40,42 +40,16 @@ func (h *Host) setIPv4(ipv4s map[string]*IPtype) {
         }
 }
 
-/*
-func (h *Host) checkDNS() {
-	var ip4 bool = false
-	var ip6 bool = false
-
-	for s, t := range h.ipmap {
-		i := t.iface
-		ipt := "IPv4"
-		if (t.ipv6) {
-			ipt = "IPv6"
-		}
-		if (! t.IsReal()) {
-			log.Println(args.VerboseDNS, "\tIP is not Real", ipt, i.Index, i.Name, s)
-			continue
-		}
-
-		log.Println(args.VerboseDNS, "\tIP is Real    ", ipt, i.Index, i.Name, s)
-		if (t.ipv6) {
-			ip6 = true
-		} else {
-			ip4 = true
+func lookupNSprovider(domain string) string {
+	for s, d := range me.nsmap {
+		log.Log(CHANGE, "lookupNS() domain =", d, "server =", s)
+		if (domain == d) {
+			// figure out the provider (google, cloudflare, etc)
+			return s + " blah"
 		}
 	}
-
-	if (ip4 == true) {
-		log.Println(args.VerboseDNS, "IPv4 should work. Wow. You actually have a real IPv4 address")
-	} else {
-		log.Println(args.VerboseDNS, "IPv4 is broken. (be nice and setup ipv4-only.wit.com)")
-	}
-	if (ip6 == true) {
-		log.Println(args.VerboseDNS, "IPv6 should be working. Need to test it here.")
-	} else {
-		log.Println(args.VerboseDNS, "IPv6 is broken. Need to fix it here.")
-	}
+	return "blah"
 }
-*/
 
 // nsLookup performs an NS lookup on the given domain name.
 func lookupNS(domain string) {
@@ -127,9 +101,15 @@ func setProvider(hostname string) {
 	if len(parts) >= 2 {
 		provider = parts[len(parts)-2]
 	}
+	if me.APIprovider != provider {
+		log.Log(CHANGE, "setProvider() changed to =", provider)
+	}
+	me.APIprovider = provider
+	/*
 	if (me.DnsAPI.S != provider) {
 		me.changed = true
 		log.Log(CHANGE, "setProvider() changed to =", provider)
 		me.DnsAPI.SetText(provider)
 	}
+	*/
 }

@@ -44,17 +44,33 @@ func debugTab(title string) {
 	})
 
 	g2 = me.debug.Box().NewGroup("debugging options")
+	gridP := g2.NewGrid("nuts", 2, 1)
 
 	// makes a slider widget
-	me.ttl = gadgets.NewDurationSlider(g2, "Loop Timeout", 10 * time.Millisecond, 5 * time.Second)
+	me.ttl = gadgets.NewDurationSlider(gridP, "Loop Timeout", 10 * time.Millisecond, 5 * time.Second)
 	me.ttl.Set(300 * time.Millisecond)
 
 	// makes a slider widget
-	me.dnsTtl = gadgets.NewDurationSlider(g2, "DNS Timeout", 800 * time.Millisecond, 300 * time.Second)
+	me.dnsTtl = gadgets.NewDurationSlider(gridP, "DNS Timeout", 800 * time.Millisecond, 300 * time.Second)
 	me.dnsTtl.Set(60 * time.Second)
+
+	gridP.NewLabel("dns resolution")
+	me.DnsSpeed = gridP.NewLabel("unknown")
+
+	gridP.NewLabel("dns resolution speed")
+	me.DnsSpeedActual = gridP.NewLabel("unknown")
+
+	gridP.NewLabel("Test speed")
+	newGrid := gridP.NewGrid("nuts", 2, 1).Pad()
 
 	g2.Margin()
 	g2.Pad()
+
+	newGrid.NewLabel("ping.wit.com =")
+	newGrid.NewLabel("unknown")
+
+	newGrid.NewLabel("ping6.wit.com =")
+	newGrid.NewLabel("unknown")
 
 	me.debug.Hide()
 }
@@ -87,7 +103,7 @@ func mainWindow(title string) {
 
 	statusGrid(me.window.Box())
 
-	gr = me.window.Box().NewGroup("debugging")
+	gr = me.window.Box().NewGroup("")
 /*
 	me.statusDNSbutton = gr.NewButton("hostname status", func () {
 		if ! me.statusDNS.Ready() {return}
@@ -133,8 +149,12 @@ func mainWindow(title string) {
 
 func statusGrid(n *gui.Node) {
 	problems := n.NewGroup("status")
+	problems.Margin()
+	problems.Pad()
 
 	gridP := problems.NewGrid("nuts", 3, 1)
+	gridP.Margin()
+	gridP.Pad()
 
 	gridP.NewLabel("hostname =")
 	me.hostnameStatus = gridP.NewLabel("invalid")
@@ -142,54 +162,40 @@ func statusGrid(n *gui.Node) {
 		me.statusOS.Toggle()
 	})
 
-	gridP.NewLabel("DNS Status =")
-	me.DnsStatus = gridP.NewLabel("unknown")
-	me.statusDNSbutton = gridP.NewButton("hostname status", func () {
-		if ! me.statusDNS.Ready() {return}
-		me.statusDNS.window.Toggle()
-	})
-
-	me.statusIPv6 = gadgets.NewOneLiner(gridP, "IPv6 working")
+	me.statusIPv6 = gadgets.NewOneLiner(gridP, "DNS Lookup")
 	me.statusIPv6.Set("known")
 	gridP.NewButton("resolver status", func () {
 		if ! me.digStatus.Ready() {return}
 		me.digStatus.window.Toggle()
 	})
 
-	gridP.NewLabel("dns API provider =")
-	me.DnsAPI = gridP.NewLabel("unknown")
-	gridP.NewButton("cloudflare wit.com", func () {
-		if me.witcom != nil {
-			me.witcom.Toggle()
-		}
-		me.witcom = cloudflare.CreateRR(me.myGui, "wit.com", "3777302ac4a78cd7fa4f6d3f72086d06")
+	gridP.NewLabel("DNS Status")
+	me.DnsStatus = gridP.NewLabel("unknown")
+	me.statusDNSbutton = gridP.NewButton("hostname status", func () {
+		if ! me.statusDNS.Ready() {return}
+		me.statusDNS.window.Toggle()
 	})
 
-	gridP.NewLabel("dns resolution")
-	me.DnsSpeed = gridP.NewLabel("unknown")
-	gridP.NewLabel("")
+	gridP.NewLabel("DNS API")
+	me.DnsAPIstatus = gridP.NewLabel("unknown")
+	var apiButton *gui.Node
+	apiButton = gridP.NewButton("unknown wit.com", func () {
+		log.Log(CHANGE, "WHAT API ARE YOU USING?")
+		provider := me.statusDNS.GetDNSapi()
+		apiButton.SetText(provider + " wit.com")
+		if provider == "cloudflare" {
+			me.DnsAPIstatus.Set("WORKING")
+			return
 
-	gridP.NewLabel("dns resolution speed")
-	me.DnsSpeedActual = gridP.NewLabel("unknown")
-	gridP.NewLabel("")
+			if me.witcom != nil {
+				me.witcom.Toggle()
+			}
+			me.witcom = cloudflare.CreateRR(me.myGui, "wit.com", "3777302ac4a78cd7fa4f6d3f72086d06")
+		}
+	})
 
-	gridP.Margin()
-	gridP.Pad()
+	n.NewGroup("NOTES")
 
-	// TODO: these are notes for me things to figure out
-	ng := n.NewGroup("TODO:")
-	gridP = ng.NewGrid("nut2", 2, 2)
-
-	gridP.NewLabel("ping.wit.com =")
-	gridP.NewLabel("unknown")
-
-	gridP.NewLabel("ping6.wit.com =")
-	gridP.NewLabel("unknown")
-
-	problems.Margin()
-	problems.Pad()
-	gridP.Margin()
-	gridP.Pad()
 }
 
 // run everything because something has changed
@@ -199,7 +205,7 @@ func updateDNS() {
 
 	if me.digStatus.Ready() {
 		if me.digStatus.IPv6() {
-			me.statusIPv6.Set("IPv6 WORKING")
+			me.statusIPv6.Set("WORKING")
 		} else {
 			me.statusIPv6.Set("Need VPN")
 		}

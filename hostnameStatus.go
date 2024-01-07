@@ -323,7 +323,9 @@ func (hs *hostnameStatus) updateStatus() {
 		hs.status.Set("BROKEN")
 	}
 
-	hs.dnsAPI.Set(me.DnsAPI.S)
+	// lookup the DNS provider
+	// hs.dnsAPI.Set(me.DnsAPI.S)
+	lookupNSprovider("wit.com")
 }
 
 func (hs *hostnameStatus) Show() {
@@ -340,4 +342,8 @@ func (hs *hostnameStatus) Hide() {
 		hs.window.Hide()
 	}
 	hs.hidden = true
+}
+
+func (hs *hostnameStatus) GetDNSapi() string {
+	return me.APIprovider
 }

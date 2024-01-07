@@ -26,8 +26,10 @@ type Host struct {
 	statusOS	*linuxstatus.LinuxStatus		// what the Linux OS sees
 	digStatus	*digStatus		// window of the results of DNS lookups
 
+	// WHEN THESE ARE ALL "WORKING", then everything is good
 	hostnameStatus	*gui.Node		// a summary for the user of where things are
-	// hostname	*gadgets.OneLiner	// the hostname grabbed from gadget.linuxStatus
+	DnsAPIstatus	*gui.Node		// does your DNS API work?
+	APIprovider	string
 
 	artificialSleep float64	`default:"0.7"`	// artificial sleep on startup
 	artificialS     string 	`default:"abc"`	// artificial sleep on startup
@@ -49,7 +51,6 @@ type Host struct {
 	ipv6s		map[string]dns.RR
 
 	// DNS stuff
-	DnsAPI		*gui.Node		// what DNS API to use?
 	DnsStatus	*gui.Node		// the current state of DNS
 	DnsSpeed	*gui.Node		// 'FAST', 'OK', 'SLOW', etc
 	DnsSpeedActual	*gui.Node		// the last actual duration
