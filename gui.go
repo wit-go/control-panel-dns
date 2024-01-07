@@ -38,8 +38,8 @@ func debugTab(title string) {
 		debugger.DebugWindow(me.myGui)
 	})
 
-	g2.NewButton("dig A & AAAA DNS records", func () {
-		log.Println("updateDNS()")
+	g2.NewButton("dig A & AAAA DNS records (updateDNS())", func () {
+		log.Log(CHANGE, "updateDNS() going to run:")
 		updateDNS()
 	})
 
@@ -200,6 +200,7 @@ func statusGrid(n *gui.Node) {
 
 // run everything because something has changed
 func updateDNS() {
+	log.Log(CHANGE, "updateDNS() START")
 	me.digStatus.Update()
 	me.statusDNS.Update()
 
@@ -215,5 +216,5 @@ func updateDNS() {
 	// if your host is test.wit.com, find the NS resource records for wit.com
 	lookupNS(me.statusOS.GetDomainName())
 
-	log.Println("updateDNS() END")
+	log.Log(CHANGE, "updateDNS() END")
 }

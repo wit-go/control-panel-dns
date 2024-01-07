@@ -6,7 +6,7 @@ package main
 
 import 	(
 	"fmt"
-	"runtime"
+	// "runtime"
 	"time"
 	"embed"
 
@@ -60,122 +60,59 @@ func main() {
 		}()
 	}
 
-	// forever monitor for network and dns changes
 	log.Sleep(me.artificialSleep)
-	checkNetworkChanges()
-}
 
-/*
-	Poll for changes to the networking settings
-*/
+	// TCP & UDP port 53 lookups + DNS over HTTP lookups + os.Exec(dig)
+	go myTicker(60 * time.Second, "DNSloop", func() {
+		me.digStatus.Update()
 
-/* https://github.com/robfig/cron/blob/master/cron.go
-
-// Run the cron scheduler, or no-op if already running.
-func (c *Cron) Run() {
-	c.runningMu.Lock()
-	if c.running {
-		c.runningMu.Unlock()
-		return
-	}
-	c.running = true
-	c.runningMu.Unlock()
-	c.run()
-}
-
-// run the scheduler.. this is private just due to the need to synchronize
-// access to the 'running' state variable.
-func (c *Cron) run() {
-	c.logger.Info("start")
-*/
-
-func checkNetworkChanges() {
-	var lastLocal time.Time = time.Now()
-	var lastDNS time.Time = time.Now()
-
-	timer2 := time.NewTimer(time.Second)
-	go func() {
-		<-timer2.C
-		fmt.Println("Timer 2 fired")
-	}()
-
-	for {
-		time.Sleep(me.ttl.Duration)
-		if (time.Since(lastLocal) > me.localSleep) {
-			if (runtime.GOOS == "linux") {
-				duration := timeFunction(linuxLoop)
-				s := fmt.Sprint(duration)
-				me.statusOS.SetSpeedActual(s)
+		if me.digStatus.Ready() {
+			current := me.statusIPv6.Get()
+			if me.digStatus.IPv6() {
+				if current != "WORKING" {
+					log.Log(CHANGE, "IPv6 resolution is WORKING")
+					me.statusIPv6.Set("WORKING")
+				}
 			} else {
-				// TODO: make windows and macos diagnostics
-				log.Warn("Windows and MacOS don't work yet")
+				if current != "Need VPN" {
+					log.Log(CHANGE, "IPv6 resolution seems to have broken")
+					me.statusIPv6.Set("Need VPN")
+				}
 			}
-			lastLocal = time.Now()
 		}
-		if (time.Since(lastDNS) > me.dnsTtl.Duration) {
-			DNSloop()
-			lastDNS = time.Now()
-		}
+	})
 
-		/*
-		stop2 := timer2.Stop()
-		if stop2 {
-			fmt.Println("Timer 2 stopped")
-		}
-		*/
-	}
-}
+	// checks if your DNS records are still broken
+	// if everything is working, then it just ignores
+	// things until the timeout happens
+	go myTicker(10 * time.Second, "DNSloop", func() {
+		log.Log(CHANGE, "me.statusDNS.Update() START")
+		me.statusDNS.Update()
+	})
 
-// run this on each timeout
-func DNSloop() {
-	duration := timeFunction(dnsTTL)
-	log.Info("dnsTTL() execution Time: ", duration)
-	var s, newSpeed string
-	if (duration > 5000 * time.Millisecond ) {
-		newSpeed = "VERY SLOW"
-	} else if (duration > 2000 * time.Millisecond ) {
-		newSpeed = "SLOWER"
-	} else if (duration > 500 * time.Millisecond ) {
-		newSpeed = "SLOW"
-	} else if (duration > 100 * time.Millisecond ) {
-		newSpeed = "OK"
-	} else {
-		newSpeed = "FAST"
-	}
-	if (newSpeed != me.DnsSpeedLast) {
-		log.Log(CHANGE, "dns lookup speed changed =", newSpeed)
-		log.Log(CHANGE, "dnsTTL() execution Time: ", duration)
-		me.DnsSpeed.SetText(newSpeed)
-		me.DnsSpeedLast = newSpeed
-	}
-	s = fmt.Sprint(duration)
-	me.DnsSpeedActual.SetText(s)
-}
+	// probes the OS network settings
+	myTicker(500 * time.Millisecond, "me.statusOS,Update()", func() {
+		duration := timeFunction( func() {
+			me.statusOS.Update()
 
-// This checks for changes to the network settings
-// and verifies that DNS is working or not working
-func dnsTTL() {
-	updateDNS()
-}
+			if me.statusOS.ValidHostname() {
+				if me.hostnameStatus.GetText() != "WORKING" {
+					me.hostnameStatus.Set("WORKING")
+					me.changed = true
+				}
+			}
 
-// run update on the LinuxStatus() window
-// also update a few things on the main window
-func linuxLoop() {
-	me.statusOS.Update()
-
-	if me.statusOS.ValidHostname() {
-		if me.hostnameStatus.GetText() != "WORKING" {
-			me.hostnameStatus.Set("WORKING")
-			me.changed = true
-		}
-	}
-
-	if (me.statusOS.Changed()) {
-		stamp := time.Now().Format("2006/01/02 15:04:05")
-		log.Log(CHANGE, "Network things changed on", stamp)
-		duration := timeFunction(updateDNS)
-		log.Log(CHANGE, "updateDNS() execution Time: ", duration)
-	}
+			// re-check DNS API provider
+			if (me.statusOS.Changed()) {
+				// lookup the NS records for your domain
+				// if your host is test.wit.com, find the NS resource records for wit.com
+				lookupNS(me.statusOS.GetDomainName())
+				log.Log(CHANGE, "updateDNS() END")
+			}
+		})
+		s := fmt.Sprint(duration)
+		me.statusOS.SetSpeedActual(s)
+	})
 }
 
 /*
@@ -189,4 +126,33 @@ func timeFunction(f func()) time.Duration {
 	startTime := time.Now() // Record the start time
 	f()                     // Execute the function
 	return time.Since(startTime) // Calculate the elapsed time
+}
+
+func timeStamp() string {
+	stamp := time.Now().Format("2006/01/02 15:04:05")
+	log.Log(CHANGE, "Network things changed on", stamp)
+	return stamp
+}
+
+
+func myTicker(t time.Duration, name string, f func()) {
+	ticker := time.NewTicker(t)
+	defer ticker.Stop()
+	done := make(chan bool)
+	/*
+	go func() {
+		time.Sleep(10 * time.Second)
+		done <- true
+	}()
+	*/
+	for {
+		select {
+		case <-done:
+			fmt.Println("Done!")
+			return
+		case t := <-ticker.C:
+			log.Log(INFO, name, "Current time: ", t)
+			f()
+		}
+	}
 }
