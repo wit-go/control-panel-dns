@@ -12,7 +12,7 @@ import 	(
 	"go.wit.com/gui/cloudflare"
 	"go.wit.com/gui/debugger"
 	"go.wit.com/gui/gadgets/logsettings"
-	"go.wit.com/wit/control-panel-dns/smartwindow"
+	"go.wit.com/apps/control-panel-dns/smartwindow"
 )
 
 // This setups up the dns control panel window
