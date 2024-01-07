@@ -11,6 +11,7 @@ import 	(
 	"go.wit.com/gui/gadgets"
 	"go.wit.com/gui/cloudflare"
 	"go.wit.com/gui/debugger"
+	"go.wit.com/gui/gadgets/logsettings"
 	// "go.wit.com/control-panels/dns/linuxstatus"
 )
 
@@ -104,6 +105,16 @@ func mainWindow(title string) {
 	})
 	gr.NewButton("Debug", func () {
 		me.debug.Toggle()
+	})
+
+	var myLS *logsettings.LogSettings
+	gr.NewButton("Logging Settings", func () {
+		if myLS == nil {
+			// initialize the log settings window (does not display it)
+			myLS = logsettings.New(me.myGui)
+			return
+		}
+		myLS.Toggle()
 	})
 }
 
