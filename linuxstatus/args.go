@@ -29,6 +29,7 @@ func myreg(f *log.LogFlag, b bool, name string, desc string) {
 
 func init() {
 	myreg(&NOW,    true,  "NOW",    "temp debugging stuff")
+	myreg(&INFO,   false, "INFO",   "normal debugging stuff")
 	myreg(&NET,    false, "NET",    "Network Logging")
 	myreg(&DNS,    false, "DNS",    "dnsStatus.update()")
 	myreg(&PROC,   false, "PROC",   "/proc logging")

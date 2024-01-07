@@ -3,6 +3,7 @@ package main
 
 import 	(
 	"go.wit.com/log"
+	"go.wit.com/gui/cloudflare"
 )
 
 func fix() bool {
@@ -12,26 +13,26 @@ func fix() bool {
 		return false
 	}
 	if me.statusOS.ValidHostname() {
-		log.Log(CHANGE, "Your hostname is VALID:", me.statusOS.GetHostname())
+		log.Log(CHANGE, "GOOD Your hostname is VALID:", me.statusOS.GetHostname())
 	} else {
 		log.Log(CHANGE, "You must first fix your hostname:", me.statusOS.GetHostname())
 		return false
 	}
 	if me.digStatus.IPv4() {
-		log.Log(CHANGE, "IPv4 addresses are resolving")
+		log.Log(CHANGE, "GOOD IPv4 addresses are resolving")
 	} else {
 		log.Log(CHANGE, "You must first figure out why you can't look up IPv4 addresses")
 		log.Log(CHANGE, "Are you on the internet at all?")
 		return false
 	}
 	if me.digStatus.IPv6() {
-		log.Log(CHANGE, "IPv6 addresses are resolving")
+		log.Log(CHANGE, "GOOD IPv6 addresses are resolving")
 	} else {
 		log.Log(CHANGE, "You must first figure out why you can't look up IPv6 addresses")
 		return false
 	}
 	if ! me.statusDNS.IPv4() {
-		log.Log(CHANGE, "You do not have real IPv4 addresses. Nothing to fix here") 
+		log.Log(CHANGE, "OK   You do not have real IPv4 addresses. Nothing to fix here") 
 	}
 	if ! me.statusDNS.IPv6() {
 		log.Log(CHANGE, "IPv6 DNS is broken. Check what is broken here")
@@ -40,7 +41,7 @@ func fix() bool {
 			return false
 		}
 	}
-	log.Log(CHANGE, "YOU SHOULD BE IN IPv6 BLISS")
+	log.Log(CHANGE, "GOOD YOU SHOULD BE IN IPv6 BLISS")
 	return true
 }
 
@@ -102,7 +103,13 @@ func deleteFromDNS(aaaa string) bool {
 
 func addToDNS(aaaa string) bool {
 	log.Log(CHANGE, "TODO: Add this to DNS !!!!", aaaa)
-	log.Log(CHANGE, "what is your API provider?")
+	api := me.statusDNS.API()
+	log.Log(CHANGE, "what is your API provider?", api)
+	if api == "cloudflare" {
+		log.Log(CHANGE, "Let's try an ADD via the Cloudflare API")
+		hostname := me.statusOS.GetHostname()
+		return cloudflare.Create("wit.com", hostname, aaaa)
+	}
 	return false
 }
 

@@ -193,7 +193,10 @@ func mainWindow(title string) {
 		me.digStatus.window.Toggle()
 	})
 	gr.NewButton("cloudflare wit.com", func () {
-		cloudflare.CreateRR(me.myGui, "wit.com", "3777302ac4a78cd7fa4f6d3f72086d06")
+		if me.witcom != nil {
+			me.witcom.Toggle()
+		}
+		me.witcom = cloudflare.CreateRR(me.myGui, "wit.com", "3777302ac4a78cd7fa4f6d3f72086d06")
 	})
 	gr.NewButton("Debug", func () {
 		me.debug.Toggle()

@@ -6,6 +6,7 @@ import 	(
 	"time"
 	"go.wit.com/gui/gui"
 	"go.wit.com/gui/gadgets"
+	// "go.wit.com/gui/cloudflare"
 	"go.wit.com/control-panels/dns/linuxstatus"
 
 	"github.com/miekg/dns"
@@ -57,6 +58,7 @@ type Host struct {
 
 	statusIPv6	*gadgets.OneLiner
 	digStatusButton *gui.Node
+	witcom		*gadgets.BasicWindow
 }
 
 type IPtype struct {
