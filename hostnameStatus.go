@@ -11,6 +11,7 @@ import (
 	"time"
 	"reflect"
 	"strings"
+	"sort"
 	"errors"
 
 	"go.wit.com/log"
@@ -22,7 +23,6 @@ type hostnameStatus struct {
 	ready		bool
 	hidden		bool
 
-	// hostname	string // my hostname. Example: "test.wit.com"
 	lastname	string // used to watch for changes in the hostname
 
 	window		*gadgets.BasicWindow
@@ -33,14 +33,12 @@ type hostnameStatus struct {
 	statusIPv4	*gadgets.OneLiner
 	statusIPv6	*gadgets.OneLiner
 
-	// Details Group
-	hostShort	*gadgets.OneLiner
+	hostname	*gadgets.OneLiner
 	domainname	*gadgets.OneLiner
 
-	// what the current IP address your network has given you
+	// what the current IP addresses your network has given you
 	currentIPv4	*gadgets.OneLiner
 	currentIPv6	*gadgets.OneLiner
-	currentAAAA	string
 
 	// what the DNS servers have
 	NSrr		*gadgets.OneLiner
@@ -81,7 +79,7 @@ func NewHostnameStatusWindow(p *gui.Node) *hostnameStatus {
 	group = hs.window.Box().NewGroup("Details")
 	grid = group.NewGrid("LookupDetails", 2, 2)
 
-	hs.hostShort	= gadgets.NewOneLiner(grid, "hostname -s")
+	hs.hostname	= gadgets.NewOneLiner(grid, "hostname")
 	hs.domainname	= gadgets.NewOneLiner(grid, "domain name")
 	hs.currentIPv4	= gadgets.NewOneLiner(grid, "Current IPv4")
 	hs.currentIPv6	= gadgets.NewOneLiner(grid, "Current IPv6")
@@ -121,12 +119,6 @@ func NewHostnameStatusWindow(p *gui.Node) *hostnameStatus {
 	return hs
 }
 
-/*
-func (hs *hostnameStatus) ValidHostname() bool {
-	return goodHostname()
-}
-*/
-
 func (hs *hostnameStatus) Domain() string {
 	if ! hs.Ready() {return ""}
 	return hs.domainname.Get()
@@ -136,34 +128,6 @@ func (hs *hostnameStatus) API() string {
 	if ! hs.Ready() {return ""}
 	return hs.dnsAPI.Get()
 }
-
-/*
-func (hs *hostnameStatus) deleteDNSrecord(value string) bool {
-	log.Info("deleteDNSrecord() START for", value)
-	log.Info("deleteDNSrecord() hostname =", me.status.GetHostname())
-	log.Info("deleteDNSrecord() domain =", hs.Domain())
-	log.Info("deleteDNSrecord() DNS API Provider =", hs.API())
-
-	if (hs.API() == "cloudflare") {
-		log.Info("deleteDNSrecord() Try to delete via cloudflare")
-		return cloudflare.Delete(hs.Domain(), me.status.GetHostname(), value)
-	}
-	return false
-}
-
-func (hs *hostnameStatus) createDNSrecord(value string) bool {
-	log.Info("createDNSrecord() START for", value)
-	log.Info("createDNSrecord() hostname =", me.status.GetHostname())
-	log.Info("createDNSrecord() domain =", hs.Domain())
-	log.Info("createDNSrecord() DNS API Provider =", hs.API())
-
-	if (hs.API() == "cloudflare") {
-		log.Warn("createDNSrecord() Try to create via cloudflare:", me.status.GetHostname(), value)
-		return cloudflare.Create(hs.Domain(), me.status.GetHostname(), value)
-	}
-	return false
-}
-*/
 
 func (hs *hostnameStatus) Update() {
 	log.Info("hostnameStatus() Update() START")
@@ -282,7 +246,7 @@ func (hs *hostnameStatus) missingAAAA() bool {
 
 func (hs *hostnameStatus) GetIPv6() []string {
 	if ! hs.Ready() { return nil}
-	return strings.Split(hs.currentAAAA, "\n")
+	return strings.Split(hs.dnsAAAA.Get(), "\n")
 }
 
 func (hs *hostnameStatus) updateStatus() {
@@ -291,8 +255,26 @@ func (hs *hostnameStatus) updateStatus() {
 	var vals []string
 	log.Log(STATUS, "updateStatus() START")
 
-	hs.hostShort.Set(me.statusOS.GetHostShort())
+	// copy the OS status over
+	lasthostname := hs.hostname.Get()
+	hostname := me.statusOS.GetHostname()
+
+	// hostname changed or was setup for the first time. Set the window title, etc
+	if lasthostname != hostname {
+		me.changed = true
+		hs.hostname.Set(hostname)
+		hs.window.Title(hostname + " Status")
+		me.statusDNSbutton.Set(hostname + " status")
+	}
 	hs.domainname.Set(me.statusOS.GetDomainName())
+
+	tmp := me.statusOS.GetIPv4()
+	sort.Strings(tmp)
+	hs.currentIPv4.Set(strings.Join(tmp, "\n"))
+
+	tmp = me.statusOS.GetIPv6()
+	sort.Strings(tmp)
+	hs.currentIPv6.Set(strings.Join(tmp, "\n"))
 
 	if me.statusOS.ValidHostname() {
 		vals = lookupDoH(me.statusOS.GetHostname(), "AAAA")
@@ -315,7 +297,8 @@ func (hs *hostnameStatus) updateStatus() {
 				// hs.dnsAction.SetText("DELETE")
 			}
 		}
-		hs.currentAAAA = strings.Join(vals, "\n")
+		sort.Strings(vals)
+		hs.dnsAAAA.Set(strings.Join(vals, "\n"))
 
 		vals = lookupDoH(me.statusOS.GetHostname(), "A")
 		log.Log(STATUS, "IPv4 Addresses for ", me.statusOS.GetHostname(), "=", vals)
@@ -333,11 +316,6 @@ func (hs *hostnameStatus) updateStatus() {
 			hs.setIPv4("GOOD")
 		}
 	}
-
-	// hs.currentIPv4.Set(me.IPv4.S)
-	// hs.currentIPv6.Set(me.IPv6.S)
-	hs.currentIPv4.Set("get this from linuxStatus")
-	hs.currentIPv6.Set("get this from linuxStatus")
 
 	if hs.IPv4() && hs.IPv6() {
 		hs.status.Set("GOOD")

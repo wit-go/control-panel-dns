@@ -1,6 +1,12 @@
 // GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007
 // Copyright (c) 2023 WIT.COM, Inc.
+
 // This is a control panel for DNS
+
+// This is the main Linux kernel / OS code
+// to check your network settings are correct
+// This does (and should do) no network or external checking
+// This is just the state of your OS
 
 package linuxstatus
 
@@ -9,30 +15,55 @@ import 	(
 	"os/user"
 	"strconv"
 	"strings"
+	"sort"
 
 	"go.wit.com/log"
 )
 
 func linuxLoop() {
 	me.changed = false
-	duration := timeFunction(lookupHostname)
-	log.Log(INFO, "getHostname() execution Time: ", duration, "me.changed =", me.changed)
 
-	duration = timeFunction(scanInterfaces)
-	log.Log(NET, "scanInterfaces() execution Time: ", duration)
+	// checks for a VALID hostname
+	lookupHostname()
+	if me.changed {
+		log.Log(CHANGE, "lookupHostname() detected a change")
+	}
+
+	// scans the linux network intefaces for your available IPv4 & IPv6 addresses
+	scanInterfaces()
+	if me.changed {
+		log.Log(CHANGE, "scanInterfaces() detected a change")
+	}
 	for i, t := range me.ifmap {
 		log.Log(NET, strconv.Itoa(i) + " iface = " + t.iface.Name)
 	}
 
+	// get all the real A records from all the network interfaces linux can see
+	a := realA()
+	sort.Strings(a)
+	tmp := strings.Join(a, "\n")
+	if tmp != me.workingIPv4.Get() {
+		log.Log(CHANGE, "realAAAA() your real IPv6 addresses changed")
+		me.changed = true
+		me.workingIPv4.Set(tmp)
+	}
+
 	// get all the real AAAA records from all the network interfaces linux can see
-	tmp := strings.Join(realAAAA(), "\n")
-	tmp = sortLines(tmp)
-	me.workingIPv6.Set(tmp)
+	aaaa := realAAAA()
+	sort.Strings(aaaa)
+	tmp = strings.Join(aaaa, "\n")
+	if tmp != me.workingIPv6.Get() {
+		log.Log(CHANGE, "realAAAA() your real IPv6 addresses changed")
+		me.changed = true
+		me.workingIPv6.Set(tmp)
+	}
 
 	user, _ := user.Current()
-	log.Log(INFO, "os.Getuid =", user.Username, os.Getuid())
-	if (me.uid != nil) {
-		me.uid.Set(user.Username + " (" + strconv.Itoa(os.Getuid()) + ")")
+	tmp = user.Username + " (" + strconv.Itoa(os.Getuid()) + ")"
+	if tmp != me.uid.Get() {
+		log.Log(CHANGE, "os.Getuid =", user.Username, os.Getuid())
+		me.changed = true
+		me.uid.Set(tmp)
 	}
 
 	/*

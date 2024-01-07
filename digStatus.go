@@ -245,6 +245,14 @@ func (ds *digStatus) updateDnsStatus() {
 	out = shell.Run(cmd)
 	log.Log(DNS, "makeDnsStatusGrid() dig", out)
 	me.digStatus.set(ds.DnsDigTCP, out)
+
+	/*
+	g2.NewButton("dig +trace", func () {
+		log.Log(NOW, "TODO: redo this")
+		// o := shell.Run("dig +trace +noadditional DS " + me.hostname + " @8.8.8.8")
+		// log.Println(o)
+	})
+	*/
 }
 
 func (ds *digStatus) makeHttpStatusGrid() {

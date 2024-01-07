@@ -269,3 +269,10 @@ func deleteChanges() bool {
 
 	return changed
 }
+
+func (ls *LinuxStatus) GetIPv4() []string {
+	if ! me.Ready() {return nil}
+	tmp := "(none) fixme"
+	return strings.Split(tmp, "\n")
+}
+

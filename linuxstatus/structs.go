@@ -35,6 +35,7 @@ type LinuxStatus struct {
 	uid		*gadgets.OneLiner
 	IPv4		*gadgets.OneLiner
 	IPv6		*gadgets.OneLiner
+	workingIPv4	*gadgets.OneLiner
 	workingIPv6	*gadgets.OneLiner
 	Interfaces	*gui.Node
 	speed		*gadgets.OneLiner

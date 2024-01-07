@@ -5,6 +5,7 @@ import 	(
 	"time"
 	"os"
 	"strings"
+	"sort"
 
 	"go.wit.com/log"
 
@@ -12,7 +13,7 @@ import 	(
 	"go.wit.com/gui/gadgets"
 	"go.wit.com/gui/cloudflare"
 	"go.wit.com/gui/debugger"
-	"go.wit.com/control-panels/dns/linuxstatus"
+	// "go.wit.com/control-panels/dns/linuxstatus"
 )
 
 // This setups up the dns control panel window
@@ -41,17 +42,6 @@ func debugTab(title string) {
 	g2.NewButton("dig A & AAAA DNS records", func () {
 		log.Println("updateDNS()")
 		updateDNS()
-	})
-
-	g2.NewButton("dig +trace", func () {
-		log.Log(NOW, "TODO: redo this")
-		// o := shell.Run("dig +trace +noadditional DS " + me.hostname + " @8.8.8.8")
-		// log.Println(o)
-	})
-
-	g2.NewButton("getProcessNameByPort()", func () {
-		processName := linuxstatus.GetProcessNameByPort(53)
-		log.Info("Process with port 53:", processName)
 	})
 
 	g2 = me.debug.Box().NewGroup("debugging options")
@@ -93,7 +83,8 @@ func displayDNS() string {
 
 	var a []string
 	a = append(a, "fixme")
-	all = sortLines(strings.Join(a, "\n"))
+	sort.Strings(a)
+	all = strings.Join(a, "\n")
 	if (all == "") {
 		log.Log(NOW, "THERE IS NOT a real A DNS ENTRY")
 		all = "CNAME ipv6.wit.com"
@@ -145,7 +136,7 @@ func mainWindow(title string) {
 	statusGrid(me.window.Box())
 
 	gr = me.window.Box().NewGroup("debugging")
-	gr.NewButton("hostname status", func () {
+	me.statusDNSbutton = gr.NewButton("hostname status", func () {
 		if ! me.statusDNS.Ready() {return}
 		me.statusDNS.window.Toggle()
 	})

@@ -4,8 +4,8 @@ package linuxstatus
 
 import (
 	"strings"
+	"io/ioutil"
 	"go.wit.com/log"
-	"go.wit.com/shell"
 
 	// will try to get this hosts FQDN
 	"github.com/Showmax/go-fqdn"
@@ -124,7 +124,14 @@ func lookupHostname() {
 // On Linux, /etc/hosts, /etc/hostname
 //      and domainname and hostname
 func goodHostname() bool {
-	hostname := shell.Chomp(shell.Cat("/etc/hostname"))
+	content, err := ioutil.ReadFile("/etc/hostname")
+	if err != nil {
+		// this needs to be a fixWindow() error
+		log.Error(err)
+	}
+
+	hostname := string(content)
+
 	log.Log(NOW, "hostname =", hostname)
 
 	hs := run("hostname -s")

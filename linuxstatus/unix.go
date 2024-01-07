@@ -13,7 +13,6 @@ import 	(
 	"strings"
 
 	"go.wit.com/log"
-	"go.wit.com/shell"
 )
 
 func CheckSuperuser() bool {
@@ -89,7 +88,8 @@ func run(s string) string {
 		return ""
 	}
 
-	tmp := shell.Chomp(out.String())
+	// Trim leading and trailing whitespace from each line
+	tmp := strings.TrimSpace(out.String())
 	// Output the results
 	log.Info("Command Output:", tmp)
 

@@ -24,6 +24,7 @@ func draw(ls *LinuxStatus) {
 	ls.uid		= gadgets.NewOneLiner(ls.grid, "UID =")
 	ls.IPv4		= gadgets.NewOneLiner(ls.grid, "Current IPv4 =")
 	ls.IPv6		= gadgets.NewOneLiner(ls.grid, "Current IPv6 =")
+	ls.workingIPv4	= gadgets.NewOneLiner(ls.grid, "Real IPv4 =")
 	ls.workingIPv6	= gadgets.NewOneLiner(ls.grid, "Real IPv6 =")
 	// ls.nics		= gadgets.NewOneLiner(ls.grid, "network intefaces =")
 
