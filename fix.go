@@ -35,11 +35,11 @@ func fix() bool {
 		log.Log(CHANGE, "OK   You do not have real IPv4 addresses. Nothing to fix here") 
 	}
 	if ! me.statusDNS.IPv6() {
-		log.Log(CHANGE, "IPv6 DNS is broken. Check what is broken here")
 		if fixIPv6dns() {
 			log.Log(CHANGE, "IPv6 DNS Repair is underway")
 			return false
 		}
+		log.Log(CHANGE, "GOOD IPv6 DNS is working!")
 	}
 	log.Log(CHANGE, "GOOD YOU SHOULD BE IN IPv6 BLISS")
 	return true

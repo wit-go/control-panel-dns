@@ -151,8 +151,18 @@ func mainWindow(title string) {
 	me.DnsA = grid.NewLabel("?")
 
 	// This is where you figure out what to do next to fix the problems
-	gr.NewButton("fix", func () {
-		fix()
+	me.fixButton = gr.NewButton("fix", func () {
+		if ! fix() {
+			log.Log(CHANGE, "boo. IPv6 isn't working yet")
+			return
+		}
+		log.Log(CHANGE, "IPv6 WORKED")
+		// update everything here visually for the user
+		hostname := me.statusOS.GetHostname()
+		me.hostname.Set(hostname)
+		me.hostnameStatus.Set("WORKING")
+		me.DnsStatus.Set("WORKING")
+		me.fixButton.Disable()
 	})
 
 	grid.Margin()

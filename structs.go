@@ -59,6 +59,7 @@ type Host struct {
 	statusIPv6	*gadgets.OneLiner
 	digStatusButton *gui.Node
 	witcom		*gadgets.BasicWindow
+	fixButton	*gui.Node
 }
 
 type IPtype struct {
