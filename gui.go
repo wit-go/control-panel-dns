@@ -40,7 +40,6 @@ func debugTab(title string) {
 
 	g2.NewButton("dig A & AAAA DNS records (updateDNS())", func () {
 		log.Log(CHANGE, "updateDNS() going to run:")
-		updateDNS()
 	})
 
 	g2 = me.debug.Box().NewGroup("debugging options")
@@ -196,25 +195,4 @@ func statusGrid(n *gui.Node) {
 
 	n.NewGroup("NOTES")
 
-}
-
-// run everything because something has changed
-func updateDNS() {
-	log.Log(CHANGE, "updateDNS() START")
-	me.digStatus.Update()
-	me.statusDNS.Update()
-
-	if me.digStatus.Ready() {
-		if me.digStatus.IPv6() {
-			me.statusIPv6.Set("WORKING")
-		} else {
-			me.statusIPv6.Set("Need VPN")
-		}
-	}
-
-	// lookup the NS records for your domain
-	// if your host is test.wit.com, find the NS resource records for wit.com
-	lookupNS(me.statusOS.GetDomainName())
-
-	log.Log(CHANGE, "updateDNS() END")
 }

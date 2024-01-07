@@ -85,9 +85,20 @@ func main() {
 	// checks if your DNS records are still broken
 	// if everything is working, then it just ignores
 	// things until the timeout happens
+
+	lastProvider := "unknown"
 	go myTicker(10 * time.Second, "DNSloop", func() {
 		log.Log(CHANGE, "me.statusDNS.Update() START")
 		me.statusDNS.Update()
+
+		provider := me.statusDNS.GetDNSapi()
+		if provider != lastProvider {
+			log.Log(CHANGE, "Your DNS API provider appears to have changed to", provider)
+			lastProvider = provider
+		}
+		if provider == "cloudflare" {
+			me.DnsAPIstatus.Set("WORKING")
+		}
 	})
 
 	// probes the OS network settings
