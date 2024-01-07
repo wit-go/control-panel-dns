@@ -46,7 +46,7 @@ func main() {
 	setupControlPanelWindow()
 
 	me.digStatus = NewDigStatusWindow(me.myGui)
-	me.status = NewHostnameStatusWindow(me.myGui)
+	me.statusDNS = NewHostnameStatusWindow(me.myGui)
 
 	linuxstatus.New()
 

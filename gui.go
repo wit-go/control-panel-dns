@@ -162,8 +162,8 @@ func mainWindow(title string) {
 
 	gr = me.window.Box().NewGroup("debugging")
 	gr.NewButton("hostname status", func () {
-		if ! me.status.Ready() {return}
-		me.status.window.Toggle()
+		if ! me.statusDNS.Ready() {return}
+		me.statusDNS.window.Toggle()
 	})
 
 	gr.NewButton("linuxstatus.New()", func () {
@@ -245,7 +245,7 @@ func statusGrid(n *gui.Node) {
 // run everything because something has changed
 func updateDNS() {
 	me.digStatus.Update()
-	me.status.Update()
+	me.statusDNS.Update()
 
 	// log.Println("digAAAA()")
 

@@ -40,6 +40,7 @@ type hostnameStatus struct {
 	// what the current IP address your network has given you
 	currentIPv4	*gadgets.OneLiner
 	currentIPv6	*gadgets.OneLiner
+	currentAAAA	string
 
 	// what the DNS servers have
 	NSrr		*gadgets.OneLiner
@@ -279,9 +280,9 @@ func (hs *hostnameStatus) missingAAAA() bool {
 }
 */
 
-func (hs *hostnameStatus) GetIPv6dns() []string {
-	tmp := hs.dnsAAAA.Get()
-	return strings.Split(tmp, "\n")
+func (hs *hostnameStatus) GetIPv6() []string {
+	if ! hs.Ready() { return nil}
+	return strings.Split(hs.currentAAAA, "\n")
 }
 
 func (hs *hostnameStatus) updateStatus() {
@@ -314,7 +315,7 @@ func (hs *hostnameStatus) updateStatus() {
 				// hs.dnsAction.SetText("DELETE")
 			}
 		}
-		hs.set(hs.dnsAAAA, s)
+		hs.currentAAAA = strings.Join(vals, "\n")
 
 		vals = lookupDoH(me.statusOS.GetHostname(), "A")
 		log.Log(STATUS, "IPv4 Addresses for ", me.statusOS.GetHostname(), "=", vals)

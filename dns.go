@@ -113,10 +113,10 @@ func lookupNS(domain string) {
 	}
 	tmp = shell.Chomp(tmp)
 
-	if (tmp != me.status.NSrr.Get()) {
+	if (tmp != me.statusDNS.NSrr.Get()) {
 		me.changed = true
 		log.Log(CHANGE, "lookupNS() setting changed to me.NSrr =", tmp)
-		me.status.NSrr.Set(tmp)
+		me.statusDNS.NSrr.Set(tmp)
 	}
 }
 

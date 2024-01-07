@@ -65,7 +65,8 @@ func (ls *LinuxStatus) setHostShort() {
 	}
 }
 
-func (ls *LinuxStatus) GetIPv6os() []string {
+func (ls *LinuxStatus) GetIPv6() []string {
+	if ! me.Ready() {return nil}
 	tmp := me.workingIPv6.Get()
 	return strings.Split(tmp, "\n")
 }

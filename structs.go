@@ -20,7 +20,7 @@ type Host struct {
 	window		*gadgets.BasicWindow	// the main window
 	debug		*gadgets.BasicWindow	// the debug window
 
-	status		*hostnameStatus		// keeps track of the hostname and it's status
+	statusDNS	*hostnameStatus		// keeps track of the hostname and it's status
 	statusOS	*linuxstatus.LinuxStatus		// what the Linux OS sees
 	digStatus	*digStatus		// window of the results of DNS lookups
 
@@ -45,7 +45,6 @@ type Host struct {
 	// DNS A and AAAA results
 	ipv4s		map[string]dns.RR
 	ipv6s		map[string]dns.RR
-
 
 	// DNS stuff
 	DnsAPI		*gui.Node		// what DNS API to use?
