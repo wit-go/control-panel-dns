@@ -279,6 +279,11 @@ func (hs *hostnameStatus) missingAAAA() bool {
 }
 */
 
+func (hs *hostnameStatus) GetIPv6dns() []string {
+	tmp := hs.dnsAAAA.Get()
+	return strings.Split(tmp, "\n")
+}
+
 func (hs *hostnameStatus) updateStatus() {
 	if ! hs.Ready() { return }
 	var s string

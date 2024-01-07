@@ -35,10 +35,21 @@ func fix() bool {
 	}
 	if ! me.status.IPv6() {
 		log.Warn("IPv6 DNS is broken. Check what is broken here")
-		log.Warn("What are my IPv6 addresses?")
-		log.Warn("What are the AAAA resource records in DNS?")
+		fixIPv6dns()
 		return false
 	}
 	log.Warn("YOU SHOULD BE IN IPv6 BLISS")
 	return true
+}
+
+func fixIPv6dns() {
+	log.Warn("What are my IPv6 addresses?")
+	for _, aaaa := range me.statusOS.GetIPv6os() {
+		log.Warn("FOUND AAAA ip", aaaa)
+	}
+
+	log.Warn("What are the AAAA resource records in DNS?")
+	for _, aaaa := range me.status.GetIPv6dns() {
+		log.Warn("FOUND AAAA ip", aaaa)
+	}
 }
