@@ -270,9 +270,15 @@ func deleteChanges() bool {
 	return changed
 }
 
+func (ls *LinuxStatus) GetIPv6() []string {
+	if ! me.Ready() {return nil}
+	tmp := me.workingIPv6.Get()
+	return strings.Split(tmp, "\n")
+}
+
 func (ls *LinuxStatus) GetIPv4() []string {
 	if ! me.Ready() {return nil}
-	tmp := "(none) fixme"
+	tmp := me.workingIPv4.Get()
 	return strings.Split(tmp, "\n")
 }
 

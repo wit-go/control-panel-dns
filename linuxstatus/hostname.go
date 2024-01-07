@@ -3,7 +3,6 @@
 package linuxstatus
 
 import (
-	"strings"
 	"io/ioutil"
 	"go.wit.com/log"
 
@@ -63,12 +62,6 @@ func (ls *LinuxStatus) setHostShort() {
 		me.hostshort.Set(hshort)
 		me.changed = true
 	}
-}
-
-func (ls *LinuxStatus) GetIPv6() []string {
-	if ! me.Ready() {return nil}
-	tmp := me.workingIPv6.Get()
-	return strings.Split(tmp, "\n")
 }
 
 func lookupHostname() {
