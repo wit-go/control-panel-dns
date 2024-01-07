@@ -282,3 +282,8 @@ func (ls *LinuxStatus) GetIPv4() []string {
 	return strings.Split(tmp, "\n")
 }
 
+func (ls *LinuxStatus) GetNameservers() []string {
+	if ! me.Ready() {return nil}
+	tmp := me.resolver.Get()
+	return strings.Split(tmp, "\n")
+}

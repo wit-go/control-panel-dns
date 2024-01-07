@@ -13,6 +13,7 @@ package linuxstatus
 import 	(
 	"os"
 	"os/user"
+	"io/ioutil"
 	"strconv"
 	"strings"
 	"sort"
@@ -64,6 +65,24 @@ func linuxLoop() {
 		log.Log(CHANGE, "os.Getuid =", user.Username, os.Getuid())
 		me.changed = true
 		me.uid.Set(tmp)
+	}
+
+	content, _ := ioutil.ReadFile("/etc/resolv.conf")
+	var ns []string
+	for _, line := range strings.Split(string(content), "\n") {
+		parts := strings.Split(line, " ")
+		if len(parts) > 1 {
+			if parts[0] == "nameserver" {
+				ns = append(ns, parts[1])
+			}
+		}
+	}
+	sort.Strings(ns)
+	newNS := strings.Join(ns, "\n")
+	if newNS != me.resolver.Get() {
+		log.Log(CHANGE, "resolver changed in /etc/resolv.conf to", ns)
+		me.changed = true
+		me.resolver.Set(newNS)
 	}
 
 	/*
