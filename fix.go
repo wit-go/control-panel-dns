@@ -8,8 +8,6 @@ import 	(
 )
 
 func fix() bool {
-	log.Log(CHANGE, "")
-
 	// make and toggle the fixWindow display
 	if me.fixWindow == nil {
 		me.fixWindow = smartwindow.New()
@@ -120,16 +118,25 @@ func fixIPv6dns() bool {
 }
 
 func deleteFromDNS(aaaa string) bool {
-	log.Log(CHANGE, "deleteFromDNS", aaaa)
+	log.Log(CHANGE, "Delete this from DNS !!!!", aaaa)
+	api := me.statusDNS.API()
+	log.Log(CHANGE, "your API provider is =", api)
+	if api == "cloudflare" {
+		log.Log(CHANGE, "Let's try a DELETE via the Cloudflare API")
+		hostname := me.statusOS.GetHostname()
+		b, response := cloudflare.Delete("wit.com", hostname, aaaa)
+		log.Log(CHANGE, "response was:", response)
+		return b
+	}
 	return false
 }
 
 func addToDNS(aaaa string) bool {
-	log.Log(CHANGE, "TODO: Add this to DNS !!!!", aaaa)
+	log.Log(CHANGE, "Add this to DNS !!!!", aaaa)
 	api := me.statusDNS.API()
-	log.Log(CHANGE, "what is your API provider?", api)
+	log.Log(CHANGE, "your API provider is =", api)
 	if api == "cloudflare" {
-		log.Log(CHANGE, "Let's try an ADD via the Cloudflare API")
+		log.Log(CHANGE, "Let's try a CREATE via the Cloudflare API")
 		hostname := me.statusOS.GetHostname()
 		return cloudflare.Create("wit.com", hostname, aaaa)
 	}

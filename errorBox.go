@@ -27,7 +27,7 @@ type errorBox struct {
 
 type anError struct {
 	kind string // what kind of error is it?
-	ip string
+	aaaa string
 	status string
 
 	kindLabel *gui.Node
@@ -62,20 +62,43 @@ func (eb *errorBox) add(kind string, ip string) bool {
 
 	anErr := new(anError)
 	anErr.kind = kind
+	anErr.aaaa = ip
 
 	anErr.kindLabel = eb.grid.NewLabel(kind)
 	anErr.ipLabel = eb.grid.NewLabel(ip)
 	anErr.statusLabel = eb.grid.NewLabel("")
 	anErr.button = eb.grid.NewButton(kind, func() {
 		log.Log(WARN, "got", kind, "here. IP =", ip)
-		eb.fix(kind, ip)
+		eb.fix(tmp)
 	})
 	eb.fixes[tmp] = anErr
 	return false
 }
 
-func (eb *errorBox) fix(name string, ip string) bool {
-	log.Log(WARN, "should try to fix", name, "here. IP =", ip)
+func (eb *errorBox) fix(key string) bool {
+	if eb.fixes[key] == nil {
+		log.Log(WARN, "Unknown error. could not find key =", key)
+		log.Log(WARN, "TODO: probably remove this error. key =", key)
+		return true
+	}
+	myErr :=  eb.fixes[key]
+	log.Log(WARN, "should try to fix", myErr.kind, "here. IP =", myErr.aaaa)
+	if myErr.kind == "DELETE" {
+		if deleteFromDNS(myErr.aaaa) {
+			log.Log(INFO, "Delete AAAA", myErr.aaaa, "Worked")
+		} else {
+			log.Log(INFO, "Delete AAAA", myErr.aaaa, "Failed")
+		}
+		return true
+	}
+	if myErr.kind == "CREATE" {
+		if addToDNS(myErr.aaaa) {
+			log.Log(INFO, "Delete AAAA", myErr.aaaa, "Worked")
+		} else {
+			log.Log(INFO, "Delete AAAA", myErr.aaaa, "Failed")
+		}
+		return true
+	}
 	return false
 }
 

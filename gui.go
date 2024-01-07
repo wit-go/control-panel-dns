@@ -69,7 +69,7 @@ func mainWindow(title string) {
 	gr := me.window.Box().NewGroup("dns update")
 
 	// This is where you figure out what to do next to fix the problems
-	me.fixButton = gr.NewButton("fix", func () {
+	me.fixButton = gr.NewButton("Check Errors", func () {
 		if ! fix() {
 			log.Log(CHANGE, "boo. IPv6 isn't working yet")
 			return
@@ -80,7 +80,6 @@ func mainWindow(title string) {
 		// me.hostname.Set(hostname)
 		me.hostnameStatus.Set("WORKING")
 		me.DnsStatus.Set("WORKING")
-		// me.fixButton.Disable()
 	})
 
 	statusGrid(me.window.Box())
@@ -155,33 +154,6 @@ func updateDNS() {
 	me.digStatus.Update()
 	me.statusDNS.Update()
 
-	// log.Println("digAAAA()")
-
-	/*
-	if me.statusOS.ValidHostname() {
-		var aaaa []string
-		h := me.statusOS.GetHostname()
-		aaaa = digAAAA(h)
-		log.Log(INFO, "digAAAA() for", h, "=", aaaa)
-
-		// log.Println(SPEW, me)
-		if (aaaa == nil) {
-			log.Warn("There are no DNS AAAA records for hostname: ", h)
-			// me.DnsAAAA.Set("(none)")
-			if (cloudflare.CFdialog.TypeNode != nil) {
-				cloudflare.CFdialog.TypeNode.SetText("AAAA new")
-			}
-	
-			if (cloudflare.CFdialog.NameNode != nil) {
-				cloudflare.CFdialog.NameNode.SetText(h)
-			}
-	
-		}
-	}
-	*/
-	// status := displayDNS() // update the GUI based on dig results
-	// me.DnsStatus.SetText(status)
-
 	if me.digStatus.Ready() {
 		if me.digStatus.IPv6() {
 			me.statusIPv6.Set("IPv6 WORKING")
@@ -189,10 +161,6 @@ func updateDNS() {
 			me.statusIPv6.Set("Need VPN")
 		}
 	}
-
-
-	// me.fix.Enable()
-
 
 	// lookup the NS records for your domain
 	// if your host is test.wit.com, find the NS resource records for wit.com
