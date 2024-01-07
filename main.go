@@ -54,8 +54,10 @@ func main() {
 	me.statusOS.Draw2()
 
 	if debugger.ArgDebug() {
-		log.Sleep(2)
-		debugger.DebugWindow(me.myGui)
+		go func() {
+			log.Sleep(2)
+			debugger.DebugWindow(me.myGui)
+		}()
 	}
 
 	// forever monitor for network and dns changes
