@@ -4,6 +4,7 @@ package main
 import 	(
 	"go.wit.com/log"
 	"go.wit.com/gui/cloudflare"
+	"go.wit.com/control-panels/dns/smartwindow"
 )
 
 func fix() bool {
@@ -65,13 +66,16 @@ func fixIPv6dns() bool {
 	// remove old DNS entries first
 	for aaaa, _ := range dnsAAAA {
 		if osAAAA[aaaa] == "dns" {
-			log.Log(INFO, "DNS AAAA is not in OS", aaaa)
 			broken = true
+			log.Log(INFO, "DNS AAAA is not in OS", aaaa)
+			addToFixWindow("DELETE", aaaa)
+			/*
 			if deleteFromDNS(aaaa) {
 				log.Log(INFO, "Delete AAAA", aaaa, "Worked")
 			} else {
 				log.Log(INFO, "Delete AAAA", aaaa, "Failed")
 			}
+			*/
 		} else {
 			log.Log(INFO, "DNS AAAA is in     OS", aaaa)
 		}
@@ -84,11 +88,14 @@ func fixIPv6dns() bool {
 		} else {
 			broken = true
 			log.Log(INFO, "OS  AAAA is not in DNS", aaaa)
+			addToFixWindow("CREATE", aaaa)
+			/*
 			if addToDNS(aaaa) {
 				log.Log(INFO, "Add AAAA", aaaa, "Worked")
 			} else {
 				log.Log(INFO, "Add AAAA", aaaa, "Failed")
 			}
+			*/
 		}
 	}
 
@@ -118,4 +125,19 @@ func exists(m map[string]bool, s string) bool {
 		return true
 	}
 	return false
+}
+
+func addToFixWindow(t string, ip string) {
+	if me.fixWindow == nil {
+		me.fixWindow = smartwindow.New()
+		me.fixWindow.SetParent(me.myGui)
+		me.fixWindow.InitWindow()
+		me.fixWindow.Title("fix window")
+		me.fixWindow.SetDraw(drawFixWindow)
+		me.fixWindow.Make()
+	}
+}
+
+func drawFixWindow(sw *smartwindow.SmartWindow) {
+	log.Log(WARN, "drawFixWindow() START")
 }

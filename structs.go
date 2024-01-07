@@ -8,6 +8,7 @@ import 	(
 	"go.wit.com/gui/gadgets"
 	// "go.wit.com/gui/cloudflare"
 	"go.wit.com/control-panels/dns/linuxstatus"
+	"go.wit.com/control-panels/dns/smartwindow"
 
 	"github.com/miekg/dns"
 )
@@ -60,6 +61,7 @@ type Host struct {
 	digStatusButton *gui.Node
 	witcom		*gadgets.BasicWindow
 	fixButton	*gui.Node
+	fixWindow	*smartwindow.SmartWindow
 }
 
 type IPtype struct {

@@ -149,26 +149,6 @@ func mainWindow(title string) {
 		if ! me.statusDNS.Ready() {return}
 		me.statusDNS.window.Toggle()
 	})
-
-	gr.NewButton("linuxstatus.New()", func () {
-		if (me.statusOS == nil) {
-			me.statusOS = linuxstatus.New()
-		}
-		me.statusOS.SetParent(me.myGui)
-		me.statusOS.InitWindow()
-		me.statusOS.Make()
-		me.statusOS.Draw2()
-	})
-	gr.NewButton("statusOS.Ready()", func () {
-		me.statusOS.Ready()
-	})
-	gr.NewButton("statusOS.Draw()", func () {
-		me.statusOS.Draw()
-		me.statusOS.Draw2()
-	})
-	gr.NewButton("statusOS.Update()", func () {
-		me.statusOS.Update()
-	})
 	gr.NewButton("Linux Status", func () {
 		me.statusOS.Toggle()
 	})

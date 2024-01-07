@@ -48,7 +48,12 @@ func main() {
 	me.digStatus = NewDigStatusWindow(me.myGui)
 	me.statusDNS = NewHostnameStatusWindow(me.myGui)
 
-	linuxstatus.New()
+	me.statusOS = linuxstatus.New()
+	me.statusOS.SetParent(me.myGui)
+	me.statusOS.InitWindow()
+	me.statusOS.Make()
+	me.statusOS.Draw()
+	me.statusOS.Draw2()
 
 	if debugger.ArgDebug() {
 		log.Sleep(2)
