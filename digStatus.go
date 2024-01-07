@@ -16,7 +16,6 @@ import (
 	"os"
 	"fmt"
 	"time"
-	"strings"
 	"reflect"
 	"errors"
 
@@ -153,6 +152,7 @@ func (ds *digStatus) setIPv6status(s string) {
 	me.digStatus.set(ds.statusAAAA, s)
 }
 
+/*
 func (ds *digStatus) SetIPv6(s string) {
 	if ! ds.Ready() {return}
 	log.Warn("Should SetIPv6() here to", s)
@@ -162,6 +162,7 @@ func (ds *digStatus) SetIPv6(s string) {
 	me.DnsAAAA.Set(s)
 	// me.digStatus.set(ds.httpGoWitCom, addr)
 }
+*/
 
 func (ds *digStatus) set(a any, s string) {
 	if ! ds.Ready() {return}
@@ -301,7 +302,7 @@ func (ds *digStatus) checkLookupDoH(hostname string) bool {
 		s = append(s, addr)
 		status = true
 	}
-	me.digStatus.SetIPv6(strings.Join(s, "\n"))
+	// me.digStatus.SetIPv6(strings.Join(s, "\n"))
 	return status
 }
 

@@ -4,8 +4,6 @@ package main
 import 	(
 	"time"
 	"os"
-	"strings"
-	"sort"
 
 	"go.wit.com/log"
 
@@ -60,42 +58,6 @@ func debugTab(title string) {
 	me.debug.Hide()
 }
 
-// doesn't actually do any network traffic
-// it just updates the GUI
-func displayDNS() string {
-	var aaaa []string
-	aaaa = append(aaaa, "blah", "more")
-	// h := me.hostname
-	var all string
-	var broken string = "unknown"
-	for _, s := range aaaa {
-		log.Log(STATUS, "host", "fixme", "DNS AAAA =", s, "ipmap[s] =", me.ipmap[s])
-		all += s + "\n"
-		if ( me.ipmap[s] == nil) {
-			log.Warn("THIS IS THE WRONG AAAA DNS ENTRY:  host", "fixme", "DNS AAAA =", s)
-			broken = "wrong AAAA entry"
-		} else {
-			if (broken == "unknown") {
-				broken = "needs update"
-			}
-		}
-	}
-
-	var a []string
-	a = append(a, "fixme")
-	sort.Strings(a)
-	all = strings.Join(a, "\n")
-	if (all == "") {
-		log.Log(NOW, "THERE IS NOT a real A DNS ENTRY")
-		all = "CNAME ipv6.wit.com"
-	}
-	if (me.DnsA.S != all) {
-		log.Log(NOW, "DnsA.SetText() to:", all)
-		me.DnsA.SetText(all)
-	}
-	return broken
-}
-
 func myDefaultExit(n *gui.Node) {
         log.Println("You can Do exit() things here")
 	os.Exit(0)
@@ -105,15 +67,6 @@ func mainWindow(title string) {
 	me.window = gadgets.NewBasicWindow(me.myGui, title)
 
 	gr := me.window.Box().NewGroup("dns update")
-	grid := gr.NewGrid("gridnuts", 2, 2)
-
-	grid.SetNext(1,1)
-
-	me.hostname = gadgets.NewOneLiner(grid, "hostname =").Set("unknown")
-	me.DnsAAAA = gadgets.NewOneLiner(grid, "DNS AAAA =").Set("unknown")
-
-	grid.NewLabel("DNS A =")
-	me.DnsA = grid.NewLabel("?")
 
 	// This is where you figure out what to do next to fix the problems
 	me.fixButton = gr.NewButton("fix", func () {
@@ -123,15 +76,12 @@ func mainWindow(title string) {
 		}
 		log.Log(CHANGE, "IPv6 WORKED")
 		// update everything here visually for the user
-		hostname := me.statusOS.GetHostname()
-		me.hostname.Set(hostname)
+		// hostname := me.statusOS.GetHostname()
+		// me.hostname.Set(hostname)
 		me.hostnameStatus.Set("WORKING")
 		me.DnsStatus.Set("WORKING")
-		me.fixButton.Disable()
+		// me.fixButton.Disable()
 	})
-
-	grid.Margin()
-	grid.Pad()
 
 	statusGrid(me.window.Box())
 
@@ -207,6 +157,7 @@ func updateDNS() {
 
 	// log.Println("digAAAA()")
 
+	/*
 	if me.statusOS.ValidHostname() {
 		var aaaa []string
 		h := me.statusOS.GetHostname()
@@ -216,7 +167,7 @@ func updateDNS() {
 		// log.Println(SPEW, me)
 		if (aaaa == nil) {
 			log.Warn("There are no DNS AAAA records for hostname: ", h)
-			me.DnsAAAA.Set("(none)")
+			// me.DnsAAAA.Set("(none)")
 			if (cloudflare.CFdialog.TypeNode != nil) {
 				cloudflare.CFdialog.TypeNode.SetText("AAAA new")
 			}
@@ -225,34 +176,11 @@ func updateDNS() {
 				cloudflare.CFdialog.NameNode.SetText(h)
 			}
 	
-			/*
-			d := deleteAAA()
-			if (d != "") {
-				if (cloudflare.CFdialog.ValueNode != nil) {
-					cloudflare.CFdialog.ValueNode.SetText(d)
-				}
-			}
-			*/
-//			m := missingAAAA()
-//			if (m != "") {
-//				if (cloudflare.CFdialog.ValueNode != nil) {
-//					cloudflare.CFdialog.ValueNode.SetText(m)
-//				}
-//				/*
-//				 rr := &cloudflare.RRT{
-//					Type:	"AAAA",
-//					Name:	me.hostname,
-//					Ttl:	"Auto",
-//					Proxied:	false,
-//					Content:	m,
-//				}
-//				cloudflare.Update(rr)
-//				*/
-//			}
 		}
 	}
-	status := displayDNS() // update the GUI based on dig results
-	me.DnsStatus.SetText(status)
+	*/
+	// status := displayDNS() // update the GUI based on dig results
+	// me.DnsStatus.SetText(status)
 
 	if me.digStatus.Ready() {
 		if me.digStatus.IPv6() {

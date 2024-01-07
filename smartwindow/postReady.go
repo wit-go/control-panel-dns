@@ -55,5 +55,24 @@ func (sw *SmartWindow) Toggle() {
 func (sw *SmartWindow) Box() *gui.Node {
 	if ! sw.Ready() {return nil}
 
-	return sw.window.Box()
+	return sw.box
+}
+
+func (sw *SmartWindow) Draw() {
+	if ! sw.Ready() {return}
+
+	log.Log(WARN, "Draw() window ready")
+	sw.window.Draw()
+
+	if sw.vertical {
+		sw.box = sw.window.NewBox("bw vbox", false)
+		log.Log(WARN, "BasicWindow.Custom() made vbox")
+	} else {
+		sw.box = sw.window.NewBox("bw hbox", true)
+		log.Log(WARN, "BasicWindow.Custom() made hbox")
+	}
+	if (sw.populate != nil) {
+		log.Log(WARN, "Make() trying to run Custom sw.populate() here")
+		sw.populate(sw)
+	}
 }

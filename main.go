@@ -157,8 +157,16 @@ func dnsTTL() {
 }
 
 // run update on the LinuxStatus() window
+// also update a few things on the main window
 func linuxLoop() {
 	me.statusOS.Update()
+
+	if me.statusOS.ValidHostname() {
+		if me.hostnameStatus.GetText() != "VALID" {
+			me.hostnameStatus.Set("VALID")
+			me.changed = true
+		}
+	}
 
 	if (me.statusOS.Changed()) {
 		stamp := time.Now().Format("2006/01/02 15:04:05")

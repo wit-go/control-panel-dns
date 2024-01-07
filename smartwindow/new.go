@@ -2,8 +2,6 @@ package smartwindow
 
 import 	(
 	"go.wit.com/log"
-
-	"go.wit.com/gui/gadgets"
 )
 
 func New() *SmartWindow {
@@ -25,8 +23,4 @@ func (sw *SmartWindow) InitWindow() {
 		sw.ready = true
 		return
 	}
-
-	log.Log(WARN, "Creating the Window")
-	sw.window = gadgets.NewBasicWindow(sw.parent, sw.title)
-	sw.ready = true
 }

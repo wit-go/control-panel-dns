@@ -9,6 +9,22 @@ import 	(
 
 func fix() bool {
 	log.Log(CHANGE, "")
+
+	// make and toggle the fixWindow display
+	if me.fixWindow == nil {
+		me.fixWindow = smartwindow.New()
+		me.fixWindow.SetParent(me.myGui)
+		me.fixWindow.Title("fix window")
+		me.fixWindow.SetDraw(drawFixWindow)
+		me.fixWindow.Vertical()
+		me.fixWindow.Make()
+		me.fixWindow.Draw()
+		me.fixWindow.Hide()
+		// me.fixWindow.Draw2()
+		return false
+	}
+	me.fixWindow.Toggle()
+
 	if ! me.statusDNS.Ready() {
 		log.Log(CHANGE, "The IPv6 Control Panel is not Ready() yet")
 		return false
@@ -65,7 +81,9 @@ func fixIPv6dns() bool {
 
 	// remove old DNS entries first
 	for aaaa, _ := range dnsAAAA {
-		if osAAAA[aaaa] == "dns" {
+		if osAAAA[aaaa] == "os" {
+			log.Log(INFO, "DNS AAAA is in     OS", aaaa)
+		} else {
 			broken = true
 			log.Log(INFO, "DNS AAAA is not in OS", aaaa)
 			addToFixWindow("DELETE", aaaa)
@@ -76,8 +94,6 @@ func fixIPv6dns() bool {
 				log.Log(INFO, "Delete AAAA", aaaa, "Failed")
 			}
 			*/
-		} else {
-			log.Log(INFO, "DNS AAAA is in     OS", aaaa)
 		}
 	}
 
@@ -127,17 +143,24 @@ func exists(m map[string]bool, s string) bool {
 	return false
 }
 
+var myErrorBox *errorBox
+
 func addToFixWindow(t string, ip string) {
+	log.Log(INFO, "addToFixWindow() START")
 	if me.fixWindow == nil {
-		me.fixWindow = smartwindow.New()
-		me.fixWindow.SetParent(me.myGui)
-		me.fixWindow.InitWindow()
-		me.fixWindow.Title("fix window")
-		me.fixWindow.SetDraw(drawFixWindow)
-		me.fixWindow.Make()
+		log.Log(WARN, "addToFixWindow() fixWindow == nil. Can't add the error", t, ip)
+		return
 	}
+	if myErrorBox == nil {
+		box := me.fixWindow.Box()
+		myErrorBox = NewErrorBox(box, t, ip)
+	}
+	myErrorBox.add(t, ip)
+	log.Log(INFO, "addToFixWindow() END")
 }
 
 func drawFixWindow(sw *smartwindow.SmartWindow) {
 	log.Log(WARN, "drawFixWindow() START")
+	box := sw.Box()
+	box.NewLabel("test")
 }

@@ -18,11 +18,11 @@ func (ls *LinuxStatus) Update() {
 	duration := timeFunction(func () {
 		linuxLoop()
 	})
-	ls.SetSpeed(duration)
+	ls.setSpeed(duration)
 	log.Log(INFO, "Update() END")
 }
 
-func (ls *LinuxStatus) SetSpeed(duration time.Duration) {
+func (ls *LinuxStatus) setSpeed(duration time.Duration) {
 	s := fmt.Sprint(duration)
 	if ls.speedActual == nil {
 		log.Log(WARN, "can't actually warn")

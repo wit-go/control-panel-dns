@@ -36,49 +36,37 @@ func (sw *SmartWindow) SetParent(p *gui.Node) {
 }
 
 func (sw *SmartWindow) SetDraw(f func(*SmartWindow)) {
-	if ! sw.Initialized() {return}
-	if sw.Ready() {return}
+	log.Log(WARN, "SetDraw() START")
+	if ! sw.Initialized() {
+		log.Log(WARN, "SetDraw() Failed. sw.Initialized == false")
+		return
+	}
+	if sw.Ready() {
+		log.Log(WARN, "SetDraw() Failed. sw.Ready() == true")
+		return
+	}
 
 	sw.populate = f
+	log.Log(WARN, "SetDraw() END sw.populate is set")
 }
 
 func (sw *SmartWindow) Make() {
 	if ! sw.Initialized() {return}
 	if sw.Ready() {return}
+	log.Log(WARN, "Make() START")
 
-	log.Log(WARN, "Make() window ready =", sw.ready)
-	sw.window.Make()
-	if (sw.populate != nil) {
-		log.Log(WARN, "Make() trying to run Custom sw.populate() here")
-		sw.populate(sw)
+	sw.window = sw.parent.RawWindow(sw.title)
+	sw.window.Custom = func() {
+		log.Warn("BasicWindow.Custom() closed. TODO: handle this", sw.title)
 	}
+	log.Log(WARN, "Make() END sw.window = RawWindow() (not sent to toolkits)")
 	sw.ready = true
 }
-
-func (sw *SmartWindow) Draw() {
-	if ! sw.Initialized() {return}
-	if sw.Ready() {return}
-
-	log.Log(WARN, "Draw() window ready =", sw.ready)
-	sw.window.Draw()
-	if (sw.populate != nil) {
-		log.Log(WARN, "Make() trying to run Custom sw.populate() here")
-		sw.populate(sw)
-	}
-	sw.ready = true
-}
-
 
 func (sw *SmartWindow) Vertical() {
 	if ! sw.Initialized() {return}
 	if sw.Ready() {return}
 
-	log.Log(WARN, "Draw() window ready =", sw.ready)
-	sw.window.Draw()
-	if (sw.populate != nil) {
-		log.Log(WARN, "Make() trying to run Custom sw.populate() here")
-		sw.populate(sw)
-	}
-	sw.ready = true
+	log.Log(WARN, "Vertical() setting vertical = true")
+	sw.vertical = true
 }
-

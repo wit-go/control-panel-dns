@@ -8,17 +8,15 @@ import 	(
 )
 
 func (sw *SmartWindow) Ready() bool {
-	log.Log(WARN, "Ready() maybe not ready? sw =", sw)
-	if sw == nil {return false}
+	log.Log(INFO, "Ready() START")
 	if sw == nil {return false}
 	if sw.window == nil {return false}
+	log.Log(INFO, "Ready() END sw.ready =", sw.ready)
 	return sw.ready
 }
 
 func (sw *SmartWindow) Initialized() bool {
-	log.Log(WARN, "checking Initialized()")
+	log.Log(INFO, "checking Initialized()")
 	if sw == nil {return false}
-	if sw == nil {return false}
-	if sw.parent == nil {return false}
 	return true
 }

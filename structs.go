@@ -27,7 +27,7 @@ type Host struct {
 	digStatus	*digStatus		// window of the results of DNS lookups
 
 	hostnameStatus	*gui.Node		// a summary for the user of where things are
-	hostname	*gadgets.OneLiner	// the hostname grabbed from gadget.linuxStatus
+	// hostname	*gadgets.OneLiner	// the hostname grabbed from gadget.linuxStatus
 
 	artificialSleep float64	`default:"0.7"`	// artificial sleep on startup
 	artificialS     string 	`default:"abc"`	// artificial sleep on startup
@@ -50,8 +50,6 @@ type Host struct {
 
 	// DNS stuff
 	DnsAPI		*gui.Node		// what DNS API to use?
-	DnsAAAA		*gadgets.OneLiner	// the actual DNS AAAA results
-	DnsA		*gui.Node		// the actual DNS A results (ignore for status since mostly never happens?)
 	DnsStatus	*gui.Node		// the current state of DNS
 	DnsSpeed	*gui.Node		// 'FAST', 'OK', 'SLOW', etc
 	DnsSpeedActual	*gui.Node		// the last actual duration
