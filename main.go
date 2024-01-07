@@ -88,7 +88,7 @@ func main() {
 
 	lastProvider := "unknown"
 	go myTicker(10 * time.Second, "DNSloop", func() {
-		log.Log(CHANGE, "me.statusDNS.Update() START")
+		log.Log(INFO, "me.statusDNS.Update() START")
 		me.statusDNS.Update()
 
 		provider := me.statusDNS.GetDNSapi()
@@ -127,7 +127,7 @@ func main() {
 	})
 
 	// check the four known things to see if they are all WORKING
-	myTicker(3 * time.Second, "MAIN LOOP", func() {
+	myTicker(10 * time.Second, "MAIN LOOP", func() {
 		if me.hostnameStatus.GetText() != "WORKING" {
 			log.Log(CHANGE, "The hostname is not WORKING yet", me.hostnameStatus.GetText())
 			return
@@ -144,7 +144,7 @@ func main() {
 			log.Log(CHANGE, "The DNS API provider is not yet working", me.DnsAPIstatus.GetText())
 			return
 		}
-		log.Log(CHANGE, "EVERYTHING IS WORKING. YOU HAVE IPv6 BLISS")
+		log.Log(CHANGE, "EVERYTHING IS WORKING. YOU HAVE IPv6 BLISS. TODO: don't check so often now")
 	})
 }
 

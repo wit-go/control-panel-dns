@@ -321,10 +321,55 @@ func (hs *hostnameStatus) updateStatus() {
 	} else {
 		hs.status.Set("BROKEN")
 	}
+	
+	if hs.verifyIPv6() {
+		hs.statusIPv6.Set("WORKING")
+	} else {
+		hs.statusIPv6.Set("BROKEN")
+	}
+}
 
-	// lookup the DNS provider
-	// hs.dnsAPI.Set(me.DnsAPI.S)
-	lookupNSprovider("wit.com")
+func (hs *hostnameStatus) verifyIPv6() bool {
+	var working bool = true
+	osAAAA := make(map[string]string)
+	dnsAAAA := make(map[string]string)
+
+	log.Log(INFO, "What are the AAAA resource records in the OS?")
+	tmp := me.statusOS.GetIPv6()
+	if len(tmp) == 0 {
+		// you don't have any IPv6 addresses in your OS right now
+		return false
+	}
+	for _, aaaa := range me.statusOS.GetIPv6() {
+		log.Log(INFO, "FOUND OS  AAAA ip", aaaa)
+		osAAAA[aaaa] = "os"
+	}
+
+	log.Log(INFO, "What are the AAAA resource records in DNS?")
+	for _, aaaa := range me.statusDNS.GetIPv6() {
+		log.Log(INFO, "FOUND DNS AAAA ip", aaaa)
+		dnsAAAA[aaaa] = "dns"
+	}
+
+	for aaaa, _ := range dnsAAAA {
+		if osAAAA[aaaa] == "os" {
+			log.Log(INFO, "DNS AAAA is in     OS", aaaa)
+		} else {
+			working = false
+			log.Log(INFO, "DNS AAAA is not in OS", aaaa)
+		}
+	}
+
+	for aaaa, _ := range osAAAA {
+		if dnsAAAA[aaaa] == "dns" {
+			log.Log(INFO, "OS  AAAA is in     DNS", aaaa)
+		} else {
+			working = false
+			log.Log(INFO, "OS  AAAA is not in DNS", aaaa)
+		}
+	}
+
+	return working
 }
 
 func (hs *hostnameStatus) Show() {
