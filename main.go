@@ -162,8 +162,8 @@ func linuxLoop() {
 	me.statusOS.Update()
 
 	if me.statusOS.ValidHostname() {
-		if me.hostnameStatus.GetText() != "VALID" {
-			me.hostnameStatus.Set("VALID")
+		if me.hostnameStatus.GetText() != "WORKING" {
+			me.hostnameStatus.Set("WORKING")
 			me.changed = true
 		}
 	}

@@ -33,7 +33,7 @@ func (ls *LinuxStatus) GetHostname() string {
 
 func (ls *LinuxStatus) ValidHostname() bool {
 	if ! me.Ready() {return false}
-	if me.hostnameStatus.Get() == "VALID" {
+	if me.hostnameStatus.Get() == "WORKING" {
 		return true
 	}
 	return false
@@ -104,9 +104,9 @@ func lookupHostname() {
 			me.hostnameStatus.Set("BROKEN")
 		}
 	} else {
-		if (me.hostnameStatus.Get() != "VALID") {
+		if (me.hostnameStatus.Get() != "WORKING") {
 			log.Log(CHANGE, "hostname", hostname, "is valid")
-			me.hostnameStatus.Set("VALID")
+			me.hostnameStatus.Set("WORKING")
 			me.changed = true
 		}
 	}

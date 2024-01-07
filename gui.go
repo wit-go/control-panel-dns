@@ -12,7 +12,7 @@ import 	(
 	"go.wit.com/gui/cloudflare"
 	"go.wit.com/gui/debugger"
 	"go.wit.com/gui/gadgets/logsettings"
-	// "go.wit.com/control-panels/dns/linuxstatus"
+	"go.wit.com/control-panels/dns/smartwindow"
 )
 
 // This setups up the dns control panel window
@@ -81,11 +81,14 @@ func mainWindow(title string) {
 		// me.hostname.Set(hostname)
 		me.hostnameStatus.Set("WORKING")
 		me.DnsStatus.Set("WORKING")
+		me.fixButton.SetText("No Errors!")
+		me.fixButton.Disable()
 	})
 
 	statusGrid(me.window.Box())
 
 	gr = me.window.Box().NewGroup("debugging")
+/*
 	me.statusDNSbutton = gr.NewButton("hostname status", func () {
 		if ! me.statusDNS.Ready() {return}
 		me.statusDNS.window.Toggle()
@@ -97,12 +100,7 @@ func mainWindow(title string) {
 		if ! me.digStatus.Ready() {return}
 		me.digStatus.window.Toggle()
 	})
-	gr.NewButton("cloudflare wit.com", func () {
-		if me.witcom != nil {
-			me.witcom.Toggle()
-		}
-		me.witcom = cloudflare.CreateRR(me.myGui, "wit.com", "3777302ac4a78cd7fa4f6d3f72086d06")
-	})
+*/
 	gr.NewButton("Debug", func () {
 		me.debug.Toggle()
 	})
@@ -116,30 +114,64 @@ func mainWindow(title string) {
 		}
 		myLS.Toggle()
 	})
+	gr.NewButton("Show Errors", func () {
+		if me.fixWindow == nil {
+			me.fixWindow = smartwindow.New()
+			me.fixWindow.SetParent(me.myGui)
+			me.fixWindow.Title("fix window")
+			me.fixWindow.SetDraw(drawFixWindow)
+			me.fixWindow.Vertical()
+			me.fixWindow.Make()
+			me.fixWindow.Draw()
+			me.fixWindow.Hide()
+			return
+		}
+		me.fixWindow.Toggle()
+	})
 }
+
 
 func statusGrid(n *gui.Node) {
 	problems := n.NewGroup("status")
 
-	gridP := problems.NewGrid("nuts", 2, 2)
+	gridP := problems.NewGrid("nuts", 3, 1)
 
 	gridP.NewLabel("hostname =")
 	me.hostnameStatus = gridP.NewLabel("invalid")
+	gridP.NewButton("Linux Status", func () {
+		me.statusOS.Toggle()
+	})
 
 	gridP.NewLabel("DNS Status =")
 	me.DnsStatus = gridP.NewLabel("unknown")
+	me.statusDNSbutton = gridP.NewButton("hostname status", func () {
+		if ! me.statusDNS.Ready() {return}
+		me.statusDNS.window.Toggle()
+	})
 
 	me.statusIPv6 = gadgets.NewOneLiner(gridP, "IPv6 working")
 	me.statusIPv6.Set("known")
-
-	gridP.NewLabel("dns resolution")
-	me.DnsSpeed = gridP.NewLabel("unknown")
-
-	gridP.NewLabel("dns resolution speed")
-	me.DnsSpeedActual = gridP.NewLabel("unknown")
+	gridP.NewButton("resolver status", func () {
+		if ! me.digStatus.Ready() {return}
+		me.digStatus.window.Toggle()
+	})
 
 	gridP.NewLabel("dns API provider =")
 	me.DnsAPI = gridP.NewLabel("unknown")
+	gridP.NewButton("cloudflare wit.com", func () {
+		if me.witcom != nil {
+			me.witcom.Toggle()
+		}
+		me.witcom = cloudflare.CreateRR(me.myGui, "wit.com", "3777302ac4a78cd7fa4f6d3f72086d06")
+	})
+
+	gridP.NewLabel("dns resolution")
+	me.DnsSpeed = gridP.NewLabel("unknown")
+	gridP.NewLabel("")
+
+	gridP.NewLabel("dns resolution speed")
+	me.DnsSpeedActual = gridP.NewLabel("unknown")
+	gridP.NewLabel("")
 
 	gridP.Margin()
 	gridP.Pad()
