@@ -22,6 +22,7 @@ import (
 type hostnameStatus struct {
 	ready		bool
 	hidden		bool
+	changed		bool
 
 	lastname	string // used to watch for changes in the hostname
 
@@ -268,36 +269,29 @@ func (hs *hostnameStatus) updateStatus() {
 	}
 	hs.domainname.Set(me.statusOS.GetDomainName())
 
-	tmp := me.statusOS.GetIPv4()
+	var tmp []string
+	tmp = me.statusOS.GetIPv4()
 	sort.Strings(tmp)
-	hs.currentIPv4.Set(strings.Join(tmp, "\n"))
+	s = strings.Join(tmp, "\n")
+	if s != hs.currentIPv4.Get() {
+		log.Log(CHANGE, "DNS IPv4 Addresses changed", tmp)
+		hs.currentIPv4.Set(s)
+		hs.changed = true
+	}
 
 	tmp = me.statusOS.GetIPv6()
 	sort.Strings(tmp)
-	hs.currentIPv6.Set(strings.Join(tmp, "\n"))
+	s = strings.Join(tmp, "\n")
+	if s != hs.currentIPv6.Get() {
+		log.Log(CHANGE, "DNS IPv6 Addresses changed", tmp)
+		hs.currentIPv6.Set(s)
+		hs.changed = true
+	}
 
 	if me.statusOS.ValidHostname() {
 		vals = lookupDoH(me.statusOS.GetHostname(), "AAAA")
 
 		log.Log(STATUS, "DNS IPv6 Addresses for ", me.statusOS.GetHostname(), "=", vals)
-		if len(vals) == 0 {
-			s = "(none)"
-		} else {
-			hs.setIPv6("Check for real IPv6 addresses here")
-			/*
-			if hs.missingAAAA() {
-				hs.setIPv6("Add the missing IPv6 address")
-			}
-			*/
-			for _, addr := range vals {
-				log.Log(STATUS, addr)
-				s += addr + " (DELETE)" + "\n"
-				hs.setIPv6("NEEDS DELETE")
-				// hs.dnsValue.SetText(addr)
-				// hs.dnsAction.SetText("DELETE")
-			}
-		}
-		sort.Strings(vals)
 		hs.dnsAAAA.Set(strings.Join(vals, "\n"))
 
 		vals = lookupDoH(me.statusOS.GetHostname(), "A")
@@ -314,6 +308,11 @@ func (hs *hostnameStatus) updateStatus() {
 		if (s != "") {
 			hs.set(hs.dnsA, "CNAME " + s)
 			hs.setIPv4("GOOD")
+		}
+		if hs.changed {
+			log.Log(CHANGE, "stuff changed. trying fixIPv6dns()")
+			fixIPv6dns()
+			hs.changed = false
 		}
 	}
 
