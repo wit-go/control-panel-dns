@@ -12,7 +12,7 @@ import 	(
 	"go.wit.com/gui/cloudflare"
 	"go.wit.com/gui/debugger"
 	"go.wit.com/gui/gadgets/logsettings"
-	// "go.wit.com/apps/control-panel-dns/smartwindow"
+	"go.wit.com/apps/control-panel-dns/smartwindow"
 )
 
 // This setups up the dns control panel window
@@ -105,6 +105,20 @@ func mainWindow(title string) {
 		myLS.Toggle()
 	})
 
+	gr.NewButton("test smartwindow()", func () {
+		if me.fixWindow == nil {
+			me.fixWindow = smartwindow.New()
+			me.fixWindow.SetParent(me.myGui)
+			me.fixWindow.Title("smart window test")
+			me.fixWindow.SetDraw(drawFixWindow)
+			me.fixWindow.Vertical()
+			me.fixWindow.Make()
+			me.fixWindow.Draw()
+			me.fixWindow.Hide()
+			return
+		}
+	})
+
 	gr.NewButton("Show Errors", func () {
 		/*
 		if me.fixWindow == nil {
@@ -121,6 +135,8 @@ func mainWindow(title string) {
 		*/
 		me.problems.Toggle()
 	})
+	me.autofix = gr.NewCheckbox("Auto-correct Errors")
+	me.autofix.Set(false)
 
 	// These are your problems
 	me.problems = NewErrorBox(me.window.Box(), "Errors", "has problems?")

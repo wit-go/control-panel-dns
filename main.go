@@ -152,7 +152,8 @@ func main() {
 		if working {
 			log.Log(CHANGE, "EVERYTHING IS WORKING. YOU HAVE IPv6 BLISS. TODO: don't check so often now")
 		} else {
-			log.Log(CHANGE, "EVERYTHING IS NOT WORKING. Probably run fix() here?")
+			log.Log(CHANGE, "EVERYTHING IS NOT WORKING. scanning errors:")
+			me.problems.Scan()
 		}
 	})
 }

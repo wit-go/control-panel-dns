@@ -103,6 +103,14 @@ func (eb *errorBox) add(kind string, ip string) bool {
 	return false
 }
 
+// get all your problems!
+func (eb *errorBox) Scan() []anError {
+	for s, thing := range eb.fixes {
+		log.Log(CHANGE, "Scan()", s, thing)
+	}
+	return nil
+}
+
 func (eb *errorBox) fix(key string) bool {
 	if eb.fixes[key] == nil {
 		log.Log(WARN, "Unknown error. could not find key =", key)

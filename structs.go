@@ -65,6 +65,7 @@ type Host struct {
 	fixWindow	*smartwindow.SmartWindow
 
 	problems	*errorBox
+	autofix		*gui.Node
 }
 
 type IPtype struct {
