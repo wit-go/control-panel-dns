@@ -95,7 +95,7 @@ func (eb *errorBox) add(kind string, ip string) bool {
 	anErr.kindLabel = eb.grid.NewLabel(kind)
 	anErr.ipLabel = eb.grid.NewLabel(ip)
 	anErr.statusLabel = eb.grid.NewLabel("")
-	anErr.button = eb.grid.NewButton(kind, func() {
+	anErr.button = eb.grid.NewButton("Fix", func() {
 		log.Log(WARN, "got", kind, "here. IP =", ip)
 		eb.fix(tmp)
 	})

@@ -110,29 +110,17 @@ func mainWindow(title string) {
 			me.fixWindow = smartwindow.New()
 			me.fixWindow.SetParent(me.myGui)
 			me.fixWindow.Title("smart window test")
-			me.fixWindow.SetDraw(drawFixWindow)
+			me.fixWindow.SetDraw(testSmartWindow)
 			me.fixWindow.Vertical()
 			me.fixWindow.Make()
 			me.fixWindow.Draw()
 			me.fixWindow.Hide()
 			return
 		}
+		me.fixWindow.Toggle()
 	})
 
 	gr.NewButton("Show Errors", func () {
-		/*
-		if me.fixWindow == nil {
-			me.fixWindow = smartwindow.New()
-			me.fixWindow.SetParent(me.myGui)
-			me.fixWindow.Title("fix window")
-			me.fixWindow.SetDraw(drawFixWindow)
-			me.fixWindow.Vertical()
-			me.fixWindow.Make()
-			me.fixWindow.Draw()
-			me.fixWindow.Hide()
-			return
-		}
-		*/
 		me.problems.Toggle()
 	})
 	me.autofix = gr.NewCheckbox("Auto-correct Errors")
