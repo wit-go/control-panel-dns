@@ -2,7 +2,8 @@
 
 run: build
 	# ./control-panel-dns >/tmp/witgui.log.stderr 2>&1
-	./control-panel-dns
+	cp -f control-panel-dns ~/
+	./control-panel-dns --tmp-log
 
 redomod:
 	rm -f go.*

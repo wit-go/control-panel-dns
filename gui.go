@@ -12,7 +12,7 @@ import 	(
 	"go.wit.com/gui/cloudflare"
 	"go.wit.com/gui/debugger"
 	"go.wit.com/gui/gadgets/logsettings"
-	"go.wit.com/apps/control-panel-dns/smartwindow"
+	// "go.wit.com/apps/control-panel-dns/smartwindow"
 )
 
 // This setups up the dns control panel window
@@ -89,6 +89,7 @@ func mainWindow(title string) {
 
 	// some artificial padding to make the last row of buttons look less wierd
 	gr := hbox.NewGroup("Development and Debugging Windows")
+	gr = gr.NewBox("vbox", false)
 
 	gr.NewButton("Debug", func () {
 		me.debug.Toggle()
@@ -103,7 +104,9 @@ func mainWindow(title string) {
 		}
 		myLS.Toggle()
 	})
+
 	gr.NewButton("Show Errors", func () {
+		/*
 		if me.fixWindow == nil {
 			me.fixWindow = smartwindow.New()
 			me.fixWindow.SetParent(me.myGui)
@@ -115,7 +118,8 @@ func mainWindow(title string) {
 			me.fixWindow.Hide()
 			return
 		}
-		me.fixWindow.Toggle()
+		*/
+		me.problems.Toggle()
 	})
 
 	// These are your problems

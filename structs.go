@@ -64,7 +64,6 @@ type Host struct {
 	fixButton	*gui.Node
 	fixWindow	*smartwindow.SmartWindow
 
-	errorGroup	*gui.Node	// Hide() and Show() this node if there are no errors
 	problems	*errorBox
 }
 

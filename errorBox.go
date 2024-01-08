@@ -12,6 +12,7 @@ import (
 
 type errorBox struct {
 	ready	bool
+	hidden	bool
 
 	parent	*gui.Node
 	group	*gui.Node
@@ -51,6 +52,27 @@ func NewErrorBox(p *gui.Node, name string, ip string) *errorBox {
 	eb.fixes = make(map[string]*anError)
 	eb.ready = true
 	return eb
+}
+
+func (eb *errorBox) Show() {
+	if eb == nil {return}
+	eb.hidden = false
+	eb.group.Show()
+}
+
+func (eb *errorBox) Hide() {
+	if eb == nil {return}
+	eb.hidden = true
+	eb.group.Hide()
+}
+
+func (eb *errorBox) Toggle() {
+	if eb == nil {return}
+	if eb.hidden {
+		eb.Show()
+	} else {
+		eb.Hide()
+	}
 }
 
 func (eb *errorBox) Ready() bool {

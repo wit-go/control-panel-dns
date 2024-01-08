@@ -35,10 +35,14 @@ func main() {
 	me.ipv4s = make(map[string]dns.RR)
 	me.ipv6s = make(map[string]dns.RR)
 
-	// send all log() output to a file in /tmp
-	log.SetTmp()
+	if args.TmpLog {
+		// send all log() output to a file in /tmp
+		log.SetTmp()
+	}
 
-	me.myGui = gui.New().Default()
+	me.myGui = gui.New()
+	me.myGui.InitEmbed(resToolkit)
+	me.myGui.Default()
 
 	log.Sleep(me.artificialSleep)
 	setupControlPanelWindow()

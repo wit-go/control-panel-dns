@@ -15,6 +15,7 @@ import 	(
 
 var args struct {
 	Display string `arg:"env:DISPLAY"`
+	TmpLog bool  `arg:"--tmp-log" help:"automatically send STDOUT to /tmp"`
 	VerboseDNS bool  `arg:"--verbose-dns" help:"debug your dns settings"`
 }
 
