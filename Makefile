@@ -4,6 +4,11 @@ run: build
 	# ./control-panel-dns >/tmp/witgui.log.stderr 2>&1
 	./control-panel-dns
 
+redomod:
+	rm -f go.*
+	go mod init
+	go mod tidy
+
 install:
 	go install -v go.wit.com/control-panel-dns@latest
 	# go install -v go.wit.com/control-panel-dns@latest

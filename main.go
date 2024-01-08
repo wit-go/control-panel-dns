@@ -128,23 +128,28 @@ func main() {
 
 	// check the four known things to see if they are all WORKING
 	myTicker(10 * time.Second, "MAIN LOOP", func() {
+		var working bool = true
 		if me.hostnameStatus.GetText() != "WORKING" {
 			log.Log(CHANGE, "The hostname is not WORKING yet", me.hostnameStatus.GetText())
-			return
+			working = false
 		}
 		if me.statusIPv6.Get() != "WORKING" {
 			log.Log(CHANGE, "IPv6 DNS lookup has not been confirmed yet", me.statusIPv6.Get())
-			return
+			working = false
 		}
 		if me.DnsStatus.GetText() != "WORKING" {
 			log.Log(CHANGE, "Your IPv6 DNS settings have not been confirmed yet", me.DnsStatus.GetText()) 
-			return
+			working = false
 		}
 		if me.DnsAPIstatus.GetText() != "WORKING" {
 			log.Log(CHANGE, "The DNS API provider is not yet working", me.DnsAPIstatus.GetText())
-			return
+			working = false
 		}
-		log.Log(CHANGE, "EVERYTHING IS WORKING. YOU HAVE IPv6 BLISS. TODO: don't check so often now")
+		if working {
+			log.Log(CHANGE, "EVERYTHING IS WORKING. YOU HAVE IPv6 BLISS. TODO: don't check so often now")
+		} else {
+			log.Log(CHANGE, "EVERYTHING IS NOT WORKING. Probably run fix() here?")
+		}
 	})
 }
 

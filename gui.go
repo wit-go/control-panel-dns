@@ -81,41 +81,15 @@ func myDefaultExit(n *gui.Node) {
 
 func mainWindow(title string) {
 	me.window = gadgets.NewBasicWindow(me.myGui, title)
+	me.window.Vertical()
 
-	gr := me.window.Box().NewGroup("dns update")
+	hbox := me.window.Box().NewBox("bw hbox", true)
 
-	// This is where you figure out what to do next to fix the problems
-	me.fixButton = gr.NewButton("Check Errors", func () {
-		if ! fix() {
-			log.Log(CHANGE, "boo. IPv6 isn't working yet")
-			return
-		}
-		log.Log(CHANGE, "IPv6 WORKED")
-		// update everything here visually for the user
-		// hostname := me.statusOS.GetHostname()
-		// me.hostname.Set(hostname)
-		me.hostnameStatus.Set("WORKING")
-		me.DnsStatus.Set("WORKING")
-		me.fixButton.SetText("No Errors!")
-		me.fixButton.Disable()
-	})
+	statusGrid(hbox)
 
-	statusGrid(me.window.Box())
+	// some artificial padding to make the last row of buttons look less wierd
+	gr := hbox.NewGroup("Development and Debugging Windows")
 
-	gr = me.window.Box().NewGroup("")
-/*
-	me.statusDNSbutton = gr.NewButton("hostname status", func () {
-		if ! me.statusDNS.Ready() {return}
-		me.statusDNS.window.Toggle()
-	})
-	gr.NewButton("Linux Status", func () {
-		me.statusOS.Toggle()
-	})
-	gr.NewButton("resolver status", func () {
-		if ! me.digStatus.Ready() {return}
-		me.digStatus.window.Toggle()
-	})
-*/
 	gr.NewButton("Debug", func () {
 		me.debug.Toggle()
 	})
@@ -143,6 +117,10 @@ func mainWindow(title string) {
 		}
 		me.fixWindow.Toggle()
 	})
+
+	// These are your problems
+	me.problems = NewErrorBox(me.window.Box(), "Errors", "has problems?")
+	me.problems.add("SOMETHING", "1:1:1:1:3")
 }
 
 
@@ -188,7 +166,4 @@ func statusGrid(n *gui.Node) {
 			}
 		}
 	})
-
-	n.NewGroup("NOTES")
-
 }

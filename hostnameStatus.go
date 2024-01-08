@@ -224,27 +224,6 @@ func (hs *hostnameStatus) existsAAAA(s string) bool {
 	return false
 }
 
-/*
-// figure out if I'm missing any IPv6 address in DNS
-func (hs *hostnameStatus) missingAAAA() bool {
-	var aaaa []string
-	aaaa = dhcpAAAA()
-	for _, s := range aaaa {
-		log.Log(NET, "my actual AAAA = ",s)
-		if hs.existsAAAA(s) {
-			log.Log(NOW, "my actual AAAA already exists in DNS =",s)
-		} else {
-			log.Log(NOW, "my actual AAAA is missing from DNS",s)
-			hs.dnsValue.SetText(s)
-			hs.dnsAction.SetText("CREATE")
-			return true
-		}
-	}
-
-	return false
-}
-*/
-
 func (hs *hostnameStatus) GetIPv6() []string {
 	if ! hs.Ready() { return nil}
 	return strings.Split(hs.dnsAAAA.Get(), "\n")
@@ -322,10 +301,21 @@ func (hs *hostnameStatus) updateStatus() {
 		hs.status.Set("BROKEN")
 	}
 	
+	last := hs.statusIPv6.Get()
 	if hs.verifyIPv6() {
-		hs.statusIPv6.Set("WORKING")
+		if last != "WORKING" {
+			log.Log(CHANGE, "Your DNS IPv6 has started working.", me.statusOS.GetHostname(), "should now work")
+			hs.changed = true
+			hs.statusIPv6.Set("WORKING")
+			me.DnsStatus.SetText("WORKING")
+		}
 	} else {
-		hs.statusIPv6.Set("BROKEN")
+		if last != "BROKEN" {
+			log.Log(CHANGE, "Your DNS entries for IPv6 have BROKEN")
+			hs.changed = true
+			hs.statusIPv6.Set("BROKEN")
+			me.DnsStatus.SetText("BROKEN")
+		}
 	}
 }
 
@@ -357,6 +347,7 @@ func (hs *hostnameStatus) verifyIPv6() bool {
 		} else {
 			working = false
 			log.Log(INFO, "DNS AAAA is not in OS", aaaa)
+			addToFixWindow("DELETE", aaaa)
 		}
 	}
 
@@ -366,6 +357,7 @@ func (hs *hostnameStatus) verifyIPv6() bool {
 		} else {
 			working = false
 			log.Log(INFO, "OS  AAAA is not in DNS", aaaa)
+			addToFixWindow("CREATE", aaaa)
 		}
 	}
 

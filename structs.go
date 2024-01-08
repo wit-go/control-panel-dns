@@ -63,6 +63,9 @@ type Host struct {
 	witcom		*gadgets.BasicWindow
 	fixButton	*gui.Node
 	fixWindow	*smartwindow.SmartWindow
+
+	errorGroup	*gui.Node	// Hide() and Show() this node if there are no errors
+	problems	*errorBox
 }
 
 type IPtype struct {

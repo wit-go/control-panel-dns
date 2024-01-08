@@ -150,19 +150,10 @@ func exists(m map[string]bool, s string) bool {
 	return false
 }
 
-var myErrorBox *errorBox
-
 func addToFixWindow(t string, ip string) {
 	log.Log(INFO, "addToFixWindow() START")
-	if me.fixWindow == nil {
-		log.Log(WARN, "addToFixWindow() fixWindow == nil. Can't add the error", t, ip)
-		return
-	}
-	if myErrorBox == nil {
-		box := me.fixWindow.Box()
-		myErrorBox = NewErrorBox(box, t, ip)
-	}
-	myErrorBox.add(t, ip)
+	if ! me.problems.Ready() { return }
+	me.problems.add(t, ip)
 	log.Log(INFO, "addToFixWindow() END")
 }
 

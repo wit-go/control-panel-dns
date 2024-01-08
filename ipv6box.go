@@ -1,5 +1,5 @@
 /* 
-	Show a box for a configuration error
+	Show your IPv6 addresses
 */
 
 package main
@@ -10,8 +10,8 @@ import (
 	"go.wit.com/gui/gadgets"
 )
 
-type errorBox struct {
-	ready	bool
+type ipv6box struct {
+	name	string // the problem name
 
 	parent	*gui.Node
 	group	*gui.Node
@@ -25,7 +25,7 @@ type errorBox struct {
 	something *gadgets.OneLiner
 }
 
-type anError struct {
+type anIPv6 struct {
 	kind string // what kind of error is it?
 	aaaa string
 	status string
@@ -36,32 +36,26 @@ type anError struct {
 	button *gui.Node
 }
 
-func NewErrorBox(p *gui.Node, name string, ip string) *errorBox {
-	var eb *errorBox
-	eb = new(errorBox)
-	eb.parent = p
-	eb.group = p.NewGroup(name)
-	eb.grid = eb.group.NewGrid("stuff", 4, 1)
+func NewIpv6box(p *gui.Node, name string, ip string) *ipv6box {
+	var ib *ipv6box
+	ib = new(ipv6box)
+	ib.parent = p
+	ib.group = p.NewGroup(name)
+	ib.grid = ib.group.NewGrid("stuff", 4, 1)
 
-	eb.grid.NewLabel("Type")
-	eb.grid.NewLabel("IP")
-	eb.grid.NewLabel("Status")
-	eb.grid.NewLabel("")
+	ib.grid.NewLabel("Type")
+	ib.grid.NewLabel("IP")
+	ib.grid.NewLabel("Status")
+	ib.grid.NewLabel("")
 
-	eb.fixes = make(map[string]*anError)
-	eb.ready = true
-	return eb
+	ib.fixes = make(map[string]*anError)
+	return ib
 }
 
-func (eb *errorBox) Ready() bool {
-	if eb == nil {return false}
-	return eb.ready
-}
 
-func (eb *errorBox) add(kind string, ip string) bool {
-	if ! eb.Ready() {return false}
+func (ib *ipv6box) add(kind string, ip string) bool {
 	tmp := kind + " " + ip
-	if eb.fixes[tmp] != nil {
+	if ib.fixes[tmp] != nil {
 		log.Log(WARN, "Error is already here", kind, ip)
 		return false
 	}
@@ -70,24 +64,24 @@ func (eb *errorBox) add(kind string, ip string) bool {
 	anErr.kind = kind
 	anErr.aaaa = ip
 
-	anErr.kindLabel = eb.grid.NewLabel(kind)
-	anErr.ipLabel = eb.grid.NewLabel(ip)
-	anErr.statusLabel = eb.grid.NewLabel("")
-	anErr.button = eb.grid.NewButton(kind, func() {
+	anErr.kindLabel = ib.grid.NewLabel(kind)
+	anErr.ipLabel = ib.grid.NewLabel(ip)
+	anErr.statusLabel = ib.grid.NewLabel("")
+	anErr.button = ib.grid.NewButton(kind, func() {
 		log.Log(WARN, "got", kind, "here. IP =", ip)
-		eb.fix(tmp)
+		ib.fix(tmp)
 	})
-	eb.fixes[tmp] = anErr
+	ib.fixes[tmp] = anErr
 	return false
 }
 
-func (eb *errorBox) fix(key string) bool {
-	if eb.fixes[key] == nil {
+func (ib *ipv6box) fix(key string) bool {
+	if ib.fixes[key] == nil {
 		log.Log(WARN, "Unknown error. could not find key =", key)
 		log.Log(WARN, "TODO: probably remove this error. key =", key)
 		return true
 	}
-	myErr :=  eb.fixes[key]
+	myErr :=  ib.fixes[key]
 	log.Log(WARN, "should try to fix", myErr.kind, "here. IP =", myErr.aaaa)
 	if myErr.kind == "DELETE" {
 		if deleteFromDNS(myErr.aaaa) {
@@ -108,9 +102,9 @@ func (eb *errorBox) fix(key string) bool {
 	return false
 }
 
-func (eb *errorBox) update() bool {
+func (ib *ipv6box) update() bool {
 	return false
 }
 
-func (eb *errorBox) toggle() {
+func (ib *ipv6box) toggle() {
 }
