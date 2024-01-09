@@ -84,7 +84,8 @@ func fixIPv6dns() bool {
 		} else {
 			broken = true
 			log.Log(INFO, "DNS AAAA is not in OS", aaaa)
-			addToFixWindow("DELETE", aaaa)
+			// addToFixWindow("DELETE", aaaa)
+			me.problems.addIPerror(RR, DELETE, aaaa)
 			/*
 			if deleteFromDNS(aaaa) {
 				log.Log(INFO, "Delete AAAA", aaaa, "Worked")
@@ -153,7 +154,7 @@ func exists(m map[string]bool, s string) bool {
 func addToFixWindow(t string, ip string) {
 	log.Log(INFO, "addToFixWindow() START")
 	if ! me.problems.Ready() { return }
-	me.problems.add(t, ip)
+	me.problems.addIPerror(RR, CREATE, ip)
 	log.Log(INFO, "addToFixWindow() END")
 }
 

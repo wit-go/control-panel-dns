@@ -1,14 +1,18 @@
 .PHONY: debian
 
+
 run: build
 	# ./control-panel-dns >/tmp/witgui.log.stderr 2>&1
 	cp -f control-panel-dns ~/
 	./control-panel-dns --tmp-log
 
-redomod:
+check-git-clean:
+	@git diff-index --quiet HEAD -- || (echo "Git repository is dirty, please commit your changes first"; exit 1)
+
+redomod: check-git-clean
 	rm -f go.*
-	go mod init
-	go mod tidy
+	GO111MODULE= go mod init
+	GO111MODULE= go mod tidy
 
 install:
 	go install -v go.wit.com/control-panel-dns@latest

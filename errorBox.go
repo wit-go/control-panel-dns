@@ -32,9 +32,12 @@ type anError struct {
 	status string
 
 	kindLabel *gui.Node
+	actionLabel *gui.Node
 	ipLabel *gui.Node
 	statusLabel *gui.Node
 	button *gui.Node
+
+	problem *Problem
 }
 
 func NewErrorBox(p *gui.Node, name string, ip string) *errorBox {
@@ -42,9 +45,10 @@ func NewErrorBox(p *gui.Node, name string, ip string) *errorBox {
 	eb = new(errorBox)
 	eb.parent = p
 	eb.group = p.NewGroup(name)
-	eb.grid = eb.group.NewGrid("stuff", 4, 1)
+	eb.grid = eb.group.NewGrid("stuff", 5, 1)
 
 	eb.grid.NewLabel("Type")
+	eb.grid.NewLabel("Action")
 	eb.grid.NewLabel("IP")
 	eb.grid.NewLabel("Status")
 	eb.grid.NewLabel("")
@@ -80,25 +84,28 @@ func (eb *errorBox) Ready() bool {
 	return eb.ready
 }
 
-func (eb *errorBox) add(kind string, ip string) bool {
+func (eb *errorBox) addIPerror(kind ProblemType, action ActionType, ip string) bool {
 	if ! eb.Ready() {return false}
-	tmp := kind + " " + ip
+	tmp := kind.String() + " " + ip
 	if eb.fixes[tmp] != nil {
 		log.Log(WARN, "Error is already here", kind, ip)
 		return false
 	}
 
 	anErr := new(anError)
-	anErr.kind = kind
 	anErr.aaaa = ip
 
-	anErr.kindLabel = eb.grid.NewLabel(kind)
+	anErr.kindLabel = eb.grid.NewLabel(kind.String())
+	anErr.actionLabel = eb.grid.NewLabel(action.String())
 	anErr.ipLabel = eb.grid.NewLabel(ip)
 	anErr.statusLabel = eb.grid.NewLabel("")
-	anErr.button = eb.grid.NewButton("Fix", func() {
+	anErr.button = eb.grid.NewButton("Try to Fix", func() {
 		log.Log(WARN, "got", kind, "here. IP =", ip)
 		eb.fix(tmp)
 	})
+	anErr.problem = new(Problem)
+	anErr.problem.kind = kind
+	anErr.problem.aaaa = ip
 	eb.fixes[tmp] = anErr
 	return false
 }

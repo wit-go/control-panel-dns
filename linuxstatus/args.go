@@ -12,29 +12,27 @@ var NOW log.LogFlag
 var INFO log.LogFlag
 var NET log.LogFlag
 var DNS log.LogFlag
+
 var PROC log.LogFlag
 var SPEW log.LogFlag
 var WARN log.LogFlag
+
 var CHANGE log.LogFlag
 var STATUS log.LogFlag
 
-func myreg(f *log.LogFlag, b bool, name string, desc string) {
-	f.B = b
-	f.Subsystem = "go.wit.com/control-panels/dns/linuxstatus"
-	f.Short = "linux"
-	f.Desc = desc
-	f.Name = name
-	f.Register()
-}
-
 func init() {
-	myreg(&NOW,    true,  "NOW",    "temp debugging stuff")
-	myreg(&INFO,   false, "INFO",   "normal debugging stuff")
-	myreg(&NET,    false, "NET",    "Network Logging")
-	myreg(&DNS,    false, "DNS",    "dnsStatus.update()")
-	myreg(&PROC,   false, "PROC",   "/proc logging")
-	myreg(&SPEW,   false, "SPEW",   "spew stuff")
-	myreg(&WARN,   true,  "WARN",   "bad things")
-	myreg(&CHANGE, true,  "CHANGE", "show droplet state changes")
-	myreg(&STATUS, false, "STATUS", "Update() details")
+	full := "go.wit.com/control-panels/dns/linuxstatus"
+	short := "linux"
+
+	NOW.NewFlag( "NOW",  true,  full, short, "temp debugging stuff")
+	INFO.NewFlag("INFO", false, full, short, "normal debugging stuff")
+	NET.NewFlag( "NET",  false, full, short, "Network logging")
+	DNS.NewFlag( "DNS",  false, full, short, "dnsStatus.update()")
+
+	PROC.NewFlag("PROC", false, full, short, "/proc loggging")
+	WARN.NewFlag("WARN", true,  full, short, "bad things")
+	SPEW.NewFlag("SPEW", false, full, short, "spew stuff")
+
+	CHANGE.NewFlag("CHANGE", true,  full, short, "when host or dns change")
+	STATUS.NewFlag("STATUS", false, full, short, "Update() details")
 }

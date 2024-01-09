@@ -14,9 +14,17 @@ type Problem struct {
 
 	id int
 	Name string
+	desc string
 	value string
+	aaaa string
 	fixed bool
 	duration *time.Duration
+}
+
+var IPcreate = Problem {
+	kind: RR,
+	action: CREATE,
+	desc: "This RR entry in the zonefile needs to be removed",
 }
 
 /*
@@ -45,4 +53,30 @@ const (
 
 func (s Problem) String() string {
 	return s.Name
+}
+
+func (s ProblemType) String() string {
+	switch s {
+	case OS:
+		return "OS"
+	case RR:
+		return "RR"
+	default:
+		return "something"
+	}
+	return "someprob"
+}
+
+func (s ActionType) String() string {
+	switch s {
+	case USER:
+		return "USER"
+	case CREATE:
+		return "CREATE"
+	case DELETE:
+		return "DELETE"
+	default:
+		return "something"
+	}
+	return "someprob"
 }

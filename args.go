@@ -23,37 +23,33 @@ var NOW log.LogFlag
 var INFO log.LogFlag
 var NET log.LogFlag
 var DNS log.LogFlag
+
 var WARN log.LogFlag
 var SPEW log.LogFlag
+
 var CHANGE log.LogFlag
 var STATUS log.LogFlag
 
-func myreg(f *log.LogFlag, b bool, name string, desc string) {
-	f.B = b
-	f.Subsystem = "go.wit.com/control-panels/dns"
-	f.Short = "cpdns"
-	f.Desc = desc
-	f.Name = name
-	f.Register()
-}
-
 func init() {
 	arg.MustParse(&args)
-	// fmt.Println(args.Foo, args.Bar, args.User)
+	full := "go.wit.com/control-panels/dns"
+	short := "cpdns"
 
-	myreg(&NOW,    true,  "NOW",    "temp debugging stuff")
-	myreg(&INFO,   false, "INFO",   "normal debugging stuff")
-	myreg(&NET,    false, "NET",    "Network logging")
-	myreg(&DNS,    false, "DNS",    "dnsStatus.update()")
-	myreg(&WARN,   true,  "WARN",   "bad things")
-	myreg(&SPEW,   false, "SPEW",   "spew stuff")
-	myreg(&CHANGE, true,  "CHANGE", "when host or dns change")
-	myreg(&STATUS, false, "STATUS", "updateStatus()")
+	NOW.NewFlag( "NOW",  true,  full, short, "temp debugging stuff")
+	INFO.NewFlag("INFO", false, full, short, "normal debugging stuff")
+	NET.NewFlag( "NET",  false, full, short, "Network logging")
+	DNS.NewFlag( "DNS",  false, full, short, "dnsStatus.update()")
+
+	WARN.NewFlag("WARN", true,  full, short, "bad things")
+	SPEW.NewFlag("SPEW", false, full, short, "spew stuff")
+
+	CHANGE.NewFlag("CHANGE", true,  full, short, "when host or dns change")
+	STATUS.NewFlag("STATUS", false, full, short, "updateStatus() polling")
 
 	if debugger.ArgDebug() {
-		log.Log(true, "INIT() gui debug == true")
+		log.Log(NOW, "INIT() gui debug == true")
 	} else {
-		log.Log(true, "INIT() gui debug == false")
+		log.Log(NOW, "INIT() gui debug == false")
 	}
 
 	me.dnsSleep = 500 * time.Millisecond
@@ -61,7 +57,7 @@ func init() {
 
 	me.artificialSleep = 0.4	// seems to need to exist or GTK crashes. TODO: fix andlabs plugin
 	me.artificialS = "blah"
-	log.Log(true, "init() me.artificialSleep =", me.artificialSleep)
-	log.Log(true, "init() me.artificialS =", me.artificialS)
+	log.Log(INFO, "init() me.artificialSleep =", me.artificialSleep)
+	log.Log(INFO, "init() me.artificialS =", me.artificialS)
 	log.Sleep(me.artificialSleep)
 }

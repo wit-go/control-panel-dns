@@ -128,7 +128,7 @@ func mainWindow(title string) {
 
 	// These are your problems
 	me.problems = NewErrorBox(me.window.Box(), "Errors", "has problems?")
-	me.problems.add("SOMETHING", "1:1:1:1:3")
+	me.problems.addIPerror(RR, USER, "1:1:1:1")
 }
 
 

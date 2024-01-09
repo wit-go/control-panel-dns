@@ -195,7 +195,7 @@ func scanInterfaces() {
 			switch v := addr.(type) {
 			case *net.IPNet:
 				if checkIP(v, i) {
-					log.Log(true, "scanInterfaces() IP is new () i =", v.IP.String())
+					log.Log(NET, "scanInterfaces() IP is new () i =", v.IP.String())
 				}
 			default:
 				log.Log(NET, "\t\taddr.(type) = NO IDEA WHAT TO DO HERE v =", v)
