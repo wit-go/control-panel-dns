@@ -106,7 +106,6 @@ func mainWindow(title string) {
 	})
 
 	gr.NewButton("test smartwindow()", func () {
-		log.Jeff(INFO, "jcarr")
 		if me.fixWindow == nil {
 			me.fixWindow = smartwindow.New()
 			me.fixWindow.SetParent(me.myGui)
