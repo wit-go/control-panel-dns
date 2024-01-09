@@ -8,17 +8,17 @@ import 	(
 	"go.wit.com/log"
 )
 
-var NOW log.LogFlag
-var INFO log.LogFlag
-var SPEW log.LogFlag
-var WARN log.LogFlag
+var NOW *log.LogFlag
+var INFO *log.LogFlag
+var SPEW *log.LogFlag
+var WARN *log.LogFlag
 
 func init() {
 	full := "go.wit.com/gui/gadgets/smartwindow"
 	short := "smartWin"
 
-	NOW.NewFlag( "NOW",  true,  full, short, "temp debugging stuff")
-	INFO.NewFlag("INFO", false, full, short, "General Info")
-	SPEW.NewFlag("SPEW", false, full, short, "spew stuff")
-	WARN.NewFlag("WARN", false, full, short, "bad things")
+	NOW = log.NewFlag( "NOW",  true,  full, short, "temp debugging stuff")
+	INFO = log.NewFlag("INFO", false, full, short, "General Info")
+	SPEW = log.NewFlag("SPEW", false, full, short, "spew stuff")
+	WARN = log.NewFlag("WARN", false, full, short, "bad things")
 }

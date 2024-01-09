@@ -19,32 +19,32 @@ var args struct {
 	VerboseDNS bool  `arg:"--verbose-dns" help:"debug your dns settings"`
 }
 
-var NOW log.LogFlag
-var INFO log.LogFlag
-var NET log.LogFlag
-var DNS log.LogFlag
+var NOW *log.LogFlag
+var INFO *log.LogFlag
+var NET *log.LogFlag
+var DNS *log.LogFlag
 
-var WARN log.LogFlag
-var SPEW log.LogFlag
+var WARN *log.LogFlag
+var SPEW *log.LogFlag
 
-var CHANGE log.LogFlag
-var STATUS log.LogFlag
+var CHANGE *log.LogFlag
+var STATUS *log.LogFlag
 
 func init() {
 	arg.MustParse(&args)
 	full := "go.wit.com/control-panels/dns"
 	short := "cpdns"
 
-	NOW.NewFlag( "NOW",  true,  full, short, "temp debugging stuff")
-	INFO.NewFlag("INFO", false, full, short, "normal debugging stuff")
-	NET.NewFlag( "NET",  false, full, short, "Network logging")
-	DNS.NewFlag( "DNS",  false, full, short, "dnsStatus.update()")
+	NOW = log.NewFlag( "NOW",  true,  full, short, "temp debugging stuff")
+	INFO = log.NewFlag("INFO", false, full, short, "normal debugging stuff")
+	NET = log.NewFlag( "NET",  false, full, short, "Network logging")
+	DNS = log.NewFlag( "DNS",  false, full, short, "dnsStatus.update()")
 
-	WARN.NewFlag("WARN", true,  full, short, "bad things")
-	SPEW.NewFlag("SPEW", false, full, short, "spew stuff")
+	WARN = log.NewFlag("WARN", true,  full, short, "bad things")
+	SPEW = log.NewFlag("SPEW", false, full, short, "spew stuff")
 
-	CHANGE.NewFlag("CHANGE", true,  full, short, "when host or dns change")
-	STATUS.NewFlag("STATUS", false, full, short, "updateStatus() polling")
+	CHANGE = log.NewFlag("CHANGE", true,  full, short, "when host or dns change")
+	STATUS = log.NewFlag("STATUS", false, full, short, "updateStatus() polling")
 
 	if debugger.ArgDebug() {
 		log.Log(NOW, "INIT() gui debug == true")
