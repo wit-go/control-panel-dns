@@ -5,6 +5,8 @@
 package main
 
 import (
+	"time"
+
 	"go.wit.com/log"
 	"go.wit.com/gui/gui"
 	"go.wit.com/gui/gadgets"
@@ -27,9 +29,10 @@ type errorBox struct {
 }
 
 type anError struct {
-	kind string // what kind of error is it?
-	aaaa string
-	status string
+//	kind ProblemType // what kind of error is it?
+//	action ActionType
+//	aaaa string
+//	status string
 
 	kindLabel *gui.Node
 	actionLabel *gui.Node
@@ -89,11 +92,13 @@ func (eb *errorBox) addIPerror(kind ProblemType, action ActionType, ip string) b
 	tmp := kind.String() + " " + ip
 	if eb.fixes[tmp] != nil {
 		log.Log(WARN, "Error is already here", kind, ip)
+		log.Log(WARN, "kind =", kind)
+		log.Log(WARN, "action =", action)
+		log.Log(WARN, "ip =", ip)
 		return false
 	}
 
 	anErr := new(anError)
-	anErr.aaaa = ip
 
 	anErr.kindLabel = eb.grid.NewLabel(kind.String())
 	anErr.actionLabel = eb.grid.NewLabel(action.String())
@@ -105,7 +110,12 @@ func (eb *errorBox) addIPerror(kind ProblemType, action ActionType, ip string) b
 	})
 	anErr.problem = new(Problem)
 	anErr.problem.kind = kind
+	anErr.problem.action = action
 	anErr.problem.aaaa = ip
+	anErr.problem.born = time.Now()
+	anErr.problem.duration = 30 * time.Second
+	anErr.problem.begun = false
+	anErr.problem.begunResult = false
 	eb.fixes[tmp] = anErr
 	return false
 }
@@ -125,22 +135,57 @@ func (eb *errorBox) fix(key string) bool {
 		return true
 	}
 	myErr :=  eb.fixes[key]
-	log.Log(WARN, "should try to fix", myErr.kind, "here. IP =", myErr.aaaa)
-	if myErr.kind == "DELETE" {
-		if deleteFromDNS(myErr.aaaa) {
-			log.Log(INFO, "Delete AAAA", myErr.aaaa, "Worked")
-		} else {
-			log.Log(INFO, "Delete AAAA", myErr.aaaa, "Failed")
-		}
-		return true
+	log.Log(WARN, "should try to fix", myErr.problem.kind, "here. IP =", myErr.problem.aaaa)
+	if ! me.autofix.B {
+		log.Log(WARN, "not autofixing. autofix == false")
+		log.Log(WARN, "problem.kind =", myErr.problem.kind)
+		log.Log(WARN, "problem.action =", myErr.problem.action)
+		log.Log(WARN, "problem.aaaa =", myErr.problem.aaaa)
+		log.Log(WARN, "problem.duration =", myErr.problem.duration)
+		log.Log(WARN, "problem.begun =", myErr.problem.begun)
+		log.Log(WARN, "problem.begunResult =", myErr.problem.begunResult)
+		// if  myErr.problem.begunTime != nil {
+			log.Log(WARN, "problem.begunTime =", myErr.problem.begunTime)
+		// }
+		return false
 	}
-	if myErr.kind == "CREATE" {
-		if addToDNS(myErr.aaaa) {
-			log.Log(INFO, "Delete AAAA", myErr.aaaa, "Worked")
-		} else {
-			log.Log(INFO, "Delete AAAA", myErr.aaaa, "Failed")
+	if myErr.problem.begun {
+		log.Log(WARN, "problem has already begun. need to check the status of the problem here")
+		log.Log(WARN, "problem.begun =", myErr.problem.begun)
+		log.Log(WARN, "problem.begunResult =", myErr.problem.begunResult)
+		log.Log(WARN, "problem.duration =", myErr.problem.duration)
+		delay := time.Since(myErr.problem.begunTime)
+		log.Log(WARN, "problem duration time =", delay)
+		if delay >= myErr.problem.duration {
+			log.Log(WARN, "duration eclipsed. check the status of the error here")
 		}
-		return true
+		return false
+	}
+	if myErr.problem.kind == RR {
+		if myErr.problem.action == DELETE {
+			myErr.problem.begun = true
+			myErr.problem.begunTime = time.Now()
+			if deleteFromDNS(myErr.problem.aaaa) {
+				log.Log(INFO, "Delete AAAA", myErr.problem.aaaa, "Worked")
+				myErr.problem.begunResult = true
+			} else {
+				log.Log(INFO, "Delete AAAA", myErr.problem.aaaa, "Failed")
+				myErr.problem.begunResult = false
+			}
+			return true
+		}
+		if myErr.problem.action == CREATE {
+			myErr.problem.begun = true
+			myErr.problem.begunTime = time.Now()
+			if addToDNS(myErr.problem.aaaa) {
+				log.Log(INFO, "Delete AAAA", myErr.problem.aaaa, "Worked")
+				myErr.problem.begunResult = true
+			} else {
+				log.Log(INFO, "Delete AAAA", myErr.problem.aaaa, "Failed")
+				myErr.problem.begunResult = false
+			}
+			return true
+		}
 	}
 	return false
 }

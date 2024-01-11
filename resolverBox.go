@@ -71,6 +71,7 @@ func NewResolverStatus(p *gui.Node, title string, server string, hostname string
 	rs = new(resolverStatus)
 	rs.parent = p
 	rs.group = p.NewGroup(server + " " + title + " lookup")
+	rs.group = rs.group.NewBox("bw vbox", false)
 	rs.grid = rs.group.NewGrid("LookupStatus", 5, 2)
 
 	rs.server = server

@@ -123,7 +123,11 @@ func main() {
 				// lookup the NS records for your domain
 				// if your host is test.wit.com, find the NS resource records for wit.com
 				lookupNS(me.statusOS.GetDomainName())
-				log.Log(CHANGE, "updateDNS() END")
+				log.Log(CHANGE, "lookupNS() RUNNING NOW. this will determine your DNS API provider")
+			}
+			if me.statusDNS.GetDNSapi() == "unknown" {
+				lookupNS(me.statusOS.GetDomainName())
+				log.Log(CHANGE, "lookupNS() RUNNING NOW. this will determine your DNS API provider")
 			}
 		})
 		s := fmt.Sprint(duration)

@@ -18,7 +18,12 @@ type Problem struct {
 	value string
 	aaaa string
 	fixed bool
-	duration *time.Duration
+	duration time.Duration // how long until you should check to see if it's fixed
+	born time.Time // when first reported
+
+	begun bool // weather or not fixing it has begun
+	begunTime time.Time // when the attempt to fix the problem happened
+	begunResult bool // weather or not the attempt worked
 }
 
 var IPcreate = Problem {
@@ -62,9 +67,9 @@ func (s ProblemType) String() string {
 	case RR:
 		return "RR"
 	default:
-		return "something"
+		return "FIXMEP"
 	}
-	return "someprob"
+	return "FIXMEP"
 }
 
 func (s ActionType) String() string {
@@ -76,7 +81,7 @@ func (s ActionType) String() string {
 	case DELETE:
 		return "DELETE"
 	default:
-		return "something"
+		return "FIXMEA"
 	}
-	return "someprob"
+	return "FIXMEA"
 }

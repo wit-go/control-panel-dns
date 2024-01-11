@@ -46,6 +46,7 @@ type hostnameStatus struct {
 	dnsA		*gadgets.OneLiner
 	dnsAAAA		*gadgets.OneLiner
 	dnsAPI		*gadgets.OneLiner
+	APIprovider	string
 
 	speed		*gadgets.OneLiner
 	speedActual	*gadgets.OneLiner
@@ -92,25 +93,6 @@ func NewHostnameStatusWindow(p *gui.Node) *hostnameStatus {
 
 	hs.speed	= gadgets.NewOneLiner(grid, "speed").Set("unknown")
 	hs.speedActual	= gadgets.NewOneLiner(grid, "actual").Set("unknown")
-
-	group.Pad()
-	grid.Pad()
-
-	/*
-	group = hs.window.Box().NewGroup("Actions")
-	grid = group.NewGrid("LookupDetails", 2, 2)
-
-	hs.dnsValue	= grid.NewLabel("3.4.5.6")
-	hs.dnsAction	= grid.NewButton("CHECK",  func () {
-		log.Warn("should", hs.dnsAction.S, "here for", hs.dnsValue.S)
-		if (hs.dnsAction.S == "DELETE") {
-			hs.deleteDNSrecord(hs.dnsValue.S)
-		}
-		if (hs.dnsAction.S == "CREATE") {
-			hs.createDNSrecord(hs.dnsValue.S)
-		}
-	})
-	*/
 
 	group.Pad()
 	grid.Pad()
@@ -381,5 +363,14 @@ func (hs *hostnameStatus) Hide() {
 }
 
 func (hs *hostnameStatus) GetDNSapi() string {
-	return me.APIprovider
+	return hs.APIprovider
+}
+
+func (hs *hostnameStatus) SetDNSapi(api string) {
+	if api == hs.APIprovider {
+		return
+	}
+	hs.APIprovider = api
+	hs.dnsAPI.Set(api)
+	hs.changed = true
 }

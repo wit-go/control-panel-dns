@@ -40,6 +40,7 @@ func (h *Host) setIPv4(ipv4s map[string]*IPtype) {
         }
 }
 
+/*
 func lookupNSprovider(domain string) string {
 	for s, d := range me.nsmap {
 		log.Log(CHANGE, "lookupNS() domain =", d, "server =", s)
@@ -50,6 +51,7 @@ func lookupNSprovider(domain string) string {
 	}
 	return "blah"
 }
+*/
 
 // nsLookup performs an NS lookup on the given domain name.
 func lookupNS(domain string) {
@@ -94,22 +96,15 @@ func lookupNS(domain string) {
 	}
 }
 
-// getDomain returns the second-to-last part of a domain name.
+// returns the second-to-last part of a domain name.
 func setProvider(hostname string) {
 	var provider string = ""
 	parts := strings.Split(hostname, ".")
 	if len(parts) >= 2 {
 		provider = parts[len(parts)-2]
 	}
-	if me.APIprovider != provider {
+	if me.statusDNS.GetDNSapi() != provider {
 		log.Log(CHANGE, "setProvider() changed to =", provider)
 	}
-	me.APIprovider = provider
-	/*
-	if (me.DnsAPI.S != provider) {
-		me.changed = true
-		log.Log(CHANGE, "setProvider() changed to =", provider)
-		me.DnsAPI.SetText(provider)
-	}
-	*/
+	me.statusDNS.SetDNSapi(provider)
 }

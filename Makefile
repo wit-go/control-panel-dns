@@ -1,6 +1,5 @@
 .PHONY: debian
 
-
 run: build
 	# ./control-panel-dns >/tmp/witgui.log.stderr 2>&1
 	cp -f control-panel-dns ~/

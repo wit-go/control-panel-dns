@@ -42,6 +42,7 @@ type digStatus struct {
 	speed		*gadgets.OneLiner
 	speedActual	*gadgets.OneLiner
 
+	detailsGroup	*gui.Node
 	details		*gui.Node
 	dsLocalhost	*resolverStatus
 	dsLocalNetwork	*resolverStatus
@@ -77,7 +78,8 @@ func NewDigStatusWindow(p *gui.Node) *digStatus {
 	ds.speedActual	= gadgets.NewOneLiner(g, "actual").Set("unknown")
 
 	// make the area to store the raw details
-	ds.details = ds.window.Box().NewGroup("Details")
+	ds.detailsGroup = ds.window.Box().NewGroup("Details")
+	ds.details = ds.detailsGroup.NewBox("bw vbox", false)
 	ds.dsLocalhost		= NewResolverStatus(ds.details, "(localhost)", "127.0.0.1:53", "go.wit.com")
 	ds.dsLocalNetwork	= NewResolverStatus(ds.details, "(Local Network)", "192.168.86.1:53", "go.wit.com")
 	ds.dsCloudflare		= NewResolverStatus(ds.details, "(cloudflare)", "1.1.1.1:53", "go.wit.com")
