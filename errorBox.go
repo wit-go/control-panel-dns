@@ -136,7 +136,7 @@ func (eb *errorBox) fix(key string) bool {
 	}
 	myErr :=  eb.fixes[key]
 	log.Log(WARN, "should try to fix", myErr.problem.kind, "here. IP =", myErr.problem.aaaa)
-	if ! me.autofix.B {
+	if ! me.autofix.GetBool() {
 		log.Log(WARN, "not autofixing. autofix == false")
 		log.Log(WARN, "problem.kind =", myErr.problem.kind)
 		log.Log(WARN, "problem.action =", myErr.problem.action)
